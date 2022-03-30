@@ -21,8 +21,8 @@ func init() {
 	}
 
 	//自动迁移
-	db.AutoMigrate(&Uva{})
+	db.AutoMigrate(&Uav{})
 
 	//创建记录
-	Insert()
+	//Insert()
 }

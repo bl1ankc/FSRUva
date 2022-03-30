@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/UVA.iml" filepath="$PROJECT_DIR$/.idea/UVA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/UAV.iml" filepath="$PROJECT_DIR$/.idea/UAV.iml" />
     </modules>
   </component>
 </project>

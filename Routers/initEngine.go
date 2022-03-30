@@ -9,7 +9,7 @@ var r *gin.Engine
 func InitRouter() *gin.Engine {
 	r = gin.Default()
 
-	UserRoute()
+	UavRoute()
 
 	return r
 }
