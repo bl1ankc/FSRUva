@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"main/Model"
 )
 
@@ -40,37 +39,30 @@ func GetDrones(c *gin.Context) {
 	c.JSON(200, &uav)
 }
 
-// UploadNewUav 上传新设备
-func UploadNewUav(c *gin.Context) {
-	//模型定义
-	var uav Model.Uav
+// GetBattery 获取所有电池设备
+func GetBattery(c *gin.Context) {
+	Battery := Model.GetUavByStates("", "battery")
 
-	//结构体绑定
-	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
-		return
-	}
-
-	//数据插入
-	Model.InsertUva(uav.Name, uav.Type, uav.Uid)
-
+	c.JSON(200, &Battery)
 }
 
-// BorrowerUav 借用设备
-func BorrowerUav(c *gin.Context) {
-	//模型定义
-	var uavs []Model.Uav
+// GetControl 获取所有遥控设备
+func GetControl(c *gin.Context) {
+	Control := Model.GetUavByStates("", "control")
 
-	//结构体绑定
-	if err := c.BindJSON(&uavs); err != nil {
-		log.Fatal(err.Error())
-		return
-	}
+	c.JSON(200, &Control)
+}
 
-	//更新状态为审核中
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "under review")
-		//Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
-		//Model.UpdateBorrowTime(uav.Uid, uav.Plan_time, uav.Plan_time)
-	}
+// GetUnderReview 获取借用审核的设备
+func GetUnderReview(c *gin.Context) {
+	uav := Model.GetUavByStates("Get under review", "")
+
+	c.JSON(200, &uav)
+}
+
+// BackUnderReview 获取归还审核设备
+func BackUnderReview(c *gin.Context) {
+	uav := Model.GetUavByStates("Back under review", "")
+
+	c.JSON(200, &uav)
 }

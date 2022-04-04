@@ -7,9 +7,22 @@ import (
 )
 
 // GetUavByStates 获取对应状态及类型的设备信息
-func GetUavByStates(UvaState string, UvaType string) []Uav {
+func GetUavByStates(UavState string, UavType string) []Uav {
 	var uav []Uav
-	DB := db.Model(&Uav{}).Where("State = ? and Type = ?", UvaState, UvaType).Find(&uav)
+	DB := db.Model(&Uav{}).Where(Uav{State: UavState, Type: UavType}).Find(&uav)
+
+	if DB.Error != nil {
+		fmt.Println("GetUvasByState Error")
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav
+}
+
+// GetUavByNames 获取对应型号及状态的设备信息
+func GetUavByNames(UavName string, UavType string) []Uav {
+	var uav []Uav
+	DB := db.Model(&Uav{}).Where(Uav{Name: UavName, Type: UavType}).Find(&uav)
 
 	if DB.Error != nil {
 		fmt.Println("GetUvasByState Error")
