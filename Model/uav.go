@@ -33,9 +33,9 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 }
 
 // InsertUva 创建新的设备
-func InsertUva(UavName string, UavType string, UavUid string) {
+func InsertUva(UavName string, UavType string) {
 	//创建新记录
-	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid})
+	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: GetUid()})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -70,8 +70,8 @@ func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string) {
 }
 
 // UpdateBorrowTime 更新借用时间
-func UpdateBorrowTime(UavUid string, UavGettime time.Time, UavPlantime time.Time) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Select("get_time", "plan_time").Updates(Uav{Get_time: UavGettime, Plan_time: UavPlantime})
+func UpdateBorrowTime(UavUid string, UavPlantime time.Time) {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: time.Now().Local(), Plan_time: UavPlantime})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -82,8 +82,13 @@ func UpdateBorrowTime(UavUid string, UavGettime time.Time, UavPlantime time.Time
 }
 
 // UpdateBackTime 更新归还时间
-func UpdateBackTime(UavUid string, UavRealtime time.Time, UavBacktime time.Time) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Select("real_time", "back_time").Updates(Uav{Real_time: UavRealtime, Back_time: UavBacktime})
+func UpdateBackTime(UavUid string) {
+	var uav Uav
+
+	//获取对应设备结构体信息
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).First(&uav)
+
+	db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).First(&uav).Updates(Uav{Back_time: time.Now()})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())

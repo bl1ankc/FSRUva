@@ -11,5 +11,9 @@ func InitRouter() *gin.Engine {
 
 	UavRoute()
 
+	AdminRoute()
+
+	UserRoute()
+	
 	return r
 }

@@ -17,10 +17,9 @@ type Uav struct {
 
 	Borrower  string    `json:"borrower"`  //借用人姓名
 	Phone     string    `json:"phone"`     //借用人电话
-	Get_time  time.Time `json:"get_Time"`  //借出时间
-	Plan_time time.Time `json:"plan_Time"` //预计借用时长
-	Real_time time.Time `json:"real_Time"` //实际借用时长
-	Back_time time.Time `json:"back_Time"` //归还时间
+	Get_time  time.Time `json:"get_time"`  //借出时间
+	Plan_time time.Time `json:"plan_time"` //预计归还时间
+	Back_time time.Time `json:"back_time"` //实际归还时间
 }
 
 // User 用户模型

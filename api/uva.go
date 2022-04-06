@@ -8,7 +8,7 @@ import (
 // GetNotUsedDrones 获取空闲的无人机设备
 func GetNotUsedDrones(c *gin.Context) {
 	//获取设备信息
-	uav := Model.GetUavByStates("free", "uav")
+	uav := Model.GetUavByStates("free", "drone")
 
 	//JSON格式返回
 	c.JSON(200, &uav)
@@ -34,7 +34,7 @@ func GetNotUsedControl(c *gin.Context) {
 
 // GetDrones 获取所有无人机设备
 func GetDrones(c *gin.Context) {
-	uav := Model.GetUavByStates("", "uav")
+	uav := Model.GetUavByStates("", "drone")
 
 	c.JSON(200, &uav)
 }

@@ -6,8 +6,8 @@ import (
 	"main/Model"
 )
 
-// BorrowerUav 借用设备
-func BorrowerUav(c *gin.Context) {
+// BorrowUav 借用设备
+func BorrowUav(c *gin.Context) {
 	//模型定义
 	var uavs []Model.Uav
 
@@ -21,24 +21,22 @@ func BorrowerUav(c *gin.Context) {
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "Get under review")
 		Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
-		//Model.UpdateBorrowTime(uav.Uid, uav.Get_time, uav.Plan_time)
 	}
 }
 
 // BackUav 归还设备
 func BackUav(c *gin.Context) {
-	//
+	//模型
 	var uavs []Model.Uav
 
-	//
+	//绑定结构体
 	if err := c.BindJSON(&uavs); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
-	//
+	//更新状态为归还审核
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "Back under review")
-		//Model.UpdateBackTime(uav.Uid,uav.Back_time)
 	}
 }

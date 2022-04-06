@@ -9,45 +9,52 @@ import (
 // UploadNewUav 上传新设备
 func UploadNewUav(c *gin.Context) {
 	//模型定义
-	var uav Model.Uav
+	var uavs []Model.Uav
 
 	//结构体绑定
-	if err := c.BindJSON(&uav); err != nil {
+	if err := c.BindJSON(&uavs); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//数据插入
-	Model.InsertUva(uav.Name, uav.Type, uav.Uid)
-
+	for _, uav := range uavs {
+		Model.InsertUva(uav.Name, uav.Type)
+	}
 }
 
-// GetReviewUav 借用审核设备
+// GetReviewUav 审核借用设备
 func GetReviewUav(c *gin.Context) {
 	//模型定义
-	var uav Model.Uav
+	var uavs []Model.Uav
 
 	//绑定结构体
-	if err := c.BindJSON(&uav); err != nil {
+	if err := c.BindJSON(&uavs); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
-	//更新状态
-	Model.UpdateState(uav.Uid, "borrowing")
+	//更新状态与借用时间
+	for _, uav := range uavs {
+		Model.UpdateState(uav.Uid, "borrowing")
+		Model.UpdateBorrowTime(uav.Uid, uav.Plan_time)
+	}
 }
 
-// BackReviewUav 借用审核设备
+// BackReviewUav 审核归还设备
 func BackReviewUav(c *gin.Context) {
 	//模型定义
-	var uav Model.Uav
+	var uavs []Model.Uav
 
 	//绑定结构体
-	if err := c.BindJSON(&uav); err != nil {
+	if err := c.BindJSON(&uavs); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
-	//更新状态
-	Model.UpdateState(uav.Uid, "free")
+	//更新状态与归还时间
+	for _, uav := range uavs {
+		Model.UpdateState(uav.Uid, "free")
+		Model.UpdateBackTime(uav.Uid)
+	}
 }
