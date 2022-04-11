@@ -10,4 +10,10 @@ func UserRoute() {
 
 	//归还设备
 	g.POST("/BackUav", api.BackUav)
+
+	//取消借用
+	g.POST("/CancelBorrow", api.CancelBorrow)
+
+	//取消归还
+	g.POST("/CancelBack", api.CancelBack)
 }

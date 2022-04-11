@@ -14,9 +14,12 @@ func AdminRoute() {
 	//提交新的设备
 	g.POST("/UploadUav", api.UploadNewUav)
 
-	//审核借用设备
-	g.POST("/GetReviewUav", api.GetReviewUav)
+	//审核通过借用设备
+	g.POST("/GetPassedUav", api.GetPassedUav)
 
-	//审核归还设备
-	g.POST("/BackReviewUav", api.BackReviewUav)
+	//审核不通过借用设备
+	g.POST("/GetFailUav", api.GetFailUav)
+
+	//审核通过归还设备
+	g.POST("/BackPassedUav", api.BackPassedUav)
 }

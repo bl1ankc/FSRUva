@@ -69,9 +69,21 @@ func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string) {
 	return
 }
 
-// UpdateBorrowTime 更新借用时间
-func UpdateBorrowTime(UavUid string, UavPlantime time.Time) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: time.Now().Local(), Plan_time: UavPlantime})
+// UpdateBorrowTime 更新借出时间
+func UpdateBorrowTime(UavUid string) {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: time.Now().Local()})
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+		return
+	}
+
+	return
+}
+
+// UpdatePlanTime 更新预计归还时间
+func UpdatePlanTime(UavUid string, UavPlanTime time.Time) {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Plan_time: UavPlanTime})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())

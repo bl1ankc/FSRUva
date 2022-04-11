@@ -23,8 +23,8 @@ func UploadNewUav(c *gin.Context) {
 	}
 }
 
-// GetReviewUav 审核借用设备
-func GetReviewUav(c *gin.Context) {
+// GetPassedUav 审核通过借用设备
+func GetPassedUav(c *gin.Context) {
 	//模型定义
 	var uavs []Model.Uav
 
@@ -37,12 +37,12 @@ func GetReviewUav(c *gin.Context) {
 	//更新状态与借用时间
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "borrowing")
-		Model.UpdateBorrowTime(uav.Uid, uav.Plan_time)
+		Model.UpdateBorrowTime(uav.Uid)
 	}
 }
 
-// BackReviewUav 审核归还设备
-func BackReviewUav(c *gin.Context) {
+// BackPassedUav 审核通过归还设备
+func BackPassedUav(c *gin.Context) {
 	//模型定义
 	var uavs []Model.Uav
 
@@ -54,7 +54,45 @@ func BackReviewUav(c *gin.Context) {
 
 	//更新状态与归还时间
 	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "free")
+		Model.UpdateState(uav.Uid, "using")
 		Model.UpdateBackTime(uav.Uid)
 	}
+}
+
+// GetFailUav 审核不通过借用设备
+func GetFailUav(c *gin.Context) {
+	//模型定义
+	var uavs []Model.Uav
+
+	//绑定结构体
+	if err := c.BindJSON(&uavs); err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+
+	//更新状态与借用时间
+	for _, uav := range uavs {
+		Model.UpdateState(uav.Uid, "free")
+	}
+
+	//返回数据
+}
+
+// BackFailUav 审核通过归还设备
+func BackFailUav(c *gin.Context) {
+	//模型定义
+	var uavs []Model.Uav
+
+	//绑定结构体
+	if err := c.BindJSON(&uavs); err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+
+	//更新状态与归还时间
+	for _, uav := range uavs {
+		Model.UpdateState(uav.Uid, "using")
+	}
+
+	//返回数据表示不成功
 }
