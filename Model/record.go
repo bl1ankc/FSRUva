@@ -64,3 +64,13 @@ func GetRecordsByName(Name string) []BackRecord {
 
 	return uavpacks
 }
+
+func GetRecordsByUid(Uid string) []Record {
+	var records []Record
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid}).Find(&records)
+	if DB.Error != nil {
+		fmt.Println("GetRecordsByUid Error")
+		log.Fatal(DB.Error.Error())
+	}
+	return records
+}
