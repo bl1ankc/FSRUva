@@ -7,15 +7,15 @@ import (
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(Uid string, Name string, Get_time time.Time, Plan_time time.Time) {
+func RecordBorrow(Uid string, Borrower string, Get_time time.Time, Plan_time time.Time) {
 
-	DB := db.Create(&Record{Uid: Uid, Borrower: Name, Get_time: Get_time, Plan_time: Plan_time})
+	DB := db.Create(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time, Plan_time: Plan_time})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 		return
 	}
-	UpdateRecordState(Uid, Name, Get_time, "Get under review")
+	UpdateRecordState(Uid, Borrower, Get_time, "Get under review")
 	return
 }
 
