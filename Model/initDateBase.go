@@ -12,7 +12,7 @@ var db *gorm.DB //数据库指针
 func init() {
 	var err error
 
-	dsn := "root:lyq200291@tcp(127.0.0.1:3306)/ginsql?parseTime=true"
+	dsn := "root:123456@tcp(127.0.0.1:3306)/ginsql?parseTime=true"
 
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
@@ -21,6 +21,5 @@ func init() {
 	}
 
 	//自动迁移
-	db.AutoMigrate(&Uav{})
-
+	db.AutoMigrate(&Uav{}, &Record{})
 }

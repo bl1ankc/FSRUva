@@ -38,6 +38,7 @@ func GetPassedUav(c *gin.Context) {
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "borrowing")
 		Model.UpdateBorrowTime(uav.Uid)
+		Model.UpdateRecordState(uav.Uid, uav.Borrower, uav.Get_time, "borrowing")
 	}
 }
 
@@ -56,6 +57,7 @@ func BackPassedUav(c *gin.Context) {
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "using")
 		Model.UpdateBackTime(uav.Uid)
+		Model.UpdateRecordState(uav.Uid, uav.Borrower, uav.Get_time, "free")
 	}
 }
 
@@ -73,12 +75,13 @@ func GetFailUav(c *gin.Context) {
 	//更新状态与借用时间
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "free")
+		Model.UpdateRecordState(uav.Uid, uav.Borrower, uav.Get_time, "free")
 	}
 
 	//返回数据
 }
 
-// BackFailUav 审核通过归还设备
+// BackFailUav 审核不通过归还设备
 func BackFailUav(c *gin.Context) {
 	//模型定义
 	var uavs []Model.Uav
@@ -92,6 +95,7 @@ func BackFailUav(c *gin.Context) {
 	//更新状态与归还时间
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "using")
+		Model.UpdateRecordState(uav.Uid, uav.Borrower, uav.Get_time, "using")
 	}
 
 	//返回数据表示不成功
