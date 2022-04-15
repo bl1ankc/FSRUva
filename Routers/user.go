@@ -16,4 +16,8 @@ func UserRoute() {
 
 	//取消归还
 	g.POST("/CancelBack", api.CancelBack)
+
+	//上传用户信息
+	g.POST("/UploadUser", api.UploadUser)
+
 }

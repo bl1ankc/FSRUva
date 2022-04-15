@@ -14,6 +14,8 @@ func InitRouter() *gin.Engine {
 	AdminRoute()
 
 	UserRoute()
-	
+
+	RecordRoute()
+
 	return r
 }
