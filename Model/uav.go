@@ -109,3 +109,16 @@ func UpdateBackTime(UavUid string) {
 
 	return
 }
+
+// GetUavStateByUid 通过Uid获取设备状态
+func (u *Uav) GetUavStateByUid() string {
+	var uav Uav
+	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
+
+	if DB.Error != nil {
+		fmt.Println("GetUvaByUid Error")
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav.Uid
+}
