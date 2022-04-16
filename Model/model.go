@@ -12,7 +12,7 @@ type Uav struct {
 	gorm.Model
 	Name  string `json:"name"`                      //设备名称
 	State string `gorm:"default:free" json:"state"` //设备状态
-	Type  string `json:"type"`                      //设备类型
+	Type  string `json:"type"`                      //设备类型  遥控器Control 电池Battery 无人机Drone
 	Uid   string `json:"uid"`                       //设备序号
 
 	Borrower  string    `json:"borrower"`  //借用人姓名
@@ -132,7 +132,6 @@ type BorrowUav struct {
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
 	Usage     string    `json:"usage"`     //用途
-	State     string    //这行要删
 }
 
 // CheckUav 审核设备模型

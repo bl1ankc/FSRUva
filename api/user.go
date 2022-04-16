@@ -33,12 +33,14 @@ func BorrowUav(c *gin.Context) {
 		Model.UpdateState(uav.Uid, "Get under review")
 		Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
 		Model.UpdatePlanTime(uav.Uid, uav.Plan_time)
-		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Get_time, uav.Plan_time, "uav.Usage") //用途
+		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Get_time, uav.Plan_time, uav.Usage) //用途
 	}
-	erruav = Model.GetUavsByUids(Uids)
+	erruav = Model.GetUavsByUids(Uids) //返回设备此时的状态信息
 	//返回错误信息
 	if flag {
 		c.JSON(200, erruav)
+	} else {
+		c.JSON(200, "OK")
 	}
 }
 

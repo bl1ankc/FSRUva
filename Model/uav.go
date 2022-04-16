@@ -181,7 +181,7 @@ func UpdateDataInUav(Uid string, HeadName string, Data string) {
 }
 
 // GetUavStateByUid 通过Uid获取设备状态
-func (u *Uav) GetUavStateByUid() string {
+func (u *BorrowUav) GetUavStateByUid() string {
 	var uav Uav
 	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
 
@@ -190,5 +190,5 @@ func (u *Uav) GetUavStateByUid() string {
 		log.Fatal(DB.Error.Error())
 	}
 
-	return uav.Uid
+	return uav.State
 }
