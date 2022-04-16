@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"main/Model"
 )
 
@@ -65,4 +66,31 @@ func BackUnderReview(c *gin.Context) {
 	uav := Model.GetUavByStates("Back under review", "")
 
 	c.JSON(200, &uav)
+}
+
+// GetUsingDevices 获取使用中的所有设备
+func GetUsingDevices(c *gin.Context) {
+	device := Model.GetUavByStates("using", "")
+
+	c.JSON(200, &device)
+}
+
+// GetAllDevices 获取所有设备
+func GetAllDevices(c *gin.Context) {
+	device := Model.GetUavByStates("", "")
+
+	c.JSON(200, &device)
+}
+
+// GetDevices 获取所有设备(前端指定状态和类型)
+func GetDevices(c *gin.Context) {
+	var uavs Model.SearchUav
+	//结构体绑定
+	if err := c.BindJSON(&uavs); err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+	device := Model.GetUavByAll(uavs)
+
+	c.JSON(200, &device)
 }
