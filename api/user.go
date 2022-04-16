@@ -25,7 +25,7 @@ func BorrowUav(c *gin.Context) {
 	//更新状态为审核中
 	for _, uav := range uavs {
 		//再次验证是否能被借用
-		if uav.State != "free" {
+		if uav.GetUavStateByUid() != "free" {
 			flag = true
 			Uids = append(Uids, uav.Uid)
 			continue
