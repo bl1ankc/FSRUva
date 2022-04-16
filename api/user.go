@@ -9,7 +9,7 @@ import (
 // BorrowUav 借用设备
 func BorrowUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.Uav
+	var uavs []Model.BorrowUav
 
 	//结构体绑定
 	if err := c.BindJSON(&uavs); err != nil {
@@ -20,23 +20,27 @@ func BorrowUav(c *gin.Context) {
 	//表单中提交不可使用的无人机
 	flag := false
 	var erruav []Model.Uav
+	var Uids []string
 
 	//更新状态为审核中
 	for _, uav := range uavs {
 		//再次验证是否能被借用
 		if uav.GetUavStateByUid() != "free" {
 			flag = true
-			erruav = append(erruav, uav)
+			Uids = append(Uids, uav.Uid)
 			continue
 		}
 		Model.UpdateState(uav.Uid, "Get under review")
 		Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
 		Model.UpdatePlanTime(uav.Uid, uav.Plan_time)
-		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Get_time, uav.Plan_time)
+		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Get_time, uav.Plan_time, uav.Usage) //用途
 	}
+	erruav = Model.GetUavsByUids(Uids) //返回设备此时的状态信息
 	//返回错误信息
 	if flag {
 		c.JSON(200, erruav)
+	} else {
+		c.JSON(200, "OK")
 	}
 }
 
@@ -71,6 +75,7 @@ func CancelBorrow(c *gin.Context) {
 	//更新状态为审核中
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "free")
+		Model.UpdateRecordState(uav.Uid, "cancelled")
 	}
 
 }

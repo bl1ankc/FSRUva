@@ -6,6 +6,35 @@ import (
 	"time"
 )
 
+// GetUavByUid 获取对应序列号的设备信息
+func GetUavByUid(Uid string) Uav {
+	var uav Uav
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav
+}
+
+// GetUavsByUids 获取对应序列号组的设备组信息
+func GetUavsByUids(Uids []string) []Uav {
+	var uavs []Uav
+	DB := db.Model(&Uav{})
+
+	for _, uid := range Uids {
+		var uav Uav
+		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
+		if DB.Error != nil {
+			log.Fatal(DB.Error.Error())
+		}
+		uavs = append(uavs, uav)
+	}
+
+	return uavs
+}
+
 // GetUavByStates 获取对应状态及类型的设备信息
 func GetUavByStates(UavState string, UavType string) []Uav {
 	var uav []Uav
@@ -110,8 +139,49 @@ func UpdateBackTime(UavUid string) {
 	return
 }
 
+// UpdateUavRemark 更新设备备注信息
+func UpdateUavRemark(Uid string, Remark string) {
+
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Updates(&Uav{Remark: Remark})
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+
+}
+
+// GetUavByAll 多条件查找设备信息
+func GetUavByAll(uav SearchUav) []BackUav {
+
+	var uavs []BackUav
+
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type, Borrower: uav.Borrower}).Find(&uavs)
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+	return uavs
+}
+
+// UpdateDevices 强制修改设备数据
+func UpdateDevices(uav ChangeUav) {
+	UpdateDataInUav(uav.Uid, "type", uav.Type)
+	UpdateDataInUav(uav.Uid, "name", uav.Name)
+	UpdateDataInUav(uav.Uid, "borrower", uav.Borrower)
+	UpdateDataInUav(uav.Uid, "phone", uav.Phone)
+	UpdateDataInUav(uav.Uid, "state", uav.State)
+}
+
+// UpdateDataInUav 修改设备单个字符串数据
+func UpdateDataInUav(Uid string, HeadName string, Data string) {
+	if Data != "" {
+		DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Update(HeadName, Data)
+		if DB.Error != nil {
+			log.Fatal(DB.Error.Error())
+		}
+	}
+}
+
 // GetUavStateByUid 通过Uid获取设备状态
-func (u *Uav) GetUavStateByUid() string {
+func (u *BorrowUav) GetUavStateByUid() string {
 	var uav Uav
 	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
 
@@ -120,5 +190,5 @@ func (u *Uav) GetUavStateByUid() string {
 		log.Fatal(DB.Error.Error())
 	}
 
-	return uav.Uid
+	return uav.State
 }

@@ -22,4 +22,19 @@ func AdminRoute() {
 
 	//审核通过归还设备
 	g.POST("/BackPassedUav", api.BackPassedUav)
+
+	//获取所有用户
+	g.GET("/GetAllUsers", api.GetAllUsers)
+
+	//获取所有历史记录
+	g.GET("/GetAllRecords", api.GetAllRecords)
+
+	//获取设备信息
+	g.POST("/GetDevices", api.GetDevices)
+
+	//强制修改设备信息
+	g.POST("/ForceUpdateDevices", api.ForceUpdateDevices)
+
+	//修改设备备注信息
+	g.POST("/UpdateUavRemark", api.UpdateUavRemark)
 }
