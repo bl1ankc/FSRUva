@@ -57,6 +57,7 @@ func BackPassedUav(c *gin.Context) {
 
 	//更新状态与归还时间
 	for _, uav := range uavs {
+		Model.UpdateBackRecord(uav.Uid)
 		Model.UpdateState(uav.Uid, "free")
 		Model.UpdateBackTime(uav.Uid)
 		Model.UpdateRecordState(uav.Uid, "returned")

@@ -192,3 +192,15 @@ func (u *BorrowUav) GetUavStateByUid() string {
 
 	return uav.State
 }
+
+// GetBasicUavsByUid 通过Uid获取设备基础信息
+func GetBasicUavsByUid(Uid string) BasicUav {
+	var uav BasicUav
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav
+}
