@@ -56,13 +56,21 @@ func GetRecordsByName(Name string) []BackRecord {
 		//DB = db.Debug().Model(&Uav{}).Joins("left join records on records.uid = uavs.uid and records.get_time = ?", t).Find(&uavs)
 		//DB = db.Model(&Uav{}).Where(&Uav{Borrower: Name, Get_time: t}).Find(&uavs)
 
-		//查找序列号组
-		var uids []string
-		DB = db.Model(&Record{}).Where(&Record{Get_time: t, Borrower: Name}).Select("uid").Find(&uids)
+		//查找设备组
+		var uavs []BackUav
+		DB = db.Model(&Record{}).Where(&Record{Get_time: t, Borrower: Name}).Select("state, uid, get_time, back_time,plan_time").Find(&uavs)
 		if DB.Error != nil {
 			log.Fatal(DB.Error.Error())
 		}
-		uavs := GetBackUavsByUids(uids)
+
+		//填充设备信息
+		for _, uav := range uavs {
+			uavinfo := GetBasicUavsByUid(uav.Uid)
+			uav.Name = uavinfo.Name
+			uav.Type = uavinfo.Type
+			uav.Remark = uavinfo.Remark
+			uavs = append(uavs, uav)
+		}
 
 		//查询剩余信息
 		var uavpack BackRecord
@@ -160,6 +168,14 @@ func BackReviewRecord(Uid string, Checker string, Result string, Comment string)
 	uav := GetUavByUid(Uid)
 
 	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{BackReviewer: Checker, BackReviewTime: Time, BackReviewResult: Result, BackReviewComment: Comment})
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+}
+
+func UpdateBackRecord(Uid string) {
+	uav := GetUavByUid(Uid)
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}

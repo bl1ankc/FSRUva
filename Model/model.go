@@ -43,6 +43,7 @@ type Record struct {
 	Phone     string    `json:"tel"`       //借用人电话
 	Get_time  time.Time `json:"get_time"`  //借出时间
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
+	Back_time time.Time `json:"back_Time"` //实际归还时间
 	Usage     string    `json:"usage"`     //用途
 
 	GetReviewer      string    `json:"getreviewer"`       //借用审核人
@@ -54,8 +55,6 @@ type Record struct {
 	BackReviewTime    time.Time `json:"backreview_time"`    //归还审核时间
 	BackReviewResult  string    `json:"backreview_result"`  //归还审核结果  通过passed 失败fail
 	BackReviewComment string    `json:"backreview_comment"` //归还审核原因
-
-	Back_time time.Time `json:"back_Time"` //实际归还时间
 
 }
 
@@ -145,4 +144,12 @@ type CheckUav struct {
 type RemarkUav struct {
 	Uid    string `json:"uid"`    //设备序号
 	Remark string `json:"remark"` //备注
+}
+
+// BasicUav 查询记录模型
+type BasicUav struct {
+	Name   string `json:"name"`   //设备名称
+	Type   string `json:"type"`   //设备类型
+	Uid    string `json:"uid"`    //设备序号
+	Remark string `json:"remark"` //设备备注
 }
