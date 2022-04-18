@@ -25,4 +25,7 @@ func UserRoute() {
 
 	//获取用户信息
 	g.GET("/GetUser", api.GetUser)
+
+	//查看个人正在借用中的设备
+	g.GET("/GetOwnUsing", api.GetUsingDevices)
 }

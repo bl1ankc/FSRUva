@@ -5,11 +5,8 @@ import "main/api"
 func AdminRoute() {
 	g := r.Group("/Admin")
 
-	//借用审核设备展示
-	g.GET("/GetUnderReviewUav", api.GetUnderReview)
-
-	//归还审核设备展示
-	g.GET("/BackUnderReviewUav", api.BackUnderReview)
+	//审核设备展示
+	g.GET("/GetUnderReviewUav", api.GetReview)
 
 	//提交新的设备
 	g.POST("/UploadUav", api.UploadNewUav)
@@ -22,6 +19,9 @@ func AdminRoute() {
 
 	//审核通过归还设备
 	g.POST("/BackPassedUav", api.BackPassedUav)
+
+	//审核不通过归还设备
+	g.POST("/BackFailUav", api.BackFailUav)
 
 	//获取所有用户
 	g.GET("/GetAllUsers", api.GetAllUsers)

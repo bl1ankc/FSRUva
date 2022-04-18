@@ -23,6 +23,23 @@ func UploadNewUav(c *gin.Context) {
 	}
 }
 
+// GetReview 获取审核中设备
+func GetReview(c *gin.Context) {
+	var uavs []Model.Uav
+
+	GetUav := Model.GetUavByStates("Get under review", "")
+	BackUav := Model.GetUavByStates("Back under review", "")
+
+	for _, uav := range GetUav {
+		uavs = append(uavs, uav)
+	}
+	for _, uav := range BackUav {
+		uavs = append(uavs, uav)
+	}
+
+	c.JSON(200, &uavs)
+}
+
 // GetPassedUav 审核通过借用设备
 func GetPassedUav(c *gin.Context) {
 	//模型定义
@@ -83,7 +100,6 @@ func GetFailUav(c *gin.Context) {
 		Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
 	}
 
-	//返回数据
 }
 
 // BackFailUav 审核不通过归还设备
@@ -104,7 +120,6 @@ func BackFailUav(c *gin.Context) {
 		Model.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
 	}
 
-	//返回数据表示不成功
 }
 
 // GetAllUsers 获取所有用户

@@ -54,20 +54,6 @@ func GetControl(c *gin.Context) {
 	c.JSON(200, &Control)
 }
 
-// GetUnderReview 获取借用审核的设备
-func GetUnderReview(c *gin.Context) {
-	uav := Model.GetUavByStates("Get under review", "")
-
-	c.JSON(200, &uav)
-}
-
-// BackUnderReview 获取归还审核设备
-func BackUnderReview(c *gin.Context) {
-	uav := Model.GetUavByStates("Back under review", "")
-
-	c.JSON(200, &uav)
-}
-
 // GetUsingDevices 获取使用中的所有设备
 func GetUsingDevices(c *gin.Context) {
 	device := Model.GetUavByStates("using", "")
