@@ -30,8 +30,8 @@ type Uav struct {
 // User 用户模型
 type User struct {
 	gorm.Model
-	Name  string `json:"name"` //姓名
-	Phone string `json:"tel" ` //电话
+	Name  string `json:"name"`   //姓名
+	Phone string `json:"phone" ` //电话
 	//pwd       string
 	StudentID string `json:"stuid"` //学号
 	Count     int    `json:"count" gorm:"default:0"`
@@ -43,7 +43,7 @@ type Record struct {
 	State     string    `json:"state"`     //状态	使用中using 拒绝借用refuse 已归还returned  损坏damaged  取消cancelled
 	Uid       string    `json:"uid"`       //设备序号
 	Borrower  string    `json:"name"`      //借用人姓名
-	Phone     string    `json:"tel"`       //借用人电话
+	Phone     string    `json:"phone"`     //借用人电话
 	Get_time  time.Time `json:"get_time"`  //借出时间
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_Time"` //实际归还时间
@@ -104,7 +104,7 @@ type BackUav struct {
 // BackUser 返回用户模型
 type BackUser struct {
 	Name      string `json:"name"`
-	Phone     string `json:"tel" `
+	Phone     string `json:"phone" `
 	StudentID string `json:"stuid"`
 	Count     int    `json:"count"`
 }
