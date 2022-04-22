@@ -16,6 +16,7 @@ func GetUavByUid(Uid string) Uav {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
 
 	if DB.Error != nil {
+		fmt.Println("获取对应序列号的设备信息报错")
 		log.Fatal(DB.Error.Error())
 	}
 
@@ -31,6 +32,7 @@ func GetUavsByUids(Uids []string) []Uav {
 		var uav Uav
 		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
 		if DB.Error != nil {
+			fmt.Println("获取对应序列号组的设备组信息报错")
 			log.Fatal(DB.Error.Error())
 		}
 		uavs = append(uavs, uav)
@@ -45,7 +47,7 @@ func GetUavByStates(UavState string, UavType string) []Uav {
 	DB := db.Model(&Uav{}).Where(Uav{State: UavState, Type: UavType}).Find(&uav)
 
 	if DB.Error != nil {
-		fmt.Println("GetUvasByState Error")
+		fmt.Println("获取对应状态级类型设备信息报错")
 		log.Fatal(DB.Error.Error())
 	}
 
@@ -58,7 +60,7 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 	DB := db.Model(&Uav{}).Where(Uav{Name: UavName, Type: UavType}).Find(&uav)
 
 	if DB.Error != nil {
-		fmt.Println("GetUvasByState Error")
+		fmt.Println("获取对应设备型号及状态报错")
 		log.Fatal(DB.Error.Error())
 	}
 
@@ -66,11 +68,12 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 }
 
 // InsertUva 创建新的设备
-func InsertUva(UavName string, UavType string) {
+func InsertUva(UavName string, UavType string, UavUid string) {
 	//创建新记录
-	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: GetUid()})
+	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Now(), Plan_time: time.Now(), Back_time: time.Now()})
 
 	if DB.Error != nil {
+		fmt.Println("创建新设备报错")
 		log.Fatal(DB.Error.Error())
 		return
 	}
