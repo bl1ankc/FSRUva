@@ -197,10 +197,10 @@ func UpdateUavRemark(Uid string, Remark string) {
 
 }
 
-// UpdateImg 更新图片uid
-func UpdateImg(uid string) {
+// UpdateImg 更新图片img
+func UpdateImg(uid string, img string) {
 
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).Update("img", uid)
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).Update("img", img)
 
 	if DB.Error != nil {
 		fmt.Println("更新图片失败")
