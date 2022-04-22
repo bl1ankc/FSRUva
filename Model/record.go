@@ -90,11 +90,17 @@ func GetRecordsByName(Name string) []BackRecord {
 			log.Fatal(DB.Error.Error())
 		}
 		for _, s := range states {
-			uavpacks[i].State = "All returned"
+			uavpacks[i].GBState = "All returned"
 			if s == "using" {
-				uavpacks[i].State = "Using"
+				uavpacks[i].GBState = "Using"
 			} else if s == "damaged" {
-				uavpacks[i].State = "Damaged"
+				uavpacks[i].GBState = "Damaged"
+				break
+			} else if s == "Get under review" || s == "Back under review" {
+				uavpacks[i].GBState = "Reviewing"
+				break
+			} else if s == "scheduled" {
+				uavpacks[i].GBState = "Scheduled"
 				break
 			}
 		}
@@ -173,10 +179,21 @@ func BackReviewRecord(Uid string, Checker string, Result string, Comment string)
 	}
 }
 
+// UpdateBackRecord 添加归还审核时间
 func UpdateBackRecord(Uid string) {
 	uav := GetUavByUid(Uid)
 	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
 	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+}
+
+// UpdateImgInRecord 记录中更新图片
+func UpdateImgInRecord(Uid string, col string) {
+	uav := GetUavByUid(Uid)
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Update(col, uav.Img)
+	if DB.Error != nil {
+		fmt.Println("UpdateImgInRecord Error!")
 		log.Fatal(DB.Error.Error())
 	}
 }

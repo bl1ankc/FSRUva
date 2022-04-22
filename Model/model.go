@@ -66,7 +66,7 @@ type Record struct {
 // BackRecord 查询历史记录返回模型
 type BackRecord struct {
 	Borrower string    `json:"borrower"` //借用人姓名
-	State    string    `json:"state" `   //状态	已全部归还 All returned 损坏Damaged 使用中Using
+	GBState  string    `json:"state" `   //全局状态	已全部归还 All returned 损坏Damaged 使用中Using 审核中Reviewing 已预定Scheduled
 	Get_time time.Time `json:"get_Time"` //借出时间
 	Usage    string    `json:"usage"`    //用途
 	Comment  string    `json:"comment"`  //备注
@@ -75,11 +75,13 @@ type BackRecord struct {
 	GetReviewTime    time.Time `json:"getreview_time"`    //借用审核时间
 	GetReviewResult  string    `json:"getreview_result"`  //借用审核结果  通过passed 失败fail
 	GetReviewComment string    `json:"getreview_comment"` //借用审核原因
+	GetImg           string    `json:"getimg"`            //借用图片记录
 
 	BackReviewer      string    `json:"backreviewer"`       //归还审核人
 	BackReviewTime    time.Time `json:"backreview_time"`    //归还审核时间
 	BackReviewResult  string    `json:"backreview_result"`  //归还审核结果  通过passed 失败fail
 	BackReviewComment string    `json:"backreview_comment"` //归还审核原因
+	BackImg           string    `json:"backImg"`            //归还图片记录
 
 	Uav []BackUav `json:"uavs" gorm:"-"` //设备组
 }
@@ -94,6 +96,7 @@ type BackUav struct {
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
 
+	Img    string `json:"img"`    //当前图片索引
 	Remark string `json:"remark"` //设备备注信息
 
 }
@@ -103,7 +106,7 @@ type BackUser struct {
 	Name      string `json:"name"`
 	Phone     string `json:"tel" `
 	StudentID string `json:"stuid"`
-	Count     int    `json:"count" gorm:"default:0"`
+	Count     int    `json:"count"`
 }
 
 // SearchUav 查询设备模型
@@ -113,7 +116,6 @@ type SearchUav struct {
 	Type     string `json:"type" form:"type" binding:"-"`         //设备类型
 	Uid      string `json:"uid" form:"uid" binding:"-"`           //设备序号
 	Borrower string `json:"borrower" form:"borrower" binding:"-"` //借用人姓名
-	Remark   string `json:"remark"`                               //设备备注信息
 }
 
 // ChangeUav 修改设备模型

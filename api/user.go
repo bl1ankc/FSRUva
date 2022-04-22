@@ -56,7 +56,7 @@ func BackUav(c *gin.Context) {
 
 	//更新状态为归还审核
 	Model.UpdateState(id, "Back under review")
-
+	Model.UpdateImgInRecord(id, "back_img")
 }
 
 // GetUav 取走设备
@@ -71,6 +71,7 @@ func GetUav(c *gin.Context) {
 
 	//更新对应设备状态
 	Model.UpdateState(id, "using")
+	Model.UpdateImgInRecord(id, "get_img")
 }
 
 // CancelBorrow 取消借用
