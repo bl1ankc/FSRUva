@@ -46,19 +46,31 @@ func BorrowUav(c *gin.Context) {
 
 // BackUav 归还设备
 func BackUav(c *gin.Context) {
-	//模型
-	var uavs []Model.Uav
+	//获取id
+	id := c.Query("uid")
 
-	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
-		log.Fatal(err.Error())
+	//上传图片
+	if UploadImg(c) == false {
 		return
 	}
 
 	//更新状态为归还审核
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "Back under review")
+	Model.UpdateState(id, "Back under review")
+
+}
+
+// GetUav 取走设备
+func GetUav(c *gin.Context) {
+	//获取id
+	id := c.Query("uid")
+
+	//上传图片
+	if UploadImg(c) == false {
+		return
 	}
+
+	//更新对应设备状态
+	Model.UpdateState(id, "using")
 }
 
 // CancelBorrow 取消借用
@@ -95,4 +107,32 @@ func CancelBack(c *gin.Context) {
 	for _, uav := range uavs {
 		Model.UpdateState(uav.Uid, "using")
 	}
+}
+
+// UploadImg 上传图片
+func UploadImg(c *gin.Context) bool {
+	/*
+		上传图片,并保存在./img服务器文件夹中
+		自动生成图片对应的uid,该uid为文件名,并且绑定对应记录
+	*/
+
+	//上传图片
+	file, _ := c.FormFile("upload_img")
+	filename := Model.GetUid()
+
+	//上传失败
+	if file != nil {
+		if err := c.SaveUploadedFile(file, "./img"); err != nil {
+			c.JSON(500, gin.H{"code": 500, "desc": "保存图片失败"})
+			return false
+		}
+	} else {
+		c.JSON(400, gin.H{"code": 400, "desc": "未上传图片"})
+		return false
+	}
+
+	//上传成功
+	Model.UpdateImg(filename)
+	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功"})
+	return true
 }

@@ -5,8 +5,11 @@ import "main/api"
 func UserRoute() {
 	g := r.Group("/User")
 
-	//借用设备
+	//预约设备
 	g.POST("/BorrowUav", api.BorrowUav)
+
+	//取走设备
+	g.POST("/GetUav", api.GetUav)
 
 	//归还设备
 	g.POST("/BackUav", api.BackUav)

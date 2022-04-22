@@ -53,9 +53,9 @@ func GetPassedUav(c *gin.Context) {
 
 	//更新状态与借用时间
 	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "using")
+		Model.UpdateState(uav.Uid, "scheduled")
 		Model.UpdateBorrowTime(uav.Uid)
-		Model.UpdateRecordState(uav.Uid, "using")
+		Model.UpdateRecordState(uav.Uid, "scheduled")
 		Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
 	}
 	Model.UpdateUserCountByUid(uavs[0].Uid, 1)

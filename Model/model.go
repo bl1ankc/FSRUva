@@ -7,6 +7,8 @@ import (
 
 //该文件存储所有数据库模型
 
+// 设备状态类型：1.空闲 free  2.预定审核 Get under review  3.已预定 scheduled  4.使用 using  5.归还审核 Back under review
+
 // Uav 设备模型
 type Uav struct {
 	gorm.Model
@@ -21,6 +23,7 @@ type Uav struct {
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
 
+	Img    string `json:"img"`    //当前图片索引
 	Remark string `json:"remark"` //设备备注信息
 }
 
@@ -50,11 +53,13 @@ type Record struct {
 	GetReviewTime    time.Time `json:"getreview_time"`    //借用审核时间
 	GetReviewResult  string    `json:"getreview_result"`  //借用审核结果  通过passed 失败fail
 	GetReviewComment string    `json:"getreview_comment"` //借用审核原因
+	GetImg           string    `json:"getimg"`            //借用图片记录
 
 	BackReviewer      string    `json:"backreviewer"`       //归还审核人
 	BackReviewTime    time.Time `json:"backreview_time"`    //归还审核时间
 	BackReviewResult  string    `json:"backreview_result"`  //归还审核结果  通过passed 失败fail
 	BackReviewComment string    `json:"backreview_comment"` //归还审核原因
+	BackImg           string    `json:"backImg"`            //归还图片记录
 
 }
 

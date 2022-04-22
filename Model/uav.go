@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+/*
+	获取及创建
+*/
+
 // GetUavByUid 获取对应序列号的设备信息
 func GetUavByUid(Uid string) Uav {
 	var uav Uav
@@ -73,6 +77,47 @@ func InsertUva(UavName string, UavType string) {
 
 	return
 }
+
+// GetUavByAll 多条件查找设备信息
+func GetUavByAll(uav SearchUav) []BackUav {
+
+	var uavs []BackUav
+
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type, Borrower: uav.Borrower}).Find(&uavs)
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+	return uavs
+}
+
+// GetUavStateByUid 通过Uid获取设备状态
+func (u *BorrowUav) GetUavStateByUid() string {
+	var uav Uav
+	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
+
+	if DB.Error != nil {
+		fmt.Println("GetUvaByUid Error")
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav.State
+}
+
+// GetBasicUavsByUid 通过Uid获取设备基础信息
+func GetBasicUavsByUid(Uid string) BasicUav {
+	var uav BasicUav
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+
+	return uav
+}
+
+/*
+	更新信息
+*/
 
 // UpdateState 更新状态
 func UpdateState(UavUid string, UavState string) {
@@ -149,17 +194,22 @@ func UpdateUavRemark(Uid string, Remark string) {
 
 }
 
-// GetUavByAll 多条件查找设备信息
-func GetUavByAll(uav SearchUav) []BackUav {
+// UpdateImg 更新图片uid
+func UpdateImg(uid string) {
 
-	var uavs []BackUav
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).Update("img", uid)
 
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type, Borrower: uav.Borrower}).Find(&uavs)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新图片失败")
+		return
 	}
-	return uavs
+
+	return
 }
+
+/*
+	修改信息
+*/
 
 // UpdateDevices 强制修改设备数据
 func UpdateDevices(uav ChangeUav) {
@@ -178,29 +228,4 @@ func UpdateDataInUav(Uid string, HeadName string, Data string) {
 			log.Fatal(DB.Error.Error())
 		}
 	}
-}
-
-// GetUavStateByUid 通过Uid获取设备状态
-func (u *BorrowUav) GetUavStateByUid() string {
-	var uav Uav
-	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
-
-	if DB.Error != nil {
-		fmt.Println("GetUvaByUid Error")
-		log.Fatal(DB.Error.Error())
-	}
-
-	return uav.State
-}
-
-// GetBasicUavsByUid 通过Uid获取设备基础信息
-func GetBasicUavsByUid(Uid string) BasicUav {
-	var uav BasicUav
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
-
-	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
-	}
-
-	return uav
 }
