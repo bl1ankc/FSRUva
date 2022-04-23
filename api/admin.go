@@ -9,19 +9,18 @@ import (
 // UploadNewUav 上传新设备
 func UploadNewUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.Uav
+	var uav Model.Uav
 
 	//结构体绑定
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//数据插入
-	for _, uav := range uavs {
-		Model.InsertUva(uav.Name, uav.Type, uav.Uid)
-		Model.CreateQRCode(uav.Uid)
-	}
+	Model.InsertUva(uav.Name, uav.Type, uav.Uid)
+	Model.CreateQRCode(uav.Uid)
+
 }
 
 // GetReview 获取审核中设备
@@ -44,83 +43,75 @@ func GetReview(c *gin.Context) {
 // GetPassedUav 审核通过借用设备
 func GetPassedUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.CheckUav
+	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态与借用时间
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "scheduled")
-		Model.UpdateBorrowTime(uav.Uid)
-		Model.UpdateRecordState(uav.Uid, "scheduled")
-		Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
-	}
-	Model.UpdateUserCountByUid(uavs[0].Uid, 1)
+	Model.UpdateState(uav.Uid, "scheduled")
+	Model.UpdateBorrowTime(uav.Uid)
+	Model.UpdateRecordState(uav.Uid, "scheduled")
+	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
+	Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
 // BackPassedUav 审核通过归还设备
 func BackPassedUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.CheckUav
+	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态与归还时间
-	for _, uav := range uavs {
-		Model.UpdateBackRecord(uav.Uid)
-		Model.UpdateState(uav.Uid, "free")
-		Model.UpdateBackTime(uav.Uid)
-		Model.UpdateRecordState(uav.Uid, "returned")
-		Model.BackReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
-	}
+	Model.UpdateBackRecord(uav.Uid)
+	Model.UpdateState(uav.Uid, "free")
+	Model.UpdateBackTime(uav.Uid)
+	Model.UpdateRecordState(uav.Uid, "returned")
+	Model.BackReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
+
 }
 
 // GetFailUav 审核不通过借用设备
 func GetFailUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.CheckUav
+	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态与借用时间
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "free")
-		Model.UpdateRecordState(uav.Uid, "refuse")
-		Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
-	}
+	Model.UpdateState(uav.Uid, "free")
+	Model.UpdateRecordState(uav.Uid, "refuse")
+	Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
 
 }
 
 // BackFailUav 审核不通过归还设备
 func BackFailUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.CheckUav
+	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态与归还时间
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "using")
-		Model.UpdateRecordState(uav.Uid, "using")
-		Model.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
-	}
-
+	Model.UpdateState(uav.Uid, "using")
+	Model.UpdateRecordState(uav.Uid, "using")
+	Model.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
 }
 
 // GetAllUsers 获取所有用户

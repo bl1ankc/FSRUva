@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"main/Model"
@@ -9,37 +10,33 @@ import (
 // BorrowUav 借用设备
 func BorrowUav(c *gin.Context) {
 	//模型定义
-	var uavs []Model.BorrowUav
+	var uav Model.BorrowUav
 
 	//结构体绑定
-	if err := c.BindJSON(&uavs); err != nil {
-		log.Fatal(err.Error())
+	if err := c.ShouldBindJSON(&uav); err != nil {
+		fmt.Println("绑定失败")
+		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
 
 	//表单中提交不可使用的无人机
 	flag := false
-	var erruav []Model.Uav
-	var Uids []string
 
 	//更新状态为审核中
-	for _, uav := range uavs {
-		//再次验证是否能被借用
-		if uav.GetUavStateByUid() != "free" {
-			flag = true
-			Uids = append(Uids, uav.Uid)
-			continue
-		}
+
+	//再次验证是否能被借用
+	if uav.GetUavStateByUid() != "free" {
+		flag = true
+	} else {
 		Model.UpdateState(uav.Uid, "Get under review")
 		Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
-		Model.UpdatePlanTime(uav.Uid, uav.Plan_time)
-		Model.UpdateUavUsage(uav.Uid, uav.Usage)
 		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Plan_time, uav.Usage) //用途
+		Model.UpdateUavUsage(uav.Uid, uav.Usage)
 	}
-	erruav = Model.GetUavsByUids(Uids) //返回设备此时的状态信息
+
 	//返回错误信息
 	if flag {
-		c.JSON(200, erruav)
+		c.JSON(200, gin.H{"code": 200, "desc": "设备已被借用"})
 	} else {
 		c.JSON(200, gin.H{"code": 200, "desc": "借用成功"})
 	}
@@ -78,37 +75,34 @@ func GetUav(c *gin.Context) {
 // CancelBorrow 取消借用
 func CancelBorrow(c *gin.Context) {
 	//模型定义
-	var uavs []Model.Uav
+	var uav Model.Uav
 
 	//结构体绑定
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态为审核中
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "free")
-		Model.UpdateRecordState(uav.Uid, "cancelled")
-	}
+	Model.UpdateState(uav.Uid, "free")
+	Model.UpdateRecordState(uav.Uid, "cancelled")
 
 }
 
 // CancelBack 取消归还
 func CancelBack(c *gin.Context) {
 	//模型
-	var uavs []Model.Uav
+	var uav Model.Uav
 
 	//绑定结构体
-	if err := c.BindJSON(&uavs); err != nil {
+	if err := c.BindJSON(&uav); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	//更新状态为归还审核
-	for _, uav := range uavs {
-		Model.UpdateState(uav.Uid, "using")
-	}
+	Model.UpdateState(uav.Uid, "using")
+
 }
 
 // UploadImg 上传图片
