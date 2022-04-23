@@ -1,7 +1,9 @@
 package Model
 
 import (
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"log"
 	"time"
 )
@@ -15,9 +17,9 @@ func GetUavByUid(Uid string) Uav {
 	var uav Uav
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
 
-	if DB.Error != nil {
-		fmt.Println("获取对应序列号的设备信息报错")
-		log.Fatal(DB.Error.Error())
+	if errors.Is(DB.Error, gorm.ErrRecordNotFound) {
+		fmt.Println("获取信息失败")
+		return Uav{}
 	}
 
 	return uav

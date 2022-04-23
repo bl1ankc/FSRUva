@@ -16,4 +16,6 @@ func UavRoute() {
 	//可借用遥控展示
 	g.GET("/GetControl", api.GetNotUsedControl)
 
+	//单独获取设备数据
+	g.GET("/GetDevice", api.GetDeviceByUid)
 }

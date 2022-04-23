@@ -40,7 +40,7 @@ func BorrowUav(c *gin.Context) {
 	if flag {
 		c.JSON(200, erruav)
 	} else {
-		c.JSON(200, "OK")
+		c.JSON(200, gin.H{"code": 200, "desc": "借用成功"})
 	}
 }
 

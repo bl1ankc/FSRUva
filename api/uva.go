@@ -80,3 +80,12 @@ func GetDevices(c *gin.Context) {
 
 	c.JSON(200, &device)
 }
+
+// GetDeviceByUid 获取对应uid设备信息
+func GetDeviceByUid(c *gin.Context) {
+	id := c.Query("uid")
+
+	uav := Model.GetUavByUid(id)
+
+	c.JSON(200, &uav)
+}
