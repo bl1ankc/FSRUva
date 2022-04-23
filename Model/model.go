@@ -24,6 +24,7 @@ type Uav struct {
 	Back_time time.Time `json:"back_time"` //实际归还时间
 
 	Img    string `json:"img"`    //当前图片索引
+	Usage  string `json:"usage"`  //当前借用用途
 	Remark string `json:"remark"` //设备备注信息
 }
 

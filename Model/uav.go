@@ -199,6 +199,15 @@ func UpdateUavRemark(Uid string, Remark string) {
 
 }
 
+// UpdateUavUsage 更新设备用途
+func UpdateUavUsage(Uid string, Usage string) {
+	DB := db.Model(&Uav{}).Where(Uav{Uid: Uid}).Updates(&Uav{Usage: Usage})
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+	}
+}
+
 // UpdateImg 更新图片img
 func UpdateImg(uid string, img string) {
 
