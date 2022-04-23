@@ -20,6 +20,7 @@ func UploadNewUav(c *gin.Context) {
 	//数据插入
 	for _, uav := range uavs {
 		Model.InsertUva(uav.Name, uav.Type, uav.Uid)
+		Model.CreateQRCode(uav.Uid)
 	}
 }
 

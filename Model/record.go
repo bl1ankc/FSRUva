@@ -7,9 +7,9 @@ import (
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(Uid string, Borrower string, Get_time time.Time, Plan_time time.Time, Usage string) {
+func RecordBorrow(Uid string, Borrower string, Plan_time time.Time, Usage string) {
 
-	DB := db.Create(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time, Plan_time: Plan_time, Usage: Usage})
+	DB := db.Create(&Record{Uid: Uid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -27,6 +27,23 @@ func UpdateRecordState(Uid string, State string) {
 	Get_time := uav.Get_time
 	//更新状态
 	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time}).Select("state").Updates(&Record{State: State})
+
+	if DB.Error != nil {
+		log.Fatal(DB.Error.Error())
+		return
+	}
+
+	return
+}
+
+// UpdateGetTime 更新借用时间
+func UpdateGetTime(Uid string, time time.Time) {
+
+	uav := GetUavByUid(Uid)
+	Borrower := uav.Borrower
+	Get_time := uav.Get_time
+	//更新状态
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time}).Select("get_time").Updates(&Record{Get_time: time})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
