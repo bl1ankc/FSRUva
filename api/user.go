@@ -45,6 +45,7 @@ func BorrowUav(c *gin.Context) {
 func BackUav(c *gin.Context) {
 	//获取id
 	id, flag := c.GetQuery("uid")
+	fmt.Println(id)
 
 	//获取失败
 	if !flag {
@@ -54,13 +55,14 @@ func BackUav(c *gin.Context) {
 
 	//上传图片
 	if UploadImg(c) == false {
+		c.JSON(200, gin.H{"desc": "图片上传失败"})
 		return
 	}
 
 	//更新状态为归还审核
 	Model.UpdateState(id, "Back under review")
 	Model.UpdateImgInRecord(id, "back_img")
-	Model.UpdateRecordState(id, "Back under review")
+	c.JSON(200, gin.H{"desc": "归还成功"})
 }
 
 // GetUav 取走设备
@@ -82,7 +84,6 @@ func GetUav(c *gin.Context) {
 	//更新对应设备状态
 	Model.UpdateState(id, "using")
 	Model.UpdateImgInRecord(id, "get_img")
-	Model.UpdateRecordState(id, "using")
 }
 
 // CancelBorrow 取消借用
@@ -132,54 +133,16 @@ func UploadImg(c *gin.Context) bool {
 	//上传失败
 	if file != nil {
 		if err := c.SaveUploadedFile(file, "./img/"+filename); err != nil {
-			c.JSON(500, gin.H{"code": 500, "desc": "保存图片失败"})
+			//c.JSON(500, gin.H{"code": 500, "desc": "保存图片失败"})
 			return false
 		}
 	} else {
-		c.JSON(400, gin.H{"code": 400, "desc": "未上传图片"})
+		//c.JSON(400, gin.H{"code": 400, "desc": "未上传图片"})
 		return false
 	}
 
 	//上传成功
 	Model.UpdateImg(c.Query("uid"), filename)
-	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功"})
+	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/img/" + filename})
 	return true
-}
-
-// GetOwnUsing 查看个人正在借用中的设备
-func GetOwnUsing(c *gin.Context) {
-	stuid, flag := c.GetQuery("stuid")
-
-	//获取失败
-	if !flag {
-		c.JSON(400, gin.H{"code": 400, "desc": "传入stuid失败"})
-		return
-	}
-
-	uavs, flag := Model.GetUsingUavsByStuID(stuid)
-	if flag {
-		c.JSON(200, &uavs)
-	} else {
-		c.JSON(502, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
-	}
-
-}
-
-// GetOwnHistory 查看历史借用中的设备
-func GetOwnHistory(c *gin.Context) {
-	stuid, flag := c.GetQuery("stuid")
-
-	//获取失败
-	if !flag {
-		c.JSON(400, gin.H{"code": 400, "desc": "传入stuid失败"})
-		return
-	}
-
-	uavs, flag := Model.GetHistoryUavsByStuID(stuid)
-	if flag {
-		c.JSON(200, &uavs)
-	} else {
-		c.JSON(502, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
-	}
-
 }
