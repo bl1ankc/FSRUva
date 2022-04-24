@@ -118,7 +118,7 @@ func UploadImg(c *gin.Context) bool {
 
 	//上传失败
 	if file != nil {
-		if err := c.SaveUploadedFile(file, "./img"); err != nil {
+		if err := c.SaveUploadedFile(file, "./img"+filename+".png"); err != nil {
 			c.JSON(500, gin.H{"code": 500, "desc": "保存图片失败"})
 			return false
 		}
