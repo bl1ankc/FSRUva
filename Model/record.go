@@ -71,7 +71,7 @@ func GetRecordsByID(Stuid string) []BackRecord {
 
 		//查找设备组
 		var uavs []BackUav
-		DB = db.Model(&Record{}).Where(&Record{Get_time: t, StudentID: Stuid}).Select("state, uid, get_time, back_time,plan_time").Find(&uavs)
+		DB = db.Model(&Record{}).Where(&Record{Get_time: t, StudentID: Stuid}).Select("state, uid, get_time, back_time, plan_time").Find(&uavs)
 		if DB.Error != nil {
 			log.Fatal(DB.Error.Error())
 		}
@@ -103,17 +103,17 @@ func GetRecordsByID(Stuid string) []BackRecord {
 			log.Fatal(DB.Error.Error())
 		}
 		for _, s := range states {
-			uavpacks[i].GBState = "All returned"
+			uavpacks[i].State = "All returned"
 			if s == "using" {
-				uavpacks[i].GBState = "Using"
+				uavpacks[i].State = "Using"
 			} else if s == "damaged" {
-				uavpacks[i].GBState = "Damaged"
+				uavpacks[i].State = "Damaged"
 				break
 			} else if s == "Get under review" || s == "Back under review" {
-				uavpacks[i].GBState = "Reviewing"
+				uavpacks[i].State = "Reviewing"
 				break
 			} else if s == "scheduled" {
-				uavpacks[i].GBState = "Scheduled"
+				uavpacks[i].State = "Scheduled"
 				break
 			}
 		}
@@ -209,12 +209,12 @@ func UpdateImgInRecord(Uid string, col string) {
 	}
 }
 
-// GetUavsByStuID 通过学号查找某状态的无人机
-func GetUavsByStuID(Stuid string, State string) ([]BackUav, bool) {
+// GetUsingUavsByStuID 通过学号查找使用中的无人机
+func GetUsingUavsByStuID(Stuid string) ([]BackUav, bool) {
 	var uids []string
 	var uavs []BackUav
 
-	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: State}).Select("uid").Find(&uids)
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "using"}).Select("uid").Find(&uids)
 	if DB.Error != nil {
 		fmt.Println("查询错误")
 		return uavs, false

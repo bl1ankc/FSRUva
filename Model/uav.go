@@ -84,9 +84,9 @@ func InsertUva(UavName string, UavType string, UavUid string) {
 }
 
 // GetUavByAll 多条件查找设备信息
-func GetUavByAll(uav SearchUav) []BackUav {
+func GetUavByAll(uav SearchUav) []Uav {
 
-	var uavs []BackUav
+	var uavs []Uav
 
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type}).Find(&uavs)
 	if DB.Error != nil {
@@ -149,7 +149,7 @@ func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string) {
 
 // UpdateBorrowTime 更新借出时间
 func UpdateBorrowTime(UavUid string, BorrowTime time.Time) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: BorrowTime})
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid, Get_time: time.Unix(0, 0)}).Updates(Uav{Get_time: BorrowTime})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())

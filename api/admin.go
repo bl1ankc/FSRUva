@@ -56,8 +56,8 @@ func GetPassedUav(c *gin.Context) {
 	BorrowTime := time.Now().Local()
 	Model.UpdateState(uav.Uid, "scheduled")
 	Model.UpdateBorrowTime(uav.Uid, BorrowTime)
-	Model.UpdateRecordState(uav.Uid, "scheduled")
 	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
+	Model.UpdateRecordState(uav.Uid, "scheduled")
 	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
