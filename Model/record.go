@@ -208,3 +208,23 @@ func UpdateImgInRecord(Uid string, col string) {
 		log.Fatal(DB.Error.Error())
 	}
 }
+
+// GetUavsByStuID 通过学号查找某状态的无人机
+func GetUavsByStuID(Stuid string, State string) ([]BackUav, bool) {
+	var uids []string
+	var uavs []BackUav
+
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: State}).Select("uid").Find(&uids)
+	if DB.Error != nil {
+		fmt.Println("查询错误")
+		return uavs, false
+	}
+
+	uavs, flag := GetUavsByUids(uids)
+	if flag {
+		return uavs, true
+	} else {
+		return uavs, false
+	}
+
+}

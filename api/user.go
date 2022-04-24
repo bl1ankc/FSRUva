@@ -132,3 +132,16 @@ func UploadImg(c *gin.Context) bool {
 	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功"})
 	return true
 }
+
+// GetOwnUsing 查看个人正在借用中的设备
+func GetOwnUsing(c *gin.Context) {
+	stuid := c.Query("stuid")
+
+	uavs, flag := Model.GetUavsByStuID(stuid, "free")
+	if flag {
+		c.JSON(200, &uavs)
+	} else {
+		c.JSON(200, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
+	}
+
+}

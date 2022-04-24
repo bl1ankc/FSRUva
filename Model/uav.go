@@ -26,21 +26,21 @@ func GetUavByUid(Uid string) Uav {
 }
 
 // GetUavsByUids 获取对应序列号组的设备组信息
-func GetUavsByUids(Uids []string) []Uav {
-	var uavs []Uav
+func GetUavsByUids(Uids []string) ([]BackUav, bool) {
+	var uavs []BackUav
 	DB := db.Model(&Uav{})
 
 	for _, uid := range Uids {
-		var uav Uav
+		var uav BackUav
 		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
 		if DB.Error != nil {
 			fmt.Println("获取对应序列号组的设备组信息报错")
-			log.Fatal(DB.Error.Error())
+			return uavs, false
 		}
 		uavs = append(uavs, uav)
 	}
 
-	return uavs
+	return uavs, true
 }
 
 // GetUavByStates 获取对应状态及类型的设备信息
