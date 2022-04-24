@@ -38,7 +38,7 @@ func BorrowUav(c *gin.Context) {
 	if flag {
 		c.JSON(200, gin.H{"code": 200, "desc": "设备已被借用"})
 	} else {
-		c.JSON(200, gin.H{"code": 200, "desc": "借用成功"})
+		c.JSON(200, gin.H{"code": 200, "desc": "预约成功"})
 	}
 }
 

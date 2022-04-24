@@ -72,7 +72,7 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 // InsertUva 创建新的设备
 func InsertUva(UavName string, UavType string, UavUid string) {
 	//创建新记录
-	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Now(), Plan_time: time.Now(), Back_time: time.Now()})
+	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Unix(0, 0), Plan_time: time.Unix(0, 0), Back_time: time.Unix(0, 0)})
 
 	if DB.Error != nil {
 		fmt.Println("创建新设备报错")
@@ -88,7 +88,7 @@ func GetUavByAll(uav SearchUav) []BackUav {
 
 	var uavs []BackUav
 
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type, Borrower: uav.Borrower}).Find(&uavs)
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type}).Find(&uavs)
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}
@@ -104,7 +104,6 @@ func (u *BorrowUav) GetUavStateByUid() string {
 		fmt.Println("GetUvaByUid Error")
 		log.Fatal(DB.Error.Error())
 	}
-
 	return uav.State
 }
 
@@ -149,8 +148,8 @@ func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string) {
 }
 
 // UpdateBorrowTime 更新借出时间
-func UpdateBorrowTime(UavUid string) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: time.Now().Local()})
+func UpdateBorrowTime(UavUid string, BorrowTime time.Time) {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: BorrowTime})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())

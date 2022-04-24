@@ -115,11 +115,10 @@ type BackUser struct {
 
 // SearchUav 查询设备模型
 type SearchUav struct {
-	Name     string `json:"name" form:"name" binding:"-"`         //设备名称
-	State    string `json:"state" form:"state" binding:"-"`       //设备状态
-	Type     string `json:"type" form:"type" binding:"-"`         //设备类型
-	Uid      string `json:"uid" form:"uid" binding:"-"`           //设备序号
-	Borrower string `json:"borrower" form:"borrower" binding:"-"` //借用人姓名
+	Name  string `json:"name" form:"name" binding:"-"`   //设备名称
+	State string `json:"state" form:"state" binding:"-"` //设备状态
+	Type  string `json:"type" form:"type" binding:"-"`   //设备类型
+	Uid   string `json:"uid" form:"uid" binding:"-"`     //设备序号
 }
 
 // ChangeUav 修改设备模型

@@ -33,7 +33,7 @@ func AdminRoute() {
 	g.POST("/GetDevices", api.GetDevices)
 
 	//强制修改设备信息
-	g.POST("/ForceUpdateDevices", api.ForceUpdateDevices)
+	//g.POST("/ForceUpdateDevices", api.ForceUpdateDevices)
 
 	//修改设备备注信息
 	g.POST("/UpdateUavRemark", api.UpdateUavRemark)

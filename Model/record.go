@@ -9,7 +9,7 @@ import (
 // RecordBorrow 增加一条记录
 func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) {
 
-	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage})
+	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: time.Unix(0, 0), Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -165,14 +165,12 @@ func GetAllRecords() [][]BackRecord {
 }
 
 // GetReviewRecord 添加借用审核记录
-func GetReviewRecord(Uid string, Checker string, Result string, Comment string) {
-	//获取时间
-	Time := time.Now()
+func GetReviewRecord(Uid string, Checker string, Result string, Comment string, GetTime time.Time) {
 
 	//匹配当前借用设备
 	uav := GetUavByUid(Uid)
 
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{GetReviewer: Checker, Get_time: Time, GetReviewResult: Result, GetReviewComment: Comment})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: time.Unix(0, 0)}).Updates(&Record{GetReviewer: Checker, Get_time: GetTime, GetReviewResult: Result, GetReviewComment: Comment})
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}

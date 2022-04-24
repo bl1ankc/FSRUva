@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"main/Model"
+	"time"
 )
 
 // UploadNewUav 上传新设备
@@ -52,10 +53,11 @@ func GetPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与借用时间
+	BorrowTime := time.Now().Local()
 	Model.UpdateState(uav.Uid, "scheduled")
-	Model.UpdateBorrowTime(uav.Uid)
+	Model.UpdateBorrowTime(uav.Uid, BorrowTime)
 	Model.UpdateRecordState(uav.Uid, "scheduled")
-	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
+	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
 	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
@@ -93,7 +95,7 @@ func GetFailUav(c *gin.Context) {
 	//更新状态与借用时间
 	Model.UpdateState(uav.Uid, "free")
 	Model.UpdateRecordState(uav.Uid, "refuse")
-	Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
+	Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now())
 
 }
 
