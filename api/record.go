@@ -9,10 +9,10 @@ import (
 func GetRecordsByUser(c *gin.Context) {
 
 	//模型绑定
-	Name := c.Query("name")
+	stuid := c.Query("stuid")
 
 	//查数据
-	records := Model.GetRecordsByName(Name)
+	records := Model.GetRecordsByID(stuid)
 	c.JSON(200, &records)
 }
 

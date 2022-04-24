@@ -56,7 +56,7 @@ func GetPassedUav(c *gin.Context) {
 	Model.UpdateBorrowTime(uav.Uid)
 	Model.UpdateRecordState(uav.Uid, "scheduled")
 	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
-	Model.UpdateUserCountByUid(uav.Uid, 1)
+	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
 // BackPassedUav 审核通过归还设备

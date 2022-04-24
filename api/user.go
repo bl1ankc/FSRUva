@@ -30,7 +30,7 @@ func BorrowUav(c *gin.Context) {
 	} else {
 		Model.UpdateState(uav.Uid, "Get under review")
 		Model.UpdateBorrower(uav.Uid, uav.Borrower, uav.Phone)
-		Model.RecordBorrow(uav.Uid, uav.Borrower, uav.Plan_time, uav.Usage) //用途
+		Model.RecordBorrow(uav.Uid, uav.StudentID, uav.Borrower, uav.Plan_time, uav.Usage) //用途
 		Model.UpdateUavUsage(uav.Uid, uav.Usage)
 	}
 

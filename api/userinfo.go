@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"main/Model"
 )
@@ -13,17 +14,18 @@ func UploadUser(c *gin.Context) {
 	//结构体绑定
 	//绑定结构体
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		fmt.Println("绑定失败")
+		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
 
 	//数据插入
-	response := Model.InsertUser(user.Name, user.Phone, user.StudentID)
+	response := Model.InsertUser(user.Name, user.Phone, user.StudentID, user.Pwd)
 	c.JSON(200, response)
 }
 
-// UpdateUser 更新用户信息
-func UpdateUser(c *gin.Context) {
+// UpdateUserPhone 更新电话
+func UpdateUserPhone(c *gin.Context) {
 	var user Model.User
 
 	//结构体绑定
@@ -32,25 +34,43 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	//数据插入
-	response := ""
-	if user.Phone != "" {
-		Model.UpdatePhone(user.Name, user.Phone)
-		response += "Phone Update! "
-	}
-	if user.StudentID != "" {
-		Model.UpdateStudentId(user.Name, user.StudentID)
-		response += "StudentID Update! "
-	}
 
-	c.JSON(200, &response)
+	if Model.UpdatePhone(user.StudentID, user.Phone) {
+		c.JSON(200, gin.H{"code": 200, "message": "电话更改成功"})
+	} else {
+		c.JSON(502, gin.H{"code": 502, "message": "电话更改失败"})
+	}
+}
+
+// UpdateUserPwd 更改密码
+func UpdateUserPwd(c *gin.Context) {
+	type UpdatePwd struct {
+		StudentID string `json:"stuid"`  //学号
+		OldPwd    string `json:"oldpwd"` //旧密码
+		NewPwd    string `json:"newpwd"` //新密码
+	}
+	var user UpdatePwd
+
+	//结构体绑定
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	//数据更新
+	resopnse, success := Model.UpdatePwd(user.StudentID, user.OldPwd, user.NewPwd)
+	if success {
+		c.JSON(200, gin.H{"code": 200, "message": resopnse})
+	} else {
+		c.JSON(502, gin.H{"code": 502, "message": resopnse})
+	}
 }
 
 // GetUser 获取单个用户信息
 func GetUser(c *gin.Context) {
 	//数据绑定
-	Name := c.Query("name")
+	id := c.Query("stuid")
 
 	//数据获取
-	response := Model.GetUserByName(Name)
+	response := Model.GetUserByID(id)
 	c.JSON(200, &response)
 }

@@ -7,9 +7,9 @@ import (
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(Uid string, Borrower string, Plan_time time.Time, Usage string) {
+func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) {
 
-	DB := db.Create(&Record{Uid: Uid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage})
+	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -23,10 +23,8 @@ func RecordBorrow(Uid string, Borrower string, Plan_time time.Time, Usage string
 func UpdateRecordState(Uid string, State string) {
 
 	uav := GetUavByUid(Uid)
-	Borrower := uav.Borrower
-	Get_time := uav.Get_time
 	//更新状态
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time}).Select("state").Updates(&Record{State: State})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Select("state").Updates(&Record{State: State})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -40,10 +38,8 @@ func UpdateRecordState(Uid string, State string) {
 func UpdateGetTime(Uid string, time time.Time) {
 
 	uav := GetUavByUid(Uid)
-	Borrower := uav.Borrower
-	Get_time := uav.Get_time
 	//更新状态
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: Borrower, Get_time: Get_time}).Select("get_time").Updates(&Record{Get_time: time})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Select("get_time").Updates(&Record{Get_time: time})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
@@ -53,11 +49,11 @@ func UpdateGetTime(Uid string, time time.Time) {
 	return
 }
 
-// GetRecordsByName 姓名查询记录
-func GetRecordsByName(Name string) []BackRecord {
+// GetRecordsByID 姓名查询记录
+func GetRecordsByID(Stuid string) []BackRecord {
 	//查找不同的借用时间
 	var times []time.Time
-	DB := db.Model(&Record{}).Where(&Record{Borrower: Name}).Distinct("Get_time").Select("Get_time").Find(&times)
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid}).Distinct("Get_time").Select("Get_time").Find(&times)
 	if DB.Error != nil {
 		fmt.Println("GetRecordsByName1 Error")
 		log.Fatal(DB.Error.Error())
@@ -75,7 +71,7 @@ func GetRecordsByName(Name string) []BackRecord {
 
 		//查找设备组
 		var uavs []BackUav
-		DB = db.Model(&Record{}).Where(&Record{Get_time: t, Borrower: Name}).Select("state, uid, get_time, back_time,plan_time").Find(&uavs)
+		DB = db.Model(&Record{}).Where(&Record{Get_time: t, StudentID: Stuid}).Select("state, uid, get_time, back_time,plan_time").Find(&uavs)
 		if DB.Error != nil {
 			log.Fatal(DB.Error.Error())
 		}
@@ -101,7 +97,7 @@ func GetRecordsByName(Name string) []BackRecord {
 
 		//判断本次借用状态
 		var states []string
-		DB = db.Model(&Record{}).Where(&Record{Get_time: t, Borrower: Name}).Select("state").Find(&states)
+		DB = db.Model(&Record{}).Where(&Record{Get_time: t, StudentID: Stuid}).Select("state").Find(&states)
 		if DB.Error != nil {
 			fmt.Println("GetRecordsByName Error")
 			log.Fatal(DB.Error.Error())
@@ -162,7 +158,7 @@ func GetAllRecords() [][]BackRecord {
 	var Records [][]BackRecord
 	//查询用户对应记录
 	for _, User := range Users {
-		Record := GetRecordsByName(User.Name)
+		Record := GetRecordsByID(User.StudentID)
 		Records = append(Records, Record)
 	}
 	return Records
@@ -176,7 +172,7 @@ func GetReviewRecord(Uid string, Checker string, Result string, Comment string) 
 	//匹配当前借用设备
 	uav := GetUavByUid(Uid)
 
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{GetReviewer: Checker, Get_time: Time, GetReviewResult: Result, GetReviewComment: Comment})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{GetReviewer: Checker, Get_time: Time, GetReviewResult: Result, GetReviewComment: Comment})
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}
@@ -190,7 +186,7 @@ func BackReviewRecord(Uid string, Checker string, Result string, Comment string)
 	//匹配当前借用设备
 	uav := GetUavByUid(Uid)
 
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{BackReviewer: Checker, BackReviewTime: Time, BackReviewResult: Result, BackReviewComment: Comment})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{BackReviewer: Checker, BackReviewTime: Time, BackReviewResult: Result, BackReviewComment: Comment})
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}
@@ -199,7 +195,7 @@ func BackReviewRecord(Uid string, Checker string, Result string, Comment string)
 // UpdateBackRecord 添加归还审核时间
 func UpdateBackRecord(Uid string) {
 	uav := GetUavByUid(Uid)
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
 	}
@@ -208,7 +204,7 @@ func UpdateBackRecord(Uid string) {
 // UpdateImgInRecord 记录中更新图片
 func UpdateImgInRecord(Uid string, col string) {
 	uav := GetUavByUid(Uid)
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, Borrower: uav.Borrower, Get_time: uav.Get_time}).Update(col, uav.Img)
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Update(col, uav.Img)
 	if DB.Error != nil {
 		fmt.Println("UpdateImgInRecord Error!")
 		log.Fatal(DB.Error.Error())

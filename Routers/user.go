@@ -23,8 +23,11 @@ func UserRoute() {
 	//上传用户信息
 	g.POST("/UploadUser", api.UploadUser)
 
-	//更新用户信息
-	g.POST("/UpdateUser", api.UpdateUser)
+	//更新用户电话
+	g.POST("/UpdateUserPhone", api.UpdateUserPhone)
+
+	//更新用户密码
+	g.POST("/UpdateUserPwd", api.UpdateUserPwd)
 
 	//获取用户信息
 	g.GET("/GetUser", api.GetUser)
