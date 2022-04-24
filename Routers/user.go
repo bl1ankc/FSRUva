@@ -34,4 +34,7 @@ func UserRoute() {
 
 	//查看个人正在借用中的设备
 	g.GET("/GetOwnUsing", api.GetOwnUsing)
+
+	//查看个人历史借用的设备
+	g.GET("/GetOwnHistory", api.GetOwnHistory)
 }

@@ -8,6 +8,7 @@ import (
 //该文件存储所有数据库模型
 
 // 设备状态类型：1.空闲 free  2.预定审核 Get under review  3.已预定 scheduled  4.使用 using  5.归还审核 Back under review
+// 记录状态类型：1.使用中 using 2.拒绝借用 refuse 3.已归还returned  4.损坏damaged  5.取消cancelled 6.预定审核 Get under review 7.已预定 scheduled  8.归还审核 Back under review
 
 // Uav 设备模型
 type Uav struct {
@@ -36,7 +37,7 @@ type User struct {
 	Pwd       string `json:"pwd"`                          //密码
 	Name      string `json:"name"`                         //姓名
 	Phone     string `json:"phone"`                        //电话
-	isAdmin   bool   `json:"isadmin" gorm:"default:false"` //判断管理员
+	IsAdmin   bool   `json:"isadmin" gorm:"default:false"` //判断管理员
 	//Count     int    `json:"count" gorm:"default:0"`
 }
 
@@ -109,7 +110,7 @@ type BackUser struct {
 	Name      string `json:"name"`
 	Phone     string `json:"phone" `
 	StudentID string `json:"stuid"`
-	isAdmin   bool   `json:"isadmin"`
+	IsAdmin   bool   `json:"isadmin"`
 }
 
 // SearchUav 查询设备模型
@@ -159,4 +160,14 @@ type BasicUav struct {
 	Type   string `json:"type"`   //设备类型
 	Uid    string `json:"uid"`    //设备序号
 	Remark string `json:"remark"` //设备备注
+}
+
+// UsingUav 使用中的无人机
+type UsingUav struct {
+	Uid       string `json:"uid"`
+	Name      string `json:"name"`
+	State     string `json:"state"`
+	Get_Time  string `json:"get_time"`  //借用时间
+	Plan_Time string `json:"plan_time"` //预计归还时间
+	LastDays  int    `json:"lastDays"`  //剩余时间
 }

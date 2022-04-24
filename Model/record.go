@@ -3,6 +3,7 @@ package Model
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -49,7 +50,7 @@ func UpdateGetTime(Uid string, time time.Time) {
 	return
 }
 
-// GetRecordsByID 姓名查询记录
+// GetRecordsByID 学号查询记录
 func GetRecordsByID(Stuid string) []BackRecord {
 	//查找不同的借用时间
 	var times []time.Time
@@ -210,21 +211,70 @@ func UpdateImgInRecord(Uid string, col string) {
 }
 
 // GetUsingUavsByStuID 通过学号查找使用中的无人机
-func GetUsingUavsByStuID(Stuid string) ([]BackUav, bool) {
-	var uids []string
-	var uavs []BackUav
+func GetUsingUavsByStuID(Stuid string) ([]UsingUav, bool) {
 
-	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "using"}).Select("uid").Find(&uids)
+	var uavs []UsingUav
+	var uav UsingUav
+	type TempUav struct {
+		Uid       string    `json:"uid"`
+		State     string    `json:"state"`
+		Get_Time  time.Time `json:"get_time"`  //借用时间
+		Plan_Time time.Time `json:"plan_time"` //预计归还时间
+	}
+	var tempuav []TempUav
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid}).Where(&Record{State: "using"}).Or(&Record{State: "Get under review"}).Or(&Record{State: "scheduled"}).Find(&tempuav)
 	if DB.Error != nil {
-		fmt.Println("查询错误")
+		fmt.Println("查找失败")
 		return uavs, false
 	}
+	flag := true
+	for _, tempuav := range tempuav {
+		uav.Uid = tempuav.Uid
+		uav.Name, flag = GetUavNameByUid(uav.Uid)
+		if flag == false {
+			return uavs, false
+		}
+		uav.State = tempuav.State
+		year, month, day := tempuav.Get_Time.Date()
+		uav.Get_Time = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
+		year, month, day = tempuav.Plan_Time.Date()
+		uav.Plan_Time = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
+		uav.LastDays = int(tempuav.Plan_Time.Sub(time.Now()).Hours()) / 24
+		uavs = append(uavs, uav)
+	}
+	return uavs, true
+}
 
-	uavs, flag := GetUavsByUids(uids)
-	if flag {
-		return uavs, true
-	} else {
+// GetHistoryUavsByStuID 通过学号查找历史借用的无人机
+func GetHistoryUavsByStuID(Stuid string) ([]UsingUav, bool) {
+
+	var uavs []UsingUav
+	var uav UsingUav
+	type TempUav struct {
+		Uid       string    `json:"uid"`
+		State     string    `json:"state"`
+		Get_Time  time.Time `json:"get_time"`  //借用时间
+		Plan_Time time.Time `json:"plan_time"` //预计归还时间
+	}
+	var tempuav []TempUav
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid}).Where(&Record{State: "returned"}).Or(&Record{State: "Back under review"}).Find(&tempuav)
+	if DB.Error != nil {
+		fmt.Println("查找失败")
 		return uavs, false
 	}
-
+	flag := true
+	for _, tempuav := range tempuav {
+		uav.Uid = tempuav.Uid
+		uav.Name, flag = GetUavNameByUid(uav.Uid)
+		if flag == false {
+			return uavs, false
+		}
+		uav.State = tempuav.State
+		year, month, day := tempuav.Get_Time.Date()
+		uav.Get_Time = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
+		year, month, day = tempuav.Plan_Time.Date()
+		uav.Plan_Time = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
+		uav.LastDays = 0
+	}
+	return uavs, true
 }

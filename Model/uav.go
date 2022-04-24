@@ -242,3 +242,13 @@ func UpdateDataInUav(Uid string, HeadName string, Data string) {
 		}
 	}
 }
+
+func GetUavNameByUid(Uid string) (string, bool) {
+	var name string
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Select("name").First(&name)
+	if DB.Error != nil {
+		fmt.Println(DB.Error.Error())
+		return "", false
+	}
+	return name, true
+}
