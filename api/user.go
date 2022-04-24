@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"main/Model"
 )
 
@@ -45,7 +44,13 @@ func BorrowUav(c *gin.Context) {
 // BackUav 归还设备
 func BackUav(c *gin.Context) {
 	//获取id
-	id := c.Query("uid")
+	id, flag := c.GetQuery("uid")
+	
+	//获取失败
+	if !flag {
+		c.JSON(400, gin.H{"code": 400, "desc": "传入id失败"})
+		return
+	}
 
 	//上传图片
 	if UploadImg(c) == false {
@@ -60,7 +65,13 @@ func BackUav(c *gin.Context) {
 // GetUav 取走设备
 func GetUav(c *gin.Context) {
 	//获取id
-	id := c.Query("uid")
+	id, flag := c.GetQuery("uid")
+
+	//获取失败
+	if !flag {
+		c.JSON(400, gin.H{"code": 400, "desc": "传入id失败"})
+		return
+	}
 
 	//上传图片
 	if UploadImg(c) == false {
@@ -74,34 +85,34 @@ func GetUav(c *gin.Context) {
 
 // CancelBorrow 取消借用
 func CancelBorrow(c *gin.Context) {
-	//模型定义
-	var uav Model.Uav
+	//获取id
+	id, flag := c.GetQuery("uid")
 
-	//结构体绑定
-	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+	//获取失败
+	if !flag {
+		c.JSON(400, gin.H{"code": 400, "desc": "传入id失败"})
 		return
 	}
 
 	//更新状态为审核中
-	Model.UpdateState(uav.Uid, "free")
-	Model.UpdateRecordState(uav.Uid, "cancelled")
+	Model.UpdateState(id, "free")
+	Model.UpdateRecordState(id, "cancelled")
 
 }
 
 // CancelBack 取消归还
 func CancelBack(c *gin.Context) {
-	//模型
-	var uav Model.Uav
+	//获取id
+	id, flag := c.GetQuery("uid")
 
-	//绑定结构体
-	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+	//获取失败
+	if !flag {
+		c.JSON(400, gin.H{"code": 400, "desc": "传入id失败"})
 		return
 	}
 
 	//更新状态为归还审核
-	Model.UpdateState(uav.Uid, "using")
+	Model.UpdateState(id, "using")
 
 }
 
@@ -131,17 +142,4 @@ func UploadImg(c *gin.Context) bool {
 	Model.UpdateImg(c.Query("uid"), filename)
 	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功"})
 	return true
-}
-
-// GetOwnUsing 查看个人正在借用中的设备
-func GetOwnUsing(c *gin.Context) {
-	stuid := c.Query("stuid")
-
-	uavs, flag := Model.GetUavsByStuID(stuid, "free")
-	if flag {
-		c.JSON(200, &uavs)
-	} else {
-		c.JSON(200, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
-	}
-
 }
