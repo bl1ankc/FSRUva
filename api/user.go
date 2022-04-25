@@ -143,6 +143,10 @@ func UploadImg(c *gin.Context) bool {
 		return false
 	}
 
+	//云端上传
+	if !Model.UploadImgToOSS("img/"+filename, "./img/"+filename) {
+		fmt.Println("OSS上传失败")
+	}
 	//上传成功
 	Model.UpdateImg(c.Query("uid"), filename)
 	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/img/" + filename})
