@@ -5,12 +5,13 @@ import (
 )
 
 func RecordRoute() {
-	g := r.Group("/Record")
+	g := r.Group("/Record", api.AuthRequired())
+	{
+		//查询用户借用记录
+		g.GET("/GetRecordsByName", api.GetRecordsByUser)
 
-	//查询用户借用记录
-	g.GET("/GetRecordsByName", api.GetRecordsByUser)
-
-	//查询设备借用记录
-	g.GET("/GetRecordsByUid", api.GetRecordsByUva)
+		//查询设备借用记录
+		g.GET("/GetRecordsByUid", api.GetRecordsByUva)
+	}
 
 }

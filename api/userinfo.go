@@ -6,12 +6,15 @@ import (
 	"main/Model"
 )
 
+/*
+	注册和登录
+*/
+
 // UploadUser 上传用户信息ljy
 func UploadUser(c *gin.Context) {
 	//模型定义
 	var user Model.User
 
-	//结构体绑定
 	//绑定结构体
 	if err := c.BindJSON(&user); err != nil {
 		fmt.Println("绑定失败")
@@ -23,6 +26,10 @@ func UploadUser(c *gin.Context) {
 	response := Model.InsertUser(user.Name, user.Phone, user.StudentID, user.Pwd)
 	c.JSON(200, response)
 }
+
+/*
+	更改信息 获取信息
+*/
 
 // UpdateUserPhone 更新电话
 func UpdateUserPhone(c *gin.Context) {

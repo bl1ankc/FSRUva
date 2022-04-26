@@ -103,14 +103,25 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 //}
 
 // GetUserByName 通过名字查找用户信息
-func GetUserByName(Name string) BackUser {
+func GetUserByName(Name string) (BackUser, error) {
 
 	var user BackUser
 	DB := db.Model(&User{}).Where(&User{Name: Name}).Find(&user)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		return user, db.Error
 	}
-	return user
+	return user, nil
+}
+
+// GetUserByIDToLogin 通过名字查找用户登录所需信息
+func GetUserByIDToLogin(stuid string) (User, error) {
+
+	var user User
+	DB := db.Model(&User{}).Where(&User{StudentID: stuid}).Find(&user)
+	if DB.Error != nil {
+		return user, db.Error
+	}
+	return user, nil
 }
 
 // GetAllUsers 获取所有用户
