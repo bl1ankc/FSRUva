@@ -106,6 +106,7 @@ func verifyAction(strToken string) (*JWTClaims, error) {
 		return nil, errors.New(ErrorReason_ServerBusy)
 	}
 	clamis, ok := token.Claims.(*JWTClaims)
+
 	if !ok {
 		return nil, errors.New(ErrorReason_ReLogin)
 	}
@@ -119,11 +120,18 @@ func verifyAction(strToken string) (*JWTClaims, error) {
 // AuthRequired 验证token
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		strToken := c.Param("token")
+		strToken := c.Query("token")
+
+		if strToken == "" {
+			c.JSON(400, gin.H{"desc": "无token"})
+			c.Abort()
+			return
+		}
 		claim, err := verifyAction(strToken)
 		if err != nil {
 			c.JSON(401, err.Error())
 			c.Abort()
+			return
 		}
 		c.JSON(200, gin.H{"desc": claim.UserID + "verify"})
 		c.Next()
