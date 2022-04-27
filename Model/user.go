@@ -66,6 +66,15 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 
 }
 
+// UpdateAdmin 修改管理员标识
+func UpdateAdmin(Stuid string, Isadmin bool) {
+	//用户变量
+	var user User
+
+	//更新用户管理权限
+	db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user).Update("isadmin", Isadmin)
+}
+
 //// UpdateStudentId 修改学号
 //func UpdateStudentId(Name string, Id string) {
 //

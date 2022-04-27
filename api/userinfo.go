@@ -7,7 +7,7 @@ import (
 )
 
 /*
-	注册和登录
+	注册
 */
 
 // UploadUser 上传用户信息ljy
@@ -80,4 +80,22 @@ func GetUser(c *gin.Context) {
 	//数据获取
 	response := Model.GetUserByID(id)
 	c.JSON(200, &response)
+}
+
+// SetAdmin 设置管理员
+func SetAdmin(c *gin.Context) {
+	//数据绑定
+	id := c.Query("stuid")
+
+	//数据更改
+	Model.UpdateAdmin(id, true)
+}
+
+// DelAdmin 取消管理员
+func DelAdmin(c *gin.Context) {
+	//数据绑定
+	id := c.Query("stuid")
+
+	//数据更改
+	Model.UpdateAdmin(id, false)
 }

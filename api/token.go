@@ -103,7 +103,7 @@ func verifyAction(strToken string) (*JWTClaims, error) {
 	})
 
 	if err != nil {
-		return nil, errors.New(ErrorReason_ServerBusy + "或token验证失败")
+		return nil, errors.New(ErrorReason_ServerBusy + "解析失败")
 	}
 	clamis, ok := token.Claims.(*JWTClaims)
 
@@ -134,6 +134,23 @@ func AuthRequired() gin.HandlerFunc {
 			return
 		}
 		c.JSON(200, gin.H{"desc": claim.UserID + "verify"})
+		user := Model.GetUserByID(claim.UserID)
+		c.Set("admin", user.IsAdmin)
+		c.Next()
+	}
+}
+
+// VerifyAdmin 验证管理员
+func VerifyAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		fmt.Println("进入验证")
+		IsAdmin := c.MustGet("admin").(bool)
+
+		if IsAdmin == false {
+			c.JSON(401, gin.H{"message": "非管理员非法操作"})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

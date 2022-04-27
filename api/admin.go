@@ -14,7 +14,7 @@ func UploadNewUav(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 

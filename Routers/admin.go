@@ -3,7 +3,7 @@ package Routers
 import "main/api"
 
 func AdminRoute() {
-	g := r.Group("/Admin", api.AuthRequired())
+	g := r.Group("/Admin", api.AuthRequired(), api.VerifyAdmin())
 	{
 		//审核设备展示
 		g.GET("/GetUnderReviewUav", api.GetReview)
@@ -37,6 +37,12 @@ func AdminRoute() {
 
 		//修改设备备注信息
 		g.POST("/UpdateUavRemark", api.UpdateUavRemark)
+
+		//管理员设置
+		g.POST("/SetAdmin", api.SetAdmin)
+		
+		//取消管理员
+		g.POST("/DelAdmin", api.DelAdmin)
 	}
 
 }
