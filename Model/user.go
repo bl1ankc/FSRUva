@@ -72,7 +72,7 @@ func UpdateAdmin(Stuid string, Isadmin bool) {
 	var user User
 
 	//更新用户管理权限
-	db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user).Update("isadmin", Isadmin)
+	db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user).Update("is_admin", Isadmin)
 }
 
 //// UpdateStudentId 修改学号

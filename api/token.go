@@ -75,6 +75,7 @@ func Login(c *gin.Context) {
 	//密码验证
 	if User.Pwd != user.Pwd {
 		c.JSON(401, gin.H{"code": 401, "desc": "密码错误"})
+		return
 	}
 
 	//claims初始化
