@@ -6,6 +6,12 @@ import (
 	"github.com/skip2/go-qrcode"
 )
 
+var (
+	Endpoint        = "https://oss-cn-shenzhen.aliyuncs.com"
+	AccessKeyID     = ""
+	AccessKeySecret = ""
+)
+
 func CreateQRCode(id string) string {
 	filename := "./img/qrcode/" + id + ".png"
 	err := qrcode.WriteFile(id, qrcode.Medium, 256, filename)
@@ -24,7 +30,7 @@ func UploadImgToOSS(cloudfilepath string, filepath string) bool {
 	// 创建OSSClient实例。
 	// yourEndpoint填写Bucket对应的Endpoint，以华东1（杭州）为例，填写为https://oss-cn-hangzhou.aliyuncs.com。其它Region请按实际情况填写。
 	// 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
-	client, err := oss.New("https://oss-cn-shenzhen.aliyuncs.com", "LTAI5t6fK4nTnorjNLVEv3Fe", "wcyAj7HSutDHMQ6A9pxKPz1sxr6P5F")
+	client, err := oss.New(Endpoint, AccessKeyID, AccessKeySecret)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return false

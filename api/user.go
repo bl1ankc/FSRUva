@@ -167,7 +167,7 @@ func GetOwnUsing(c *gin.Context) {
 	if flag {
 		c.JSON(200, &uavs)
 	} else {
-		c.JSON(502, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
+		c.JSON(502, gin.H{"code": 502, "message": "查询失败"})
 	}
 
 }
@@ -186,7 +186,7 @@ func GetOwnHistory(c *gin.Context) {
 	if flag {
 		c.JSON(200, &uavs)
 	} else {
-		c.JSON(502, gin.H{"code": 200, "message": "查询失败"}) //不知道有没有问题
+		c.JSON(502, gin.H{"code": 502, "message": "查询失败"})
 	}
 
 }
