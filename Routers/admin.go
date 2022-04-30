@@ -8,6 +8,9 @@ func AdminRoute() {
 		//审核设备展示
 		g.GET("/GetUnderReviewUav", api.GetReview)
 
+		//获取所有设备信息
+		g.GET("/GetAllDevices", api.GetAllDevices)
+
 		//提交新的设备
 		g.POST("/UploadUav", api.UploadNewUav)
 
@@ -29,7 +32,7 @@ func AdminRoute() {
 		//获取所有历史记录
 		g.GET("/GetAllRecords", api.GetAllRecords)
 
-		//获取设备信息
+		//获取指定设备信息
 		g.POST("/GetDevices", api.GetDevices)
 
 		//强制修改设备信息
@@ -40,7 +43,7 @@ func AdminRoute() {
 
 		//管理员设置
 		g.POST("/SetAdmin", api.SetAdmin)
-		
+
 		//取消管理员
 		g.POST("/DelAdmin", api.DelAdmin)
 	}
