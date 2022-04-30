@@ -136,8 +136,8 @@ func UpdateState(UavUid string, UavState string) {
 }
 
 // UpdateBorrower 更新借用人信息
-func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string) {
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Select("borrower", "phone").Updates(Uav{Borrower: UavBorrower, Phone: UavPhone})
+func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string, UavStuID string) {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Select("borrower", "phone", "stuid").Updates(Uav{Borrower: UavBorrower, Phone: UavPhone, StudentID: UavStuID})
 
 	if DB.Error != nil {
 		log.Fatal(DB.Error.Error())
