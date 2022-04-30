@@ -114,7 +114,7 @@ func verifyAction(strToken string) (*JWTClaims, error) {
 	if err := token.Claims.Valid(); err != nil {
 		return nil, errors.New(ErrorReason_ReLogin)
 	}
-	fmt.Println("verify")
+	fmt.Println("verify access")
 	return clamis, nil
 }
 
@@ -134,7 +134,7 @@ func AuthRequired() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.JSON(200, gin.H{"desc": claim.UserID + "verify"})
+
 		user := Model.GetUserByID(claim.UserID)
 		c.Set("admin", user.IsAdmin)
 		c.Next()
@@ -144,7 +144,7 @@ func AuthRequired() gin.HandlerFunc {
 // VerifyAdmin 验证管理员
 func VerifyAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Println("进入验证")
+
 		IsAdmin := c.MustGet("admin").(bool)
 
 		if IsAdmin == false {
