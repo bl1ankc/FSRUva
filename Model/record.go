@@ -7,46 +7,62 @@ import (
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) {
+func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) bool {
+	var id uint
 
-	uav := GetUavByUid(Uid)
+	//uav := GetUavByUid(Uid)
 
-	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: uav.Get_time, Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
+	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: time.Now(), Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
 
 	if DB.Error != nil {
 		fmt.Println("增加一条记录失败：", DB.Error.Error())
+		return false
 	}
+
+	UpdateRecordIdinUav(Uid, id)
 	UpdateRecordState(Uid, "Get under review")
-	return
+	return true
 }
 
 // UpdateRecordState 更新记录状态
-func UpdateRecordState(Uid string, State string) {
+func UpdateRecordState(Uid string, State string) bool {
 
-	uav := GetUavByUid(Uid)
+	//uav := GetUavByUid(Uid)
 	//更新状态
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{State: State})
+	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{State: State})
+	id, flag := GetRecordIdinUav(Uid)
+	if !flag {
+		return false
+	}
 
+	DB := db.Model(&Record{}).Where("id", id).Updates(&Record{State: State})
 	if DB.Error != nil {
 		fmt.Println("更新记录状态失败：", DB.Error.Error())
-		return
+		return false
 	}
 
-	return
+	return true
 }
 
-// UpdateGetTime 更新借用时间
-func UpdateGetTime(Uid string, time time.Time) {
+// UpdateGetTimeinRecords 记录中更新借用时间
+func UpdateGetTimeinRecords(Uid string) bool {
 
-	uav := GetUavByUid(Uid)
+	//uav := GetUavByUid(Uid)
 	//更新状态
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Select("get_time").Updates(&Record{Get_time: time})
+	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Select("get_time").Updates(&Record{Get_time: time})
 
-	if DB.Error != nil {
-		fmt.Println("更新借用时间失败：", DB.Error.Error())
+	id, flag := GetRecordIdinUav(Uid)
+	if !flag {
+		return false
 	}
 
-	return
+	DB := db.Model(&Record{}).Where("id", id).Updates(&Record{Get_time: time.Now()})
+	if DB.Error != nil {
+		fmt.Println("记录中更新借用时间：", DB.Error.Error())
+		return false
+	}
+
+	return true
 }
 
 // GetRecordsByID 学号查询记录
@@ -162,47 +178,86 @@ func GetAllRecords() [][]BackRecord {
 }
 
 // GetReviewRecord 添加借用审核记录
-func GetReviewRecord(Uid string, Checker string, Result string, Comment string, GetTime time.Time) {
+func GetReviewRecord(Uid string, Checker string, Result string, Comment string, GetTime time.Time) bool {
 
 	//匹配当前借用设备
-	uav := GetUavByUid(Uid)
+	//uav := GetUavByUid(Uid)
 
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: time.Unix(0, 0)}).Updates(&Record{GetReviewer: Checker, Get_time: GetTime, GetReviewResult: Result, GetReviewComment: Comment})
+	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: time.Unix(0, 0)}).Updates(&Record{GetReviewer: Checker, Get_time: GetTime, GetReviewResult: Result, GetReviewComment: Comment})
+	//if DB.Error != nil {
+	//	fmt.Println("添加借用审核记录失败：", DB.Error.Error())
+	//}
+
+	id, flag := GetRecordIdinUav(Uid)
+	if !flag {
+		return false
+	}
+
+	DB := db.Model(&Record{}).Where("id", id).Updates(&Record{GetReviewer: Checker, Get_time: GetTime, GetReviewResult: Result, GetReviewComment: Comment, GetReviewTime: time.Now()})
 	if DB.Error != nil {
 		fmt.Println("添加借用审核记录失败：", DB.Error.Error())
+		return false
 	}
+
+	return true
 }
 
 // BackReviewRecord 添加归还审核记录
-func BackReviewRecord(Uid string, Checker string, Result string, Comment string) {
+func BackReviewRecord(Uid string, Checker string, Result string, Comment string) bool {
 	//获取时间
-	Time := time.Now()
+	//Time := time.Now()
 
 	//匹配当前借用设备
-	uav := GetUavByUid(Uid)
+	//uav := GetUavByUid(Uid)
 
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{BackReviewer: Checker, BackReviewTime: Time, BackReviewResult: Result, BackReviewComment: Comment})
+	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{BackReviewer: Checker, BackReviewTime: Time, BackReviewResult: Result, BackReviewComment: Comment})
+	//if DB.Error != nil {
+	//	fmt.Println("添加归还审核记录失败：", DB.Error.Error())
+	//}
+	id, flag := GetRecordIdinUav(Uid)
+	if !flag {
+		return false
+	}
+
+	DB := db.Model(&Record{}).Where("id", id).Updates(&Record{BackReviewer: Checker, BackReviewTime: time.Now(), BackReviewResult: Result, BackReviewComment: Comment})
 	if DB.Error != nil {
 		fmt.Println("添加归还审核记录失败：", DB.Error.Error())
+		return false
 	}
+
+	return true
 }
 
-// UpdateBackRecord 添加归还审核时间
-func UpdateBackRecord(Uid string) {
-	uav := GetUavByUid(Uid)
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
-	if DB.Error != nil {
-		fmt.Println("添加归还审核时间失败：", DB.Error.Error())
+// UpdateBackRecord 添加归还时间
+func UpdateBackRecord(Uid string) bool {
+	//uav := GetUavByUid(Uid)
+	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{Back_time: time.Now()})
+	//if DB.Error != nil {
+	//	fmt.Println("添加归还时间失败：", DB.Error.Error())
+	//}
+	id, flag := GetRecordIdinUav(Uid)
+	if !flag {
+		return false
 	}
+
+	DB := db.Model(&Record{}).Where("id", id).Updates(&Record{Back_time: time.Now()})
+	if DB.Error != nil {
+		fmt.Println("添加归还时间失败：", DB.Error.Error())
+		return false
+	}
+
+	return true
 }
 
 // UpdateImgInRecord 记录中更新图片
-func UpdateImgInRecord(Uid string, col string) {
+func UpdateImgInRecord(Uid string, col string) bool {
 	uav := GetUavByUid(Uid)
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Update(col, uav.Img)
+	DB := db.Model(&Record{}).Where("id", uav.RecordID).Update(col, uav.Img)
 	if DB.Error != nil {
 		fmt.Println("更新照片失败：", DB.Error.Error())
+		return false
 	}
+	return true
 }
 
 // GetUsingUavsByStuID 通过学号查找使用中的无人机

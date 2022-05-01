@@ -18,9 +18,12 @@ type Uav struct {
 	Type  string `json:"type"`                      //设备类型  遥控器Control 电池Battery 无人机Drone
 	Uid   string `json:"uid"`                       //设备序号
 
-	StudentID string    `json:"stuid"`     //借用人学号
-	Borrower  string    `json:"borrower"`  //借用人姓名
-	Phone     string    `json:"phone"`     //借用人电话
+	StudentID string `json:"stuid"`    //借用人学号
+	Borrower  string `json:"borrower"` //借用人姓名
+	Phone     string `json:"phone"`    //借用人电话
+
+	RecordID uint //记录ID
+
 	Get_time  time.Time `json:"get_time"`  //借出时间
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间

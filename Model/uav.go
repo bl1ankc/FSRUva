@@ -260,3 +260,24 @@ func GetUavNameByUid(Uid string) (string, bool) {
 	}
 	return name, true
 }
+
+// UpdateRecordIdinUav 在设备中更新记录ID
+func UpdateRecordIdinUav(Uid string, id uint) bool {
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Updates(&Uav{RecordID: id})
+	if DB.Error != nil {
+		fmt.Println("在设备中更新记录ID失败：", DB.Error.Error())
+		return false
+	}
+	return true
+}
+
+// GetRecordIdinUav 在设备中获取记录ID
+func GetRecordIdinUav(Uid string) (uint, bool) {
+	var id uint
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Select("record_id").Find(&id)
+	if DB.Error != nil {
+		fmt.Println("在设备中更新记录ID失败：", DB.Error.Error())
+		return 0, false
+	}
+	return id, true
+}
