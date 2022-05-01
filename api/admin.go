@@ -48,7 +48,7 @@ func GetPassedUav(c *gin.Context) {
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		c.JSON(400, gin.H{"desc": "数据格式错误"})
 		return
 	}
 
@@ -58,6 +58,8 @@ func GetPassedUav(c *gin.Context) {
 	Model.UpdateBorrowTime(uav.Uid, BorrowTime)
 	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
 	Model.UpdateRecordState(uav.Uid, "scheduled")
+
+	c.JSON(200, gin.H{"desc": "审核成功"})
 	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
