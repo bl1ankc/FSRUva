@@ -1,8 +1,8 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"main/Model"
 	"time"
 )
@@ -14,6 +14,7 @@ func UploadNewUav(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.BindJSON(&uav); err != nil {
+		fmt.Println("上传新设备数据绑定失败：", err.Error())
 		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
@@ -21,7 +22,7 @@ func UploadNewUav(c *gin.Context) {
 	//数据插入
 	Model.InsertUva(uav.Name, uav.Type, uav.Uid)
 	Model.CreateQRCode(uav.Uid)
-
+	c.JSON(200, gin.H{"desc": "上传成功"})
 }
 
 // GetReview 获取审核中设备
@@ -48,7 +49,8 @@ func GetPassedUav(c *gin.Context) {
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		c.JSON(400, gin.H{"desc": "数据格式错误"})
+		fmt.Println("审核通过借用设备数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 
@@ -70,7 +72,8 @@ func BackPassedUav(c *gin.Context) {
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 
@@ -80,7 +83,7 @@ func BackPassedUav(c *gin.Context) {
 	Model.UpdateBackTime(uav.Uid)
 	Model.UpdateRecordState(uav.Uid, "returned")
 	Model.BackReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
-
+	c.JSON(200, gin.H{"desc": "审核成功"})
 }
 
 // GetFailUav 审核不通过借用设备
@@ -90,7 +93,8 @@ func GetFailUav(c *gin.Context) {
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("审核不通过借用设备数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 
@@ -98,7 +102,7 @@ func GetFailUav(c *gin.Context) {
 	Model.UpdateState(uav.Uid, "free")
 	Model.UpdateRecordState(uav.Uid, "refuse")
 	Model.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now())
-
+	c.JSON(200, gin.H{"desc": "审核成功"})
 }
 
 // BackFailUav 审核不通过归还设备
@@ -108,7 +112,8 @@ func BackFailUav(c *gin.Context) {
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("审核不通过归还设备数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 
@@ -116,6 +121,7 @@ func BackFailUav(c *gin.Context) {
 	Model.UpdateState(uav.Uid, "using")
 	Model.UpdateRecordState(uav.Uid, "using")
 	Model.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
+	c.JSON(200, gin.H{"desc": "审核成功"})
 }
 
 // GetAllUsers 获取所有用户
@@ -139,7 +145,8 @@ func ForceUpdateDevices(c *gin.Context) {
 	var uav Model.ChangeUav
 	//结构体绑定
 	if err := c.BindJSON(&uav); err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("强制修改设备信息数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 	Model.UpdateDevices(uav)
@@ -153,9 +160,10 @@ func UpdateUavRemark(c *gin.Context) {
 	var remark Model.RemarkUav
 	//结构体绑定
 	if err := c.BindJSON(&remark); err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("修改设备备注信息数据绑定失败：", err.Error())
+		c.JSON(400, gin.H{"msg": "参数格式错误"})
 	}
 
 	Model.UpdateUavRemark(remark.Uid, remark.Remark)
-	c.JSON(200, "OK")
+	c.JSON(200, gin.H{"desc": "修改成功"})
 }

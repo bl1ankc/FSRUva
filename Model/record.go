@@ -219,7 +219,7 @@ func GetUsingUavsByStuID(Stuid string) ([]UsingUav, bool) {
 	var tempuav []TempUav
 	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "using"}).Or(&Record{StudentID: Stuid, State: "Get under review"}).Or(&Record{StudentID: Stuid, State: "scheduled"}).Order("get_time Desc").Find(&tempuav)
 	if DB.Error != nil {
-		fmt.Println("通过学号查找使用中的无人机失败")
+		fmt.Println("通过学号查找使用中的无人机失败：", DB.Error.Error())
 		return uavs, false
 	}
 	flag := true

@@ -47,9 +47,9 @@ func UpdateUserPhone(c *gin.Context) {
 	//数据插入
 
 	if Model.UpdatePhone(user.StudentID, user.Phone) {
-		c.JSON(200, gin.H{"code": 200, "message": "电话更改成功"})
+		c.JSON(200, gin.H{"code": 200, "desc": "电话更改成功"})
 	} else {
-		c.JSON(502, gin.H{"code": 502, "message": "电话更改失败"})
+		c.JSON(502, gin.H{"code": 502, "desc": "电话更改失败"})
 	}
 }
 
@@ -70,9 +70,9 @@ func UpdateUserPwd(c *gin.Context) {
 	//数据更新
 	resopnse, success := Model.UpdatePwd(user.StudentID, user.OldPwd, user.NewPwd)
 	if success {
-		c.JSON(200, gin.H{"code": 200, "message": resopnse})
+		c.JSON(200, gin.H{"code": 200, "desc": resopnse})
 	} else {
-		c.JSON(502, gin.H{"code": 502, "message": resopnse})
+		c.JSON(502, gin.H{"code": 502, "desc": resopnse})
 	}
 }
 
@@ -93,6 +93,7 @@ func SetAdmin(c *gin.Context) {
 
 	//数据更改
 	Model.UpdateAdmin(id, true)
+	c.JSON(200, gin.H{"code": 200, "desc": "设置成功"})
 }
 
 // DelAdmin 取消管理员
@@ -102,4 +103,5 @@ func DelAdmin(c *gin.Context) {
 
 	//数据更改
 	Model.UpdateAdmin(id, false)
+	c.JSON(200, gin.H{"code": 200, "desc": "取消成功"})
 }

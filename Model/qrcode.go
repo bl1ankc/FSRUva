@@ -32,14 +32,14 @@ func UploadImgToOSS(cloudfilepath string, filepath string) bool {
 	// 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
 	client, err := oss.New(Endpoint, AccessKeyID, AccessKeySecret)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("oss上传失败1:", err)
 		return false
 	}
 
 	// 填写存储空间名称，例如examplebucket。
 	bucket, err := client.Bucket("unknownx")
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("oss上传失败2:", err)
 		return false
 	}
 
@@ -47,7 +47,7 @@ func UploadImgToOSS(cloudfilepath string, filepath string) bool {
 	//err = bucket.PutObjectFromFile("exampledir/exampleobject.txt", "D:\\localpath\\examplefile.txt")
 	err = bucket.PutObjectFromFile(cloudfilepath, filepath)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("oss上传失败3:", err)
 		return false
 	}
 	return true
