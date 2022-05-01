@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
-	"log"
 	"time"
 )
 
@@ -18,7 +17,7 @@ func GetUavByUid(Uid string) Uav {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
 
 	if errors.Is(DB.Error, gorm.ErrRecordNotFound) {
-		fmt.Println("获取信息失败")
+		fmt.Println("获取信息失败：", DB.Error.Error())
 		return Uav{}
 	}
 
@@ -34,7 +33,7 @@ func GetUavsByUids(Uids []string) ([]BackUav, bool) {
 		var uav BackUav
 		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
 		if DB.Error != nil {
-			fmt.Println("获取对应序列号组的设备组信息报错")
+			fmt.Println("获取对应序列号组的设备组信息失败：", DB.Error.Error())
 			return uavs, false
 		}
 		uavs = append(uavs, uav)
@@ -49,8 +48,7 @@ func GetUavByStates(UavState string, UavType string) []Uav {
 	DB := db.Model(&Uav{}).Where(Uav{State: UavState, Type: UavType}).Find(&uav)
 
 	if DB.Error != nil {
-		fmt.Println("获取对应状态级类型设备信息报错")
-		log.Fatal(DB.Error.Error())
+		fmt.Println("获取对应状态及类型的设备信息失败：", DB.Error.Error())
 	}
 
 	return uav
@@ -62,8 +60,7 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 	DB := db.Model(&Uav{}).Where(Uav{Name: UavName, Type: UavType}).Find(&uav)
 
 	if DB.Error != nil {
-		fmt.Println("获取对应设备型号及状态报错")
-		log.Fatal(DB.Error.Error())
+		fmt.Println("获取对应型号及状态的设备信息失败：", DB.Error.Error())
 	}
 
 	return uav
@@ -75,8 +72,7 @@ func InsertUva(UavName string, UavType string, UavUid string) {
 	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Unix(0, 0), Plan_time: time.Unix(0, 0), Back_time: time.Unix(0, 0)})
 
 	if DB.Error != nil {
-		fmt.Println("创建新设备报错")
-		log.Fatal(DB.Error.Error())
+		fmt.Println("创建新的设备失败：", DB.Error.Error())
 		return
 	}
 
@@ -90,7 +86,7 @@ func GetUavByAll(uav SearchUav) []Uav {
 
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type}).Find(&uavs)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("多条件查找设备信息失败：", DB.Error.Error())
 	}
 	return uavs
 }
@@ -101,8 +97,7 @@ func (u *BorrowUav) GetUavStateByUid() string {
 	DB := db.Model(&Uav{}).Where("uid = ?", u.Uid).First(&uav)
 
 	if DB.Error != nil {
-		fmt.Println("GetUvaByUid Error")
-		log.Fatal(DB.Error.Error())
+		fmt.Println("通过Uid获取设备状态失败：", DB.Error.Error())
 	}
 	return uav.State
 }
@@ -113,7 +108,7 @@ func GetBasicUavsByUid(Uid string) BasicUav {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("通过Uid获取设备基础信息失败：", DB.Error.Error())
 	}
 
 	return uav
@@ -128,7 +123,7 @@ func UpdateState(UavUid string, UavState string) {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Select("state").Updates(Uav{State: UavState})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新状态失败：", DB.Error.Error())
 		return
 	}
 
@@ -140,7 +135,7 @@ func UpdateBorrower(UavUid string, UavBorrower string, UavPhone string, UavStuID
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Borrower: UavBorrower, Phone: UavPhone, StudentID: UavStuID})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新借用人信息失败：", DB.Error.Error())
 		return
 	}
 
@@ -153,7 +148,7 @@ func UpdateBorrowTime(UavUid string, BorrowTime time.Time) {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Get_time: BorrowTime})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新借出时间失败：", DB.Error.Error())
 		return
 	}
 
@@ -165,7 +160,7 @@ func UpdatePlanTime(UavUid string, UavPlanTime time.Time) {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Updates(Uav{Plan_time: UavPlanTime})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新预计归还时间失败：", DB.Error.Error())
 		return
 	}
 
@@ -182,7 +177,7 @@ func UpdateBackTime(UavUid string) {
 	db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).First(&uav).Updates(Uav{Back_time: time.Now()})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新归还时间失败：", DB.Error.Error())
 		return
 	}
 
@@ -194,7 +189,7 @@ func UpdateUavRemark(Uid string, Remark string) {
 
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Updates(&Uav{Remark: Remark})
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新设备备注信息失败：", DB.Error.Error())
 	}
 
 }
@@ -204,7 +199,7 @@ func UpdateUavUsage(Uid string, Usage string) {
 	DB := db.Model(&Uav{}).Where(Uav{Uid: Uid}).Updates(&Uav{Usage: Usage})
 
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("更新设备用途失败：", DB.Error.Error())
 	}
 }
 
@@ -214,7 +209,7 @@ func UpdateImg(uid string, img string) {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).Update("img", img)
 
 	if DB.Error != nil {
-		fmt.Println("更新图片失败")
+		fmt.Println("更新图片img失败", DB.Error.Error())
 		return
 	}
 
@@ -239,16 +234,17 @@ func UpdateDataInUav(Uid string, HeadName string, Data string) {
 	if Data != "" {
 		DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Update(HeadName, Data)
 		if DB.Error != nil {
-			log.Fatal(DB.Error.Error())
+			fmt.Println("修改设备单个字符串数据失败：", DB.Error.Error())
 		}
 	}
 }
 
+// GetUavNameByUid 通过序列号查找设备名
 func GetUavNameByUid(Uid string) (string, bool) {
 	var name string
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Select("name").First(&name)
 	if DB.Error != nil {
-		fmt.Println(DB.Error.Error())
+		fmt.Println("通过序列号查找设备名失败：", DB.Error.Error())
 		return "", false
 	}
 	return name, true
