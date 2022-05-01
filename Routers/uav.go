@@ -5,7 +5,7 @@ import (
 )
 
 func UavRoute() {
-	g := r.Group("/Uav", api.AuthRequired())
+	g := r.Group("/Uav")
 	{
 		//可借用无人机展示
 		g.GET("/GetUav", api.GetNotUsedDrones)

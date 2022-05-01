@@ -53,9 +53,9 @@ func Login(c *gin.Context) {
 
 	//登录结构体定义
 	type UserLogin struct {
-		UserID  string `json:"stuid"`
-		Pwd     string `json:"pwd"`
-		IsAdmin bool   `json:"isAdmin"`
+		UserID string `json:"stuid"`
+		Pwd    string `json:"pwd"`
+		//IsAdmin bool   `json:"isAdmin"`
 	}
 	var user UserLogin
 
@@ -94,7 +94,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"token": signedToken, "desc": "登录成功", "IsAdmin": User.IsAdmin})
+	c.JSON(200, gin.H{"token": signedToken, "desc": "登录成功", "IsAdmin": User.IsAdmin, "phone": User.Phone, "name": User.Name})
 }
 
 // verifyAction

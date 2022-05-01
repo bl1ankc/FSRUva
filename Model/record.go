@@ -9,7 +9,7 @@ import (
 // RecordBorrow 增加一条记录
 func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) {
 
-	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: time.Unix(0, 0), Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
+	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: time.Date(3000, 0, 0, 0, 0, 0, 0, time.Local), Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
 
 	if DB.Error != nil {
 		fmt.Println("增加一条记录失败：", DB.Error.Error())
@@ -23,7 +23,7 @@ func UpdateRecordState(Uid string, State string) {
 
 	uav := GetUavByUid(Uid)
 	//更新状态
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Select("state").Updates(&Record{State: State})
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, Get_time: uav.Get_time}).Updates(&Record{State: State})
 
 	if DB.Error != nil {
 		fmt.Println("更新记录状态失败：", DB.Error.Error())
@@ -250,7 +250,7 @@ func GetHistoryUavsByStuID(Stuid string) ([]UsingUav, bool) {
 		Plan_Time time.Time `json:"plan_time"` //预计归还时间
 	}
 	var tempuav []TempUav
-	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "returned"}).Or(&Record{StudentID: Stuid, State: "Back under review"}).Order("get_time Desc").Find(&tempuav)
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "returned"}).Or(&Record{StudentID: Stuid, State: "refuse"}).Or(&Record{StudentID: Stuid, State: "cancelled"}).Or(&Record{StudentID: Stuid, State: "Back under review"}).Order("get_time Desc").Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找历史借用的无人机失败", DB.Error.Error())
 		return uavs, false

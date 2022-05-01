@@ -53,7 +53,7 @@ func GetPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与借用时间
-	BorrowTime := time.Now().Local()
+	BorrowTime := time.Now()
 	Model.UpdateState(uav.Uid, "scheduled")
 	Model.UpdateBorrowTime(uav.Uid, BorrowTime)
 	Model.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)

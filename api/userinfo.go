@@ -21,7 +21,6 @@ func UploadUser(c *gin.Context) {
 		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
-
 	//数据插入
 	response := Model.InsertUser(user.Name, user.Phone, user.StudentID, user.Pwd)
 	c.JSON(200, response)
