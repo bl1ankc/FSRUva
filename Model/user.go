@@ -32,7 +32,7 @@ func UpdatePhone(Stuid string, Phone string) bool {
 	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Updates(&User{Phone: Phone})
 
 	if DB.Error != nil {
-		fmt.Println(Stuid, "电话更改失败")
+		fmt.Println(Stuid, "电话更改失败：", DB.Error.Error())
 		return false
 	}
 
@@ -46,7 +46,7 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Select("pwd").First(&old)
 
 	if DB.Error != nil {
-		fmt.Println(Stuid, "密码更改失败")
+		fmt.Println(Stuid, "密码更改失败1：", DB.Error.Error())
 		return "密码更改失败", false
 	}
 
@@ -55,7 +55,7 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 		DB = db.Model(&User{}).Where(&User{StudentID: Stuid}).Updates(&User{Pwd: NewPwd})
 
 		if DB.Error != nil {
-			fmt.Println(Stuid, "密码更改失败")
+			fmt.Println(Stuid, "密码更改失败2：", DB.Error.Error())
 			return "密码更改失败", false
 		}
 
@@ -67,12 +67,17 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 }
 
 // UpdateAdmin 修改管理员标识
-func UpdateAdmin(Stuid string, Isadmin bool) {
+func UpdateAdmin(Stuid string, Isadmin bool) bool {
 	//用户变量
 	var user User
 
 	//更新用户管理权限
-	db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user).Update("is_admin", Isadmin)
+	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user).Update("is_admin", Isadmin)
+	if DB.Error != nil {
+		fmt.Println("修改管理员标识失败：", DB.Error.Error())
+		return false
+	}
+	return true
 }
 
 //// UpdateStudentId 修改学号

@@ -10,14 +10,14 @@ import (
 	注册
 */
 
-// UploadUser 上传用户信息ljy
+// UploadUser 上传用户信息
 func UploadUser(c *gin.Context) {
 	//模型定义
 	var user Model.User
 
 	//绑定结构体
 	if err := c.BindJSON(&user); err != nil {
-		fmt.Println("绑定失败")
+		fmt.Println("上传用户信息绑定失败：", err.Error())
 		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
@@ -41,7 +41,8 @@ func UpdateUserPhone(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		fmt.Println("更新电话数据绑定失败", err.Error())
+		c.JSON(400, gin.H{"code": 400, "desc": "更改失败"})
 		return
 	}
 	//数据插入
@@ -64,7 +65,8 @@ func UpdateUserPwd(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		fmt.Println("更改密码数据绑定失败", err.Error())
+		c.JSON(400, gin.H{"code": 400, "desc": "更改失败"})
 		return
 	}
 	//数据更新
@@ -92,8 +94,12 @@ func SetAdmin(c *gin.Context) {
 	id := c.Query("stuid")
 
 	//数据更改
-	Model.UpdateAdmin(id, true)
-	c.JSON(200, gin.H{"code": 200, "desc": "设置成功"})
+	if Model.UpdateAdmin(id, true) {
+		c.JSON(200, gin.H{"code": 200, "desc": "设置成功"})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": "设置失败"})
+	}
+
 }
 
 // DelAdmin 取消管理员
@@ -102,6 +108,9 @@ func DelAdmin(c *gin.Context) {
 	id := c.Query("stuid")
 
 	//数据更改
-	Model.UpdateAdmin(id, false)
-	c.JSON(200, gin.H{"code": 200, "desc": "取消成功"})
+	if Model.UpdateAdmin(id, false) {
+		c.JSON(200, gin.H{"code": 200, "desc": "取消成功"})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": "取消失败"})
+	}
 }

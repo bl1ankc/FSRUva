@@ -110,7 +110,7 @@ type BackUser struct {
 	Name      string `json:"name"`
 	Phone     string `json:"phone" `
 	StudentID string `json:"stuid"`
-	IsAdmin   bool   `json:"isadmin"`
+	IsAdmin   bool   `json:"IsAdmin"`
 }
 
 // SearchUav 查询设备模型

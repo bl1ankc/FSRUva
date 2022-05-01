@@ -20,9 +20,13 @@ func UploadNewUav(c *gin.Context) {
 	}
 
 	//数据插入
-	Model.InsertUva(uav.Name, uav.Type, uav.Uid)
+	flag, response := Model.InsertUva(uav.Name, uav.Type, uav.Uid)
 	Model.CreateQRCode(uav.Uid)
-	c.JSON(200, gin.H{"desc": "上传成功"})
+	if flag {
+		c.JSON(200, gin.H{"code": 200, "desc": "上传成功"})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": response})
+	}
 }
 
 // GetReview 获取审核中设备

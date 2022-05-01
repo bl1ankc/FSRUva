@@ -67,16 +67,27 @@ func GetUavByNames(UavName string, UavType string) []Uav {
 }
 
 // InsertUva 创建新的设备
-func InsertUva(UavName string, UavType string, UavUid string) {
-	//创建新记录
-	DB := db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Unix(0, 0), Plan_time: time.Unix(0, 0), Back_time: time.Unix(0, 0)})
-
+func InsertUva(UavName string, UavType string, UavUid string) (bool, string) {
+	//查询设备是否存在
+	var cnt int64
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: UavUid}).Count(&cnt)
 	if DB.Error != nil {
-		fmt.Println("创建新的设备失败：", DB.Error.Error())
-		return
+		fmt.Println("创建新的设备失败1：", DB.Error.Error())
+		return false, "发生未知错误1"
+	}
+	if cnt >= 1 {
+		return false, "设备已存在"
 	}
 
-	return
+	//创建新记录
+	DB = db.Create(&Uav{Name: UavName, Type: UavType, Uid: UavUid, Get_time: time.Unix(0, 0), Plan_time: time.Unix(0, 0), Back_time: time.Unix(0, 0)})
+
+	if DB.Error != nil {
+		fmt.Println("创建新的设备失败2：", DB.Error.Error())
+		return false, "发生未知错误2"
+	}
+
+	return true, "创建成功"
 }
 
 // GetUavByAll 多条件查找设备信息
