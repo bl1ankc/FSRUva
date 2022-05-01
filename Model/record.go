@@ -9,7 +9,9 @@ import (
 // RecordBorrow 增加一条记录
 func RecordBorrow(Uid string, Stuid string, Borrower string, Plan_time time.Time, Usage string) {
 
-	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: time.Date(3000, 0, 0, 0, 0, 0, 0, time.Local), Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
+	uav := GetUavByUid(Uid)
+
+	DB := db.Create(&Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, Plan_time: Plan_time, Usage: Usage, Get_time: uav.Get_time, Back_time: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)})
 
 	if DB.Error != nil {
 		fmt.Println("增加一条记录失败：", DB.Error.Error())

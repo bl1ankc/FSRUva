@@ -22,8 +22,13 @@ func UploadUser(c *gin.Context) {
 		return
 	}
 	//数据插入
-	response := Model.InsertUser(user.Name, user.Phone, user.StudentID, user.Pwd)
-	c.JSON(200, response)
+	flag, response := Model.InsertUser(user.Name, user.Phone, user.StudentID, user.Pwd)
+	if flag {
+		c.JSON(200, gin.H{"code": 200, "desc": response})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": response})
+	}
+
 }
 
 /*

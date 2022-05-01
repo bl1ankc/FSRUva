@@ -2,28 +2,28 @@ package Model
 
 import (
 	"fmt"
-	"log"
 )
 
 // InsertUser 创建新用户
-func InsertUser(Name string, Phone string, StudentID string, Pwd string) string {
+func InsertUser(Name string, Phone string, StudentID string, Pwd string) (bool, string) {
 
 	//判断用户是否存在
 	var count int64
 	DB := db.Model(&User{}).Where(&User{StudentID: StudentID}).Count(&count)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("创建新用户失败1：", DB.Error.Error())
 	}
 	if count != 0 {
-		return "用户已存在"
+		return false, "用户已存在"
 	}
 
 	//创建数据
 	DB = db.Create(&User{Name: Name, Phone: Phone, StudentID: StudentID, Pwd: Pwd})
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("创建新用户失败2：", DB.Error.Error())
+		return false, "注册失败，请联系管理员"
 	}
-	return "OK"
+	return true, "注册成功"
 }
 
 // UpdatePhone 修改电话号码
@@ -139,7 +139,7 @@ func GetAllUsers() []BackUser {
 	var user []BackUser
 	DB := db.Model(&User{}).Find(&user)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("获取所有用户失败：", DB.Error.Error())
 	}
 	return user
 }
@@ -150,7 +150,7 @@ func GetUserByID(Stuid string) BackUser {
 	var user BackUser
 	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Find(&user)
 	if DB.Error != nil {
-		log.Fatal(DB.Error.Error())
+		fmt.Println("通过学号查找用户信息失败：", DB.Error.Error())
 	}
 	return user
 }
