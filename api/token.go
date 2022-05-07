@@ -53,8 +53,10 @@ func Login(c *gin.Context) {
 
 	//登录结构体定义
 	type UserLogin struct {
-		UserID string `json:"stuid"`
-		Pwd    string `json:"pwd"`
+		UserID    string `json:"stuid"`
+		Pwd       string `json:"pwd"`
+		NickName  string `json:"nickName"`
+		AvatarUrl string `json:"avatarUrl"`
 		//IsAdmin bool   `json:"isAdmin"`
 	}
 	var user UserLogin
@@ -93,7 +95,7 @@ func Login(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-
+	Model.UpdateUserInfo(user.UserID, user.NickName, user.AvatarUrl)
 	c.JSON(200, gin.H{"token": signedToken, "desc": "登录成功", "IsAdmin": User.IsAdmin, "phone": User.Phone, "name": User.Name})
 }
 

@@ -42,6 +42,8 @@ type User struct {
 	Phone     string `json:"phone"`                        //电话
 	IsAdmin   bool   `json:"isadmin" gorm:"default:false"` //判断管理员
 	//Count     int    `json:"count" gorm:"default:0"`
+	NickName  string `json:"nickName"`  //昵称
+	AvatarUrl string `json:"avatarUrl"` //头像
 }
 
 // Record 历史记录模型
@@ -114,6 +116,8 @@ type BackUser struct {
 	Phone     string `json:"phone" `
 	StudentID string `json:"stuid"`
 	IsAdmin   bool   `json:"IsAdmin"`
+	NickName  string `json:"nickName"`
+	AvatarUrl string `json:"avatarUrl"`
 }
 
 // SearchUav 查询设备模型
