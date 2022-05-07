@@ -86,6 +86,6 @@ func GetDeviceByUid(c *gin.Context) {
 	id := c.Query("uid")
 
 	uav := Model.GetUavByUid(id)
-
+	uav.Img, _ = Model.GetPicUrl(uav.Img)
 	c.JSON(200, &uav)
 }

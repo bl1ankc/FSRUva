@@ -13,7 +13,7 @@ func BorrowUav(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.ShouldBindJSON(&uav); err != nil {
-		fmt.Println("绑定失败")
+		fmt.Println("绑定失败：", err.Error())
 		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
