@@ -2,6 +2,7 @@ package Model
 
 import (
 	"fmt"
+	"time"
 )
 
 // InsertUser 创建新用户
@@ -168,4 +169,15 @@ func UpdateUserInfo(Stuid string, Nickname string, AvatarUrl string) bool {
 		return false
 	}
 	return true
+}
+
+// SearchStuInOneDay 获取有即将归还设备的用户
+func SearchStuInOneDay() ([]string, bool) {
+	var stus []string
+	DB := db.Model(&Uav{}).Where(&Uav{State: "using"}).Where("plan_time > ?", time.Now().AddDate(0, 0, -2)).Select("student_id").Distinct("student_id").Find(&stus)
+	if DB.Error != nil {
+		fmt.Println("获取即将要归还的无人机失败：", DB.Error.Error())
+		return stus, false
+	}
+	return stus, true
 }

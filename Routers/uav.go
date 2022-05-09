@@ -18,5 +18,8 @@ func UavRoute() {
 
 		//单独获取设备数据
 		g.GET("/GetDevice", api.GetDeviceByUid)
+
+		//获取设备组信息
+		g.POST("/GetDeviceByUids", api.GetDeviceByUids)
 	}
 }

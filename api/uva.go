@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"main/Model"
@@ -88,4 +89,25 @@ func GetDeviceByUid(c *gin.Context) {
 	uav := Model.GetUavByUid(id)
 	uav.Img, _ = Model.GetPicUrl(uav.Img)
 	c.JSON(200, &uav)
+}
+
+// GetDeviceByUids 获取对应uid设备信息
+func GetDeviceByUids(c *gin.Context) {
+	type searchuid struct {
+		Uid []string `json:"uid"`
+	}
+	var searchuids searchuid
+
+	//结构体绑定
+	if err := c.BindJSON(&searchuids); err != nil {
+		fmt.Println("获取对应uid设备信息 绑定失败", err.Error())
+		c.JSON(401, gin.H{"code": 400, "desc": "绑定失败"})
+		return
+	}
+	uavs, flag := Model.GetUavsByUids(searchuids.Uid)
+	if flag {
+		c.JSON(200, uavs)
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": "查找失败"})
+	}
 }

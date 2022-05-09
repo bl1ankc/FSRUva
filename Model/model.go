@@ -44,6 +44,8 @@ type User struct {
 	//Count     int    `json:"count" gorm:"default:0"`
 	NickName  string `json:"nickName"`  //昵称
 	AvatarUrl string `json:"avatarUrl"` //头像
+	Openid    string `json:"openid"`    //微信openid
+	Unionid   string `json:"unionid"`   //微信unionid
 }
 
 // Record 历史记录模型

@@ -27,11 +27,10 @@ func GetUavByUid(Uid string) Uav {
 // GetUavsByUids 获取对应序列号组的设备组信息
 func GetUavsByUids(Uids []string) ([]BackUav, bool) {
 	var uavs []BackUav
-	DB := db.Model(&Uav{})
 
 	for _, uid := range Uids {
 		var uav BackUav
-		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
+		DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
 		if DB.Error != nil {
 			fmt.Println("获取对应序列号组的设备组信息失败：", DB.Error.Error())
 			return uavs, false
