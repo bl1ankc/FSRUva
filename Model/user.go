@@ -2,7 +2,6 @@ package Model
 
 import (
 	"fmt"
-	"time"
 )
 
 // InsertUser 创建新用户
@@ -150,7 +149,7 @@ func GetAllUsers() []BackUser {
 	return user
 }
 
-// GetUserByID 通过学号查找用户信息
+// GetUserByID 通过学号查找登录用户信息
 func GetUserByID(Stuid string) BackUser {
 
 	var user BackUser
@@ -171,13 +170,13 @@ func UpdateUserInfo(Stuid string, Nickname string, AvatarUrl string) bool {
 	return true
 }
 
-// SearchStuInOneDay 获取有即将归还设备的用户
-func SearchStuInOneDay() ([]string, bool) {
-	var stus []string
-	DB := db.Model(&Uav{}).Where(&Uav{State: "using"}).Where("plan_time > ?", time.Now().AddDate(0, 0, -2)).Select("student_id").Distinct("student_id").Find(&stus)
+// GetUserInfoByStudentId 通过学号获取全部用户信息
+func GetUserInfoByStudentId(Stuid string) User {
+	var user User
+	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user)
 	if DB.Error != nil {
-		fmt.Println("获取即将要归还的无人机失败：", DB.Error.Error())
-		return stus, false
+		fmt.Println("通过学号获取用户信息失败：", DB.Error.Error())
+		return user
 	}
-	return stus, true
+	return user
 }

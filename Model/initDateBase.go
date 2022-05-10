@@ -22,4 +22,7 @@ func init() {
 
 	//自动迁移
 	db.AutoMigrate(&Uav{}, &Record{}, &User{})
+
+	//初始化微信模板ID
+	InitWXMessage()
 }

@@ -1,10 +1,9 @@
-package Routers
+package cron
 
 import (
 	"fmt"
 	cron2 "github.com/robfig/cron/v3"
 	"main/Model"
-	"main/api"
 )
 
 var c *cron2.Cron
@@ -24,7 +23,7 @@ func InitCron() *cron2.Cron {
 	cronid = append(cronid, id)
 
 	//每天7点，18点 提醒用户归还
-	id, err = c.AddFunc("0 0 7,18 * * ?", api.RemindUserReturnUav)
+	id, err = c.AddFunc("0 0 7,18 * * ?", RemindUserReturnUav)
 	if err != nil {
 		fmt.Println("定时任务2出错", err.Error())
 	}

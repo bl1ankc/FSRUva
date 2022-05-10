@@ -280,3 +280,14 @@ func GetRecordIdinUav(Uid string) (uint, bool) {
 	}
 	return id, true
 }
+
+// SearchStuInOneDay 获取即将归还的设备
+func SearchStuInOneDay() ([]Uav, bool) {
+	var uavs []Uav
+	DB := db.Model(&Uav{}).Where(&Uav{State: "using"}).Where("plan_time > ?", time.Now().AddDate(0, 0, -2)).Find(&uavs)
+	if DB.Error != nil {
+		fmt.Println("获取即将要归还的无人机失败：", DB.Error.Error())
+		return uavs, false
+	}
+	return uavs, true
+}

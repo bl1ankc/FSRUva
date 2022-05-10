@@ -2,11 +2,12 @@ package main
 
 import (
 	"main/Routers"
+	"main/cron"
 )
 
 func main() {
 	//初始化定时任务
-	c := Routers.InitCron()
+	c := cron.InitCron()
 
 	c.Start()
 
