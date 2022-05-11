@@ -25,7 +25,7 @@ func GetUavByUid(Uid string) Uav {
 }
 
 // GetUavsByUids 获取对应序列号组的设备组信息
-func GetUavsByUids(Uids []string) ([]BackUav, bool) {
+func GetUavsByUids(Uids []string) []BackUav {
 	var uavs []BackUav
 
 	for _, uid := range Uids {
@@ -33,12 +33,13 @@ func GetUavsByUids(Uids []string) ([]BackUav, bool) {
 		DB := db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
 		if DB.Error != nil {
 			fmt.Println("获取对应序列号组的设备组信息失败：", DB.Error.Error())
-			return uavs, false
+		} else {
+			uavs = append(uavs, uav)
 		}
-		uavs = append(uavs, uav)
+
 	}
 
-	return uavs, true
+	return uavs
 }
 
 // GetUavByStates 获取对应状态及类型的设备信息
@@ -110,18 +111,6 @@ func (u *BorrowUav) GetUavStateByUid() string {
 		fmt.Println("通过Uid获取设备状态失败：", DB.Error.Error())
 	}
 	return uav.State
-}
-
-// GetBasicUavsByUid 通过Uid获取设备基础信息
-func GetBasicUavsByUid(Uid string) BasicUav {
-	var uav BasicUav
-	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
-
-	if DB.Error != nil {
-		fmt.Println("通过Uid获取设备基础信息失败：", DB.Error.Error())
-	}
-
-	return uav
 }
 
 /*
@@ -231,12 +220,14 @@ func UpdateImg(uid string, img string) {
 */
 
 // UpdateDevices 强制修改设备数据
-func UpdateDevices(uav ChangeUav) {
+func UpdateDevices(uav Uav) {
 	UpdateDataInUav(uav.Uid, "type", uav.Type)
 	UpdateDataInUav(uav.Uid, "name", uav.Name)
-	UpdateDataInUav(uav.Uid, "borrower", uav.Borrower)
-	UpdateDataInUav(uav.Uid, "phone", uav.Phone)
-	UpdateDataInUav(uav.Uid, "state", uav.State)
+	UpdateDataInUav(uav.Uid, "location", uav.Location)
+	UpdateDataInUav(uav.Uid, "remark", uav.Remark)
+	//UpdateDataInUav(uav.Uid, "borrower", uav.Borrower)
+	//UpdateDataInUav(uav.Uid, "phone", uav.Phone)
+	//UpdateDataInUav(uav.Uid, "state", uav.State)
 }
 
 // UpdateDataInUav 修改设备单个字符串数据

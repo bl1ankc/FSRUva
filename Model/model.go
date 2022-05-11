@@ -28,9 +28,11 @@ type Uav struct {
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
 
-	Img    string `json:"img"`    //当前图片索引
-	Usage  string `json:"usage"`  //当前借用用途
-	Remark string `json:"remark"` //设备备注信息
+	Img   string `json:"img"`   //当前图片索引
+	Usage string `json:"usage"` //当前借用用途
+
+	Location string `json:"location"` //设备存放位置
+	Remark   string `json:"remark"`   //设备备注信息
 }
 
 // User 用户模型
@@ -108,7 +110,8 @@ type BackUav struct {
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
 
-	Remark string `json:"remark"` //设备备注信息
+	Location string `json:"location"` //设备存放位置
+	Remark   string `json:"remark"`   //设备备注信息
 
 }
 
@@ -130,16 +133,6 @@ type SearchUav struct {
 	Uid   string `json:"uid" form:"uid" binding:"-"`     //设备序号
 }
 
-// ChangeUav 修改设备模型
-type ChangeUav struct {
-	Name     string `json:"name"`     //设备名称
-	State    string `json:"state"`    //设备状态
-	Type     string `json:"type"`     //设备类型
-	Uid      string `json:"uid"`      //设备序号（识别设备）
-	Borrower string `json:"borrower"` //借用人姓名
-	Phone    string `json:"phone"`    //借用人电话
-}
-
 // BorrowUav 借用设备模型
 type BorrowUav struct {
 	Uid       string    `json:"uid"`       //设备序号
@@ -155,20 +148,6 @@ type CheckUav struct {
 	Uid     string `json:"uid"`     //设备序号
 	Checker string `json:"checker"` //审核人姓名
 	Comment string `json:"comment"` //备注原因
-}
-
-// RemarkUav 修改设备备注模型
-type RemarkUav struct {
-	Uid    string `json:"uid"`    //设备序号
-	Remark string `json:"remark"` //备注
-}
-
-// BasicUav 查询记录模型
-type BasicUav struct {
-	Name   string `json:"name"`   //设备名称
-	Type   string `json:"type"`   //设备类型
-	Uid    string `json:"uid"`    //设备序号
-	Remark string `json:"remark"` //设备备注
 }
 
 // UsingUav 使用中的无人机

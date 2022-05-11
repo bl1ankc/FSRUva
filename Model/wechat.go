@@ -22,7 +22,10 @@ const (
 // InitWXMessage 初始化模板ID
 func InitWXMessage() {
 	WXMESSAGE = make(map[string]string)
-
+	WXMESSAGE["RemindUserReturnUav"] = ""
+	WXMESSAGE["RemindScheduleOK"] = ""
+	WXMESSAGE["RemindCheckOK"] = ""
+	WXMESSAGE["RemindAdminCheck"] = ""
 }
 
 // GetWXAccessToken 获取微信accesstoken
@@ -74,8 +77,8 @@ func GetWXAccessToken() {
 
 }
 
-// GetOPENID 获取用户OPENID和UNIONID
-func GetOPENID(CODE string) (bool, string, string) {
+// GetOpenid 获取用户OPENID和UNIONID
+func GetOpenid(CODE string) (bool, string, string) {
 	//发送请求
 	res, err := http.Get("https://api.weixin.qq.com/sns/jscode2session?appid=" + APPID + "&secret=" + APPSECRET + "&js_code=" + CODE + "&grant_type=authorization_code")
 	if err != nil {
@@ -129,22 +132,22 @@ func SendMessage(Openid string, ID string, Page string, Data interface{}) bool {
 
 	//定义结构体
 	type Request struct {
-		AccessToken string      `json:"access_token"`
-		Truser      string      `json:"truser"`
-		TemplateId  string      `json:"template_id"`
-		Page        string      `json:"page"`
-		Data        interface{} `json:"data"`
+		//AccessToken string      `json:"access_token"`
+		Touser     string      `json:"touser"`
+		TemplateId string      `json:"template_id"`
+		Page       string      `json:"page"`
+		Data       interface{} `json:"data"`
 	}
 
 	//绑定数据
 	requestData := Request{
-		AccessToken: WXAccessToken,
-		Truser:      Openid,
-		TemplateId:  WXMESSAGE[ID],
-		Page:        Page,
-		Data:        Data,
+		//AccessToken: WXAccessToken,
+		Touser:     Openid,
+		TemplateId: WXMESSAGE[ID],
+		Page:       Page,
+		Data:       Data,
 	}
-	url := "https://api.weixin.qq.com/cgi-bin/message/subscribe/send"
+	url := "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + WXAccessToken
 
 	//转换数据
 	requestByte, err := json.Marshal(requestData)
@@ -197,7 +200,6 @@ func SendMessage(Openid string, ID string, Page string, Data interface{}) bool {
 		return false
 	}
 
-	fmt.Println(responseData)
 	return true
 
 }

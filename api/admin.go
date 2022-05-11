@@ -146,7 +146,7 @@ func GetAllRecords(c *gin.Context) {
 
 // ForceUpdateDevices 强制修改设备信息
 func ForceUpdateDevices(c *gin.Context) {
-	var uav Model.ChangeUav
+	var uav Model.Uav
 	//结构体绑定
 	if err := c.BindJSON(&uav); err != nil {
 		fmt.Println("强制修改设备信息数据绑定失败：", err.Error())
@@ -161,7 +161,7 @@ func ForceUpdateDevices(c *gin.Context) {
 
 //UpdateUavRemark 修改设备备注信息
 func UpdateUavRemark(c *gin.Context) {
-	var remark Model.RemarkUav
+	var remark Model.Uav
 	//结构体绑定
 	if err := c.BindJSON(&remark); err != nil {
 		fmt.Println("修改设备备注信息数据绑定失败：", err.Error())

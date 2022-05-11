@@ -93,9 +93,10 @@ func GetRecordsByID(Stuid string) []BackRecord {
 
 		//填充设备信息
 		for _, uav := range uavs {
-			uavinfo := GetBasicUavsByUid(uav.Uid)
+			uavinfo := GetUavByUid(uav.Uid)
 			uav.Name = uavinfo.Name
 			uav.Type = uavinfo.Type
+			uav.Location = uavinfo.Location
 			uav.Remark = uavinfo.Remark
 			uavs = append(uavs, uav)
 		}
@@ -328,4 +329,17 @@ func GetHistoryUavsByStuID(Stuid string) ([]UsingUav, bool) {
 		uavs = append(uavs, uav)
 	}
 	return uavs, true
+}
+
+// GetRecordById 通过记录ID查找记录信息
+func GetRecordById(recordid uint) (bool, Record) {
+	var record Record
+
+	DB := db.Model(&Record{}).Where("id", recordid).First(&record)
+	if DB.Error != nil {
+		fmt.Println("通过记录ID查找记录信息失败", DB.Error.Error())
+		return false, record
+	}
+
+	return true, record
 }

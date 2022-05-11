@@ -104,10 +104,8 @@ func GetDeviceByUids(c *gin.Context) {
 		c.JSON(401, gin.H{"code": 400, "desc": "绑定失败"})
 		return
 	}
-	uavs, flag := Model.GetUavsByUids(searchuids.Uid)
-	if flag {
-		c.JSON(200, uavs)
-	} else {
-		c.JSON(200, gin.H{"code": 200, "desc": "查找失败"})
-	}
+	uavs := Model.GetUavsByUids(searchuids.Uid)
+
+	c.JSON(200, uavs)
+
 }

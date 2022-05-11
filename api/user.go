@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"main/Model"
+	"mime/multipart"
 )
 
 // BorrowUav 借用设备
@@ -64,6 +65,7 @@ func BackUav(c *gin.Context) {
 	Model.UpdateState(id, "Back under review")
 	Model.UpdateImgInRecord(id, "back_img")
 	Model.UpdateRecordState(id, "Back under review")
+	Model.UpdateBackRecord(id)
 	c.JSON(200, gin.H{"desc": "归还成功"})
 }
 
@@ -144,12 +146,29 @@ func UploadImg(c *gin.Context) bool {
 		return false
 	}
 
+	//转换失败
+	src, err := file.Open()
+	if err != nil {
+		fmt.Println("OSS文件转换失败")
+		return false
+	}
+
+	//关闭失败
+	defer func(src multipart.File) {
+		err := src.Close()
+		if err != nil {
+			fmt.Println("OSS文件关闭失败")
+		}
+	}(src)
+
 	//云端上传
-	if !Model.UploadImgToOSS("img/"+filename, "./img/"+filename) {
+	if !Model.UploadImgToOSS("img/"+filename, src) {
 		fmt.Println("OSS上传失败")
 	}
+
 	//上传成功
 	Model.UpdateImg(c.Query("uid"), filename)
+	fmt.Println("OSS上传成功")
 	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/img/" + filename})
 	return true
 }

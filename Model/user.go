@@ -161,7 +161,7 @@ func GetUserByID(Stuid string) BackUser {
 }
 
 // UpdateUserInfo 更新用户昵称头像
-func UpdateUserInfo(Stuid string, Nickname string, AvatarUrl string) bool {
+func UpdateUserInfo(Stuid string, Nickname string, AvatarUrl string, Openid string, Unionid string) bool {
 	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Updates(&User{NickName: Nickname, AvatarUrl: AvatarUrl})
 	if DB.Error != nil {
 		fmt.Println("更新用户昵称头像失败：", DB.Error.Error())
