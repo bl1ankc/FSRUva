@@ -162,21 +162,10 @@ func GetUserByID(Stuid string) BackUser {
 
 // UpdateUserInfo 更新用户昵称头像
 func UpdateUserInfo(Stuid string, Nickname string, AvatarUrl string, Openid string, Unionid string) bool {
-	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Updates(&User{NickName: Nickname, AvatarUrl: AvatarUrl})
+	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).Updates(&User{NickName: Nickname, AvatarUrl: AvatarUrl, Openid: Openid, Unionid: Unionid})
 	if DB.Error != nil {
 		fmt.Println("更新用户昵称头像失败：", DB.Error.Error())
 		return false
 	}
 	return true
-}
-
-// GetUserInfoByStudentId 通过学号获取全部用户信息
-func GetUserInfoByStudentId(Stuid string) User {
-	var user User
-	DB := db.Model(&User{}).Where(&User{StudentID: Stuid}).First(&user)
-	if DB.Error != nil {
-		fmt.Println("通过学号获取用户信息失败：", DB.Error.Error())
-		return user
-	}
-	return user
 }

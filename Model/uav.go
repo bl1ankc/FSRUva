@@ -24,6 +24,18 @@ func GetUavByUid(Uid string) Uav {
 	return uav
 }
 
+// GetBackUavByUid 获取对应序列号的设备返回信息
+func GetBackUavByUid(Uid string) BackUav {
+	var uav BackUav
+
+	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
+	if DB.Error != nil {
+		fmt.Println("获取对应序列号的设备返回信息：", DB.Error.Error())
+	}
+
+	return uav
+}
+
 // GetUavsByUids 获取对应序列号组的设备组信息
 func GetUavsByUids(Uids []string) []BackUav {
 	var uavs []BackUav
@@ -111,6 +123,17 @@ func (u *BorrowUav) GetUavStateByUid() string {
 		fmt.Println("通过Uid获取设备状态失败：", DB.Error.Error())
 	}
 	return uav.State
+}
+
+// SearchStuInOneDay 获取即将归还的设备
+func SearchStuInOneDay() ([]Uav, bool) {
+	var uavs []Uav
+	DB := db.Model(&Uav{}).Where(&Uav{State: "using"}).Where("plan_time > ?", time.Now().AddDate(0, 0, -2)).Find(&uavs)
+	if DB.Error != nil {
+		fmt.Println("获取即将要归还的无人机失败：", DB.Error.Error())
+		return uavs, false
+	}
+	return uavs, true
 }
 
 /*
@@ -251,6 +274,10 @@ func GetUavNameByUid(Uid string) (string, bool) {
 	return name, true
 }
 
+/*
+	记录相关
+*/
+
 // UpdateRecordIdinUav 在设备中更新记录ID
 func UpdateRecordIdinUav(Uid string, id uint) bool {
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).Updates(&Uav{RecordID: id})
@@ -270,15 +297,4 @@ func GetRecordIdinUav(Uid string) (uint, bool) {
 		return 0, false
 	}
 	return id, true
-}
-
-// SearchStuInOneDay 获取即将归还的设备
-func SearchStuInOneDay() ([]Uav, bool) {
-	var uavs []Uav
-	DB := db.Model(&Uav{}).Where(&Uav{State: "using"}).Where("plan_time > ?", time.Now().AddDate(0, 0, -2)).Find(&uavs)
-	if DB.Error != nil {
-		fmt.Println("获取即将要归还的无人机失败：", DB.Error.Error())
-		return uavs, false
-	}
-	return uavs, true
 }

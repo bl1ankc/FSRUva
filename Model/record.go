@@ -147,23 +147,6 @@ func GetRecordsByUid(Uid string) []Record {
 	return records
 }
 
-// GetBackUavsByUids 获取对应序列号组的设备组返回信息
-func GetBackUavsByUids(Uids []string) []BackUav {
-	var uavs []BackUav
-	DB := db.Model(&Uav{})
-
-	for _, uid := range Uids {
-		var uav BackUav
-		DB = db.Model(&Uav{}).Where(&Uav{Uid: uid}).First(&uav)
-		if DB.Error != nil {
-			fmt.Println("获取对应序列号组的设备组返回信息失败：", DB.Error.Error())
-		}
-		uavs = append(uavs, uav)
-	}
-
-	return uavs
-}
-
 // GetAllRecords 获取所有历史记录
 func GetAllRecords() [][]BackRecord {
 	//获取用户列表

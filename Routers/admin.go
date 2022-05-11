@@ -35,6 +35,9 @@ func AdminRoute() {
 		//获取指定设备信息
 		g.POST("/GetDevices", api.GetDevices)
 
+		//通过uid获取设备信息（管理员）
+		g.GET("/GetDevices", api.AdminGetDeviceByUid)
+
 		//强制修改设备信息
 		g.POST("/ForceUpdateDevices", api.ForceUpdateDevices)
 

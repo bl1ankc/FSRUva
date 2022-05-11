@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"fmt"
 	"main/Model"
 )
 
@@ -8,7 +9,7 @@ type Value struct {
 	Value string `json:"value"`
 }
 
-// RemindUserReturnUav 提醒用户归还无人机(未完成)
+// RemindUserReturnUav 提醒用户归还无人机
 func RemindUserReturnUav() {
 	//查找即将要归还的无人机
 	uavs, _ := Model.SearchStuInOneDay()
@@ -28,7 +29,10 @@ func RemindUserReturnUav() {
 			EndTime:   Value{Value: uav.Plan_time.Format("2006-01-02 15:04")},
 			Comment:   Value{Value: Message},
 		}
-		user := Model.GetUserInfoByStudentId(uav.StudentID)
+		user, err := Model.GetUserByIDToLogin(uav.StudentID)
+		if err != nil {
+			fmt.Println("提醒用户归还无人机失败 查找用户：", err.Error())
+		}
 		Model.SendMessage(user.Openid, "RemindUserReturnUav", "/pages/returnby_rfid/returnby_rfid", data)
 	}
 }
@@ -56,7 +60,10 @@ func RemindScheduleOK(Uid string) {
 		UavName:   Value{Value: uav.Name},
 	}
 
-	user := Model.GetUserInfoByStudentId(uav.StudentID)
+	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	if err != nil {
+		fmt.Println("预约成功提醒失败 查找用户：", err.Error())
+	}
 
 	Model.SendMessage(user.Openid, "RemindScheduleOK", "", data)
 }
@@ -93,7 +100,10 @@ func RemindCheckOK(uid string, op string) {
 		page = ""
 	}
 
-	user := Model.GetUserInfoByStudentId(record.StudentID)
+	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	if err != nil {
+		fmt.Println("预约成功审核成功 查找用户：", err.Error())
+	}
 
 	Model.SendMessage(user.Openid, "RemindCheckOK", page, data)
 }
@@ -123,7 +133,10 @@ func RemindAdminCheck(uid string, op string) {
 		data.Comment = Value{Value: "归还审核：" + uav.Name}
 	}
 
-	user := Model.GetUserInfoByStudentId(uav.StudentID)
+	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	if err != nil {
+		fmt.Println("审核通知审核成功 查找用户：", err.Error())
+	}
 
 	Model.SendMessage(user.Openid, "RemindAdminCheck", "pages/showunderreview/showunderreview", data)
 }
