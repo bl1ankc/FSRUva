@@ -11,22 +11,18 @@ import (
 
 var (
 	WXAccessToken string
-	WXMESSAGE     map[string]string
+	WXMESSAGE     = map[string]string{
+		"RemindUserReturnUav": "",
+		"RemindScheduleOK":    "",
+		"RemindCheckOK":       "",
+		"RemindAdminCheck":    "",
+	}
 )
 
 const (
 	APPID     = ""
 	APPSECRET = ""
 )
-
-// InitWXMessage 初始化模板ID
-func InitWXMessage() {
-	WXMESSAGE = make(map[string]string)
-	WXMESSAGE["RemindUserReturnUav"] = ""
-	WXMESSAGE["RemindScheduleOK"] = ""
-	WXMESSAGE["RemindCheckOK"] = ""
-	WXMESSAGE["RemindAdminCheck"] = ""
-}
 
 // GetWXAccessToken 获取微信accesstoken
 func GetWXAccessToken() {
