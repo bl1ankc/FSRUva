@@ -32,11 +32,11 @@ func AdminRoute() {
 		//获取所有历史记录
 		g.GET("/GetAllRecords", api.GetAllRecords)
 
-		//获取指定设备信息
+		//导出设备
 		g.POST("/GetDevices", api.GetDevices)
 
 		//通过uid获取设备信息（管理员）
-		g.GET("/GetDevices", api.AdminGetDeviceByUid)
+		g.GET("/GetDevice", api.AdminGetDeviceByUid)
 
 		//强制修改设备信息
 		g.POST("/ForceUpdateDevices", api.ForceUpdateDevices)

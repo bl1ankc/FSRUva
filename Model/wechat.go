@@ -196,6 +196,96 @@ func SendMessage(Openid string, ID string, Page string, Data interface{}) bool {
 		return false
 	}
 
+	//错误处理
+	if responseData.Errcode != 0 {
+		fmt.Println("获取用户OPENID和UNIONID 错误处理：", responseData.Errmsg)
+		return false
+	}
+
 	return true
 
+}
+
+// WXGetPhoneNum 获取用户手机号
+func WXGetPhoneNum(code string) (bool, string) {
+
+	//定义结构体
+	type Request struct {
+		Code string `json:"code"`
+	}
+
+	//绑定数据
+	requestData := Request{
+		Code: code,
+	}
+	url := "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + WXAccessToken
+
+	//转换数据
+	requestByte, err := json.Marshal(requestData)
+	if err != nil {
+		fmt.Println("获取用户手机号 转换数据：", err.Error())
+		return false, ""
+	}
+
+	//增加请求
+	requset, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestByte))
+	if err != nil {
+		fmt.Println("获取用户手机号 增加请求：", err.Error())
+		return false, ""
+	}
+
+	requset.Header.Set("Content-Type", "application/json;charset=UTF-8")
+
+	//发起请求
+	client := http.Client{}
+	response, err := client.Do(requset)
+	if err != nil {
+		fmt.Println("获取用户手机号 发起请求：", err.Error())
+		return false, ""
+	}
+
+	//结束请求
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Println("获取用户手机号 结束请求：", err.Error())
+		}
+	}(response.Body)
+
+	//解析数据
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println("获取用户手机号 解析数据：", err.Error())
+		return false, ""
+	}
+
+	//绑定数据
+	type Response struct {
+		Errcode   int    `json:"errcode"`
+		Errmsg    string `json:"errmsg"`
+		PhoneInfo struct {
+			PhoneNumber     string `json:"phoneNumber"`
+			PurePhoneNumber string `json:"purePhoneNumber"`
+			CountryCode     int    `json:"countryCode"`
+			Watermark       struct {
+				Timestamp int    `json:"timestamp"`
+				Appid     string `json:"appid"`
+			} `json:"watermark"`
+		} `json:"phone_info"`
+	}
+
+	var responseData Response
+	err = json.Unmarshal(body, &responseData)
+	if err != nil {
+		fmt.Println("获取用户手机号 绑定数据：", err.Error())
+		return false, ""
+	}
+
+	//错误处理
+	if responseData.Errcode != 0 {
+		fmt.Println("获取用户手机号 错误处理：", responseData.Errmsg)
+		return false, ""
+	}
+
+	return true, responseData.PhoneInfo.PhoneNumber
 }

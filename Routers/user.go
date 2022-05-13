@@ -10,6 +10,8 @@ func UserRoute() {
 	r.POST("/login", api.Login)
 	//上传用户信息
 	r.POST("/UploadUser", api.UploadUser)
+	//获取用户手机号
+	//r.POST("/GetPhoneNumber", api.GetPhoneNumber)
 
 	g := r.Group("/User", api.AuthRequired())
 	{

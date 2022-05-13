@@ -245,7 +245,14 @@ func UpdateImgInRecord(Uid string, col string) bool {
 }
 
 // GetUsingUavsByStuID 通过学号查找使用中的无人机
-func GetUsingUavsByStuID(Stuid string) ([]UsingUav, bool) {
+func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]UsingUav, bool) {
+
+	//转换数据格式
+	pageint, err := strconv.Atoi(Page)
+	if err != nil {
+		fmt.Println("通过学号查找使用中的无人机 数据转换失败", err.Error())
+		pageint = 0
+	}
 
 	var uavs []UsingUav
 	var uav UsingUav
@@ -256,7 +263,7 @@ func GetUsingUavsByStuID(Stuid string) ([]UsingUav, bool) {
 		Plan_Time time.Time `json:"plan_time"` //预计归还时间
 	}
 	var tempuav []TempUav
-	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "using"}).Or(&Record{StudentID: Stuid, State: "Get under review"}).Or(&Record{StudentID: Stuid, State: "scheduled"}).Order("get_time Desc").Find(&tempuav)
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "using"}).Or(&Record{StudentID: Stuid, State: "Get under review"}).Or(&Record{StudentID: Stuid, State: "scheduled"}).Order("get_time Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找使用中的无人机失败：", DB.Error.Error())
 		return uavs, false
@@ -280,7 +287,14 @@ func GetUsingUavsByStuID(Stuid string) ([]UsingUav, bool) {
 }
 
 // GetHistoryUavsByStuID 通过学号查找历史借用的无人机
-func GetHistoryUavsByStuID(Stuid string) ([]UsingUav, bool) {
+func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]UsingUav, bool) {
+
+	//转换数据格式
+	pageint, err := strconv.Atoi(Page)
+	if err != nil {
+		fmt.Println("通过学号查找历史借用的无人机 数据转换失败", err.Error())
+		pageint = 0
+	}
 
 	var uavs []UsingUav
 	var uav UsingUav
@@ -291,7 +305,7 @@ func GetHistoryUavsByStuID(Stuid string) ([]UsingUav, bool) {
 		Plan_Time time.Time `json:"plan_time"` //预计归还时间
 	}
 	var tempuav []TempUav
-	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "returned"}).Or(&Record{StudentID: Stuid, State: "refuse"}).Or(&Record{StudentID: Stuid, State: "cancelled"}).Or(&Record{StudentID: Stuid, State: "Back under review"}).Order("get_time Desc").Find(&tempuav)
+	DB := db.Model(&Record{}).Where(&Record{StudentID: Stuid, State: "returned"}).Or(&Record{StudentID: Stuid, State: "refuse"}).Or(&Record{StudentID: Stuid, State: "cancelled"}).Or(&Record{StudentID: Stuid, State: "Back under review"}).Order("get_time Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找历史借用的无人机失败", DB.Error.Error())
 		return uavs, false

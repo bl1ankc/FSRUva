@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -25,15 +26,16 @@ func GetUavByUid(Uid string) Uav {
 }
 
 // GetBackUavByUid 获取对应序列号的设备返回信息
-func GetBackUavByUid(Uid string) BackUav {
+func GetBackUavByUid(Uid string) (bool, BackUav) {
 	var uav BackUav
 
 	DB := db.Model(&Uav{}).Where(&Uav{Uid: Uid}).First(&uav)
 	if DB.Error != nil {
 		fmt.Println("获取对应序列号的设备返回信息：", DB.Error.Error())
+		return false, BackUav{}
 	}
 
-	return uav
+	return true, uav
 }
 
 // GetUavsByUids 获取对应序列号组的设备组信息
@@ -134,6 +136,29 @@ func SearchStuInOneDay() ([]Uav, bool) {
 		return uavs, false
 	}
 	return uavs, true
+}
+
+// GetUavsByStatesWithPage 分页获取对应序列号组的设备组信息
+func GetUavsByStatesWithPage(UavState string, UavType string, Page string, Max int) []BackUav {
+
+	//转换数据格式
+	pageint, err := strconv.Atoi(Page)
+	if err != nil {
+		fmt.Println("分页获取对应序列号组的设备组信息 数据转换失败", err.Error())
+		pageint = 0
+	}
+
+	//查找数据
+	var uavs []BackUav
+
+	DB := db.Model(&Uav{}).Where(Uav{State: UavState, Type: UavType}).Offset(pageint * Max).Limit(Max).Find(&uavs)
+
+	if DB.Error != nil {
+		fmt.Println("分页获取对应序列号组的设备组信息：", DB.Error.Error())
+		return []BackUav{}
+	}
+
+	return uavs
 }
 
 /*

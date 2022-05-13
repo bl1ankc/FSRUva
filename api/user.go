@@ -177,13 +177,15 @@ func UploadImg(c *gin.Context) bool {
 func GetOwnUsing(c *gin.Context) {
 	stuid, flag := c.GetQuery("stuid")
 
+	page := c.DefaultQuery("page", "0")
+
 	//获取失败
 	if !flag {
 		c.JSON(400, gin.H{"code": 400, "desc": "传入stuid失败"})
 		return
 	}
 
-	uavs, flag := Model.GetUsingUavsByStuID(stuid)
+	uavs, flag := Model.GetUsingUavsByStuID(stuid, page, PAGEMAX)
 	if flag {
 		c.JSON(200, &uavs)
 	} else {
@@ -196,13 +198,14 @@ func GetOwnUsing(c *gin.Context) {
 func GetOwnHistory(c *gin.Context) {
 	stuid, flag := c.GetQuery("stuid")
 
+	page := c.DefaultQuery("page", "0")
 	//获取失败
 	if !flag {
 		c.JSON(400, gin.H{"code": 400, "desc": "传入stuid失败"})
 		return
 	}
 
-	uavs, flag := Model.GetHistoryUavsByStuID(stuid)
+	uavs, flag := Model.GetHistoryUavsByStuID(stuid, page, PAGEMAX)
 	if flag {
 		c.JSON(200, &uavs)
 	} else {

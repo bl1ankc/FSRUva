@@ -9,8 +9,11 @@ import (
 
 // GetNotUsedDrones 获取空闲的无人机设备
 func GetNotUsedDrones(c *gin.Context) {
+
+	page := c.DefaultQuery("page", "0")
+
 	//获取设备信息
-	uav := Model.GetUavByStates("free", "Drone")
+	uav := Model.GetUavsByStatesWithPage("free", "Drone", page, PAGEMAX)
 
 	//JSON格式返回
 	c.JSON(200, &uav)
@@ -18,8 +21,11 @@ func GetNotUsedDrones(c *gin.Context) {
 
 // GetNotUsedBattery 获取空闲的电池设备
 func GetNotUsedBattery(c *gin.Context) {
+
+	page := c.DefaultQuery("page", "0")
+
 	//获取设备信息
-	Battery := Model.GetUavByStates("free", "Battery")
+	Battery := Model.GetUavsByStatesWithPage("free", "Battery", page, PAGEMAX)
 
 	//JSON格式返回
 	c.JSON(200, &Battery)
@@ -27,8 +33,11 @@ func GetNotUsedBattery(c *gin.Context) {
 
 // GetNotUsedControl 获取空闲的遥控设备
 func GetNotUsedControl(c *gin.Context) {
+
+	page := c.DefaultQuery("page", "0")
+
 	//获取设备信息
-	Control := Model.GetUavByStates("free", "Control")
+	Control := Model.GetUavsByStatesWithPage("free", "Control", page, PAGEMAX)
 
 	//JSON格式返回
 	c.JSON(200, &Control)
@@ -86,8 +95,16 @@ func GetDevices(c *gin.Context) {
 func GetDeviceByUid(c *gin.Context) {
 	id := c.Query("uid")
 
-	uav := Model.GetBackUavByUid(id)
-	c.JSON(200, &uav)
+	flag, uav := Model.GetBackUavByUid(id)
+	if flag {
+		c.JSON(200, &uav)
+	} else {
+		c.JSON(200, gin.H{
+			"code": 200,
+			"desc": "未查找到该设备",
+		})
+	}
+
 }
 
 // AdminGetDeviceByUid 获取对应uid设备信息(管理员)
