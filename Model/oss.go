@@ -7,8 +7,6 @@ import (
 	"io"
 )
 
-var ()
-
 /*
 func CreateQRCode(id string) string {
 	filename := "./img/qrcode/" + id + ".png"

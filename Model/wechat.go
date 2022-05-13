@@ -11,17 +11,6 @@ import (
 
 var (
 	WXAccessToken string
-	WXMESSAGE     = map[string]string{
-		"RemindUserReturnUav": "",
-		"RemindScheduleOK":    "",
-		"RemindCheckOK":       "",
-		"RemindAdminCheck":    "",
-	}
-)
-
-const (
-	APPID     = ""
-	APPSECRET = ""
 )
 
 // GetWXAccessToken 获取微信accesstoken
