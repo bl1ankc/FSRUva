@@ -47,7 +47,6 @@ func BorrowUav(c *gin.Context) {
 func BackUav(c *gin.Context) {
 	//获取id
 	id, flag := c.GetQuery("uid")
-	fmt.Println(id)
 
 	//获取失败
 	if !flag {
@@ -55,9 +54,21 @@ func BackUav(c *gin.Context) {
 		return
 	}
 
+	//获取设备信息
+	uav := Model.GetUavByUid(id)
+	if uav.StudentID != c.MustGet("studentid") {
+		c.JSON(403, gin.H{"code": 403, "desc": "不可归还别人借用的设备"})
+		return
+	}
+	//再次验证是否可以归还
+	if uav.State != "using" {
+		c.JSON(403, gin.H{"code": 403, "desc": "设备不处于使用中状态，不可归还"})
+		return
+	}
+
 	//上传图片
 	if UploadImg(c) == false {
-		c.JSON(200, gin.H{"desc": "图片上传失败"})
+		c.JSON(200, gin.H{"code": 200, "desc": "图片上传失败"})
 		return
 	}
 

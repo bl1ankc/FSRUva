@@ -141,6 +141,7 @@ func AuthRequired() gin.HandlerFunc {
 
 		user := Model.GetUserByID(claim.UserID)
 		c.Set("admin", user.IsAdmin)
+		c.Set("studentid", user.StudentID)
 		c.Next()
 	}
 }

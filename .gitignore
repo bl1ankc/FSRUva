@@ -2,3 +2,11 @@
 img/
 
 .idea/
+
+tmp/main
+
+tmp/build-errors.log
+
+Model/JWXT.go
+
+code.png
