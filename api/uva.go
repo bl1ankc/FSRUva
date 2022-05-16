@@ -134,3 +134,62 @@ func GetDeviceByUids(c *gin.Context) {
 	c.JSON(200, uavs)
 
 }
+
+// GetUavType 获取设备类型列表
+func GetUavType(c *gin.Context) {
+
+	flag, types := Model.GetUavType()
+
+	if flag {
+		c.JSON(200, gin.H{"code": 200, "desc": "查询成功", "data": types})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": "查询失败"})
+	}
+
+}
+
+// AddUavType 添加设备类型
+func AddUavType(c *gin.Context) {
+	//定义结构体
+	var typename Model.UavType
+
+	//绑定数据
+	err := c.BindJSON(&typename)
+	if err != nil {
+		fmt.Println("添加设备类型 绑定失败", err.Error())
+		c.JSON(401, gin.H{"code": 400, "desc": "绑定失败"})
+		return
+	}
+
+	//添加数据
+	if Model.AddUavType(typename.TypeName, typename.Remark) {
+		_, newType := Model.GetUavType()
+		c.JSON(200, gin.H{"code": 200, "desc": "增加成功", "data": newType})
+	} else {
+		_, newType := Model.GetUavType()
+		c.JSON(200, gin.H{"code": 200, "desc": "增加失败", "data": newType})
+	}
+}
+
+// RemoveUavType 删除设备类型
+func RemoveUavType(c *gin.Context) {
+
+	var typename Model.UavType
+
+	//绑定数据
+	err := c.BindJSON(&typename)
+	if err != nil {
+		fmt.Println("删除设备类型 绑定失败", err.Error())
+		c.JSON(401, gin.H{"code": 400, "desc": "绑定失败"})
+		return
+	}
+
+	//查询数据
+	if Model.RemoveUavType(typename.TypeName) {
+		_, newType := Model.GetUavType()
+		c.JSON(200, gin.H{"code": 200, "desc": "删除成功", "data": newType})
+	} else {
+		_, newType := Model.GetUavType()
+		c.JSON(200, gin.H{"code": 200, "desc": "删除失败", "data": newType})
+	}
+}

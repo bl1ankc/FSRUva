@@ -109,6 +109,7 @@ type BackUav struct {
 	Get_time  time.Time `json:"get_time"`  //借出时间
 	Plan_time time.Time `json:"plan_time"` //预计归还时间
 	Back_time time.Time `json:"back_time"` //实际归还时间
+	Borrower  string    `json:"borrower"`  //借用人
 
 	Location string `json:"location"` //设备存放位置
 	Remark   string `json:"remark"`   //设备备注信息
@@ -158,4 +159,10 @@ type UsingUav struct {
 	Get_Time  string `json:"get_time"`  //借用时间
 	Plan_Time string `json:"plan_time"` //预计归还时间
 	LastDays  int    `json:"lastDays"`  //剩余时间
+}
+
+type UavType struct {
+	gorm.Model
+	TypeName string `json:"typeName" gorm:"unique"` //设备类型名
+	Remark   string `json:"remark"`                 //备注
 }

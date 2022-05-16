@@ -161,6 +161,45 @@ func GetUavsByStatesWithPage(UavState string, UavType string, Page string, Max i
 	return uavs
 }
 
+// GetUavType 获取设备类型列表
+func GetUavType() (bool, []UavType) {
+	var types []UavType
+	DB := db.Model(&UavType{}).Find(&types)
+
+	if DB.Error != nil {
+		fmt.Println("获取设备类型列表：", DB.Error.Error())
+		return false, []UavType{}
+	}
+
+	return true, types
+}
+
+// AddUavType 增加设备类型
+func AddUavType(TypeName string, Remark string) bool {
+
+	DB := db.Model(&UavType{}).Create(&UavType{TypeName: TypeName, Remark: Remark})
+
+	if DB.Error != nil {
+		fmt.Println("增加设备类型失败：", DB.Error.Error())
+		return false
+	}
+
+	return true
+}
+
+// RemoveUavType 删除设备类型
+func RemoveUavType(TypeName string) bool {
+
+	DB := db.Where("type_name=?", TypeName).Delete(&UavType{})
+
+	if DB.Error != nil {
+		fmt.Println("删除设备类型失败：", DB.Error.Error())
+		return false
+	}
+
+	return true
+}
+
 /*
 	更新信息
 */

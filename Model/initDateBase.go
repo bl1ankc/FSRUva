@@ -21,6 +21,6 @@ func init() {
 	}
 
 	//自动迁移
-	db.AutoMigrate(&Uav{}, &Record{}, &User{})
+	db.AutoMigrate(&Uav{}, &Record{}, &User{}, &UavType{})
 
 }

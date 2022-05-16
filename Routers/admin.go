@@ -49,6 +49,12 @@ func AdminRoute() {
 
 		//取消管理员
 		g.POST("/DelAdmin", api.DelAdmin)
+
+		//添加设备类型
+		g.POST("/UavType", api.AddUavType)
+
+		//删除设备类型
+		g.DELETE("/UavType", api.RemoveUavType)
 	}
 
 }
