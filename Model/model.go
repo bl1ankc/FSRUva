@@ -163,6 +163,6 @@ type UsingUav struct {
 
 type UavType struct {
 	gorm.Model
-	TypeName string `json:"typeName" gorm:"unique"` //设备类型名
-	Remark   string `json:"remark"`                 //备注
+	TypeName string `json:"typeName"` //设备类型名
+	Remark   string `json:"remark"`   //备注
 }
