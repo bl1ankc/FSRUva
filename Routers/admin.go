@@ -55,6 +55,9 @@ func AdminRoute() {
 
 		//删除设备类型
 		g.DELETE("/UavType", api.RemoveUavType)
+
+		//获取图片临时访问地址
+		g.GET("/GetImgUrl", api.GetImgUrl)
 	}
 
 }
