@@ -7,18 +7,20 @@ import (
 	"main/Model"
 )
 
-// GetNotUsedDrones 获取空闲的无人机设备
+// GetNotUsedDrones 获取空闲的设备
 func GetNotUsedDrones(c *gin.Context) {
 
 	page := c.DefaultQuery("page", "0")
+	typename := c.Query("type")
 
 	//获取设备信息
-	uav := Model.GetUavsByStatesWithPage("free", "Drone", page, PAGEMAX)
+	uav := Model.GetUavsByStatesWithPage("free", typename, page, PAGEMAX)
 
 	//JSON格式返回
 	c.JSON(200, &uav)
 }
 
+/* 优化
 // GetNotUsedBattery 获取空闲的电池设备
 func GetNotUsedBattery(c *gin.Context) {
 
@@ -42,6 +44,7 @@ func GetNotUsedControl(c *gin.Context) {
 	//JSON格式返回
 	c.JSON(200, &Control)
 }
+*/
 
 // GetDrones 获取所有无人机设备
 func GetDrones(c *gin.Context) {
