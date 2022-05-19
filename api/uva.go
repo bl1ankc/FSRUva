@@ -76,7 +76,10 @@ func GetUsingDevices(c *gin.Context) {
 
 // GetAllDevices 获取所有设备
 func GetAllDevices(c *gin.Context) {
-	device := Model.GetUavByStates("", "")
+	page := c.DefaultQuery("page", "0")
+	typename := c.DefaultQuery("type", "")
+
+	device := Model.GetUavsByStatesWithPage("", typename, page, PAGEMAX)
 
 	c.JSON(200, &device)
 }
