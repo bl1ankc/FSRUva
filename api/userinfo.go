@@ -95,7 +95,8 @@ func SetAdmin(c *gin.Context) {
 
 	//数据更改
 	if Model.UpdateAdmin(id, true) {
-		c.JSON(200, gin.H{"code": 200, "desc": "设置成功"})
+		user := Model.GetUserByID(id)
+		c.JSON(200, gin.H{"code": 200, "desc": "设置成功", "data": user})
 	} else {
 		c.JSON(200, gin.H{"code": 200, "desc": "设置失败"})
 	}
@@ -109,7 +110,8 @@ func DelAdmin(c *gin.Context) {
 
 	//数据更改
 	if Model.UpdateAdmin(id, false) {
-		c.JSON(200, gin.H{"code": 200, "desc": "取消成功"})
+		user := Model.GetUserByID(id)
+		c.JSON(200, gin.H{"code": 200, "desc": "取消成功", "data": user})
 	} else {
 		c.JSON(200, gin.H{"code": 200, "desc": "取消失败"})
 	}

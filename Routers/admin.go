@@ -45,10 +45,10 @@ func AdminRoute() {
 		g.POST("/UpdateUavRemark", api.UpdateUavRemark)
 
 		//管理员设置
-		g.POST("/SetAdmin", api.SetAdmin)
+		g.GET("/SetAdmin", api.SetAdmin)
 
 		//取消管理员
-		g.POST("/DelAdmin", api.DelAdmin)
+		g.GET("/DelAdmin", api.DelAdmin)
 
 		//添加设备类型
 		g.POST("/UavType", api.AddUavType)
