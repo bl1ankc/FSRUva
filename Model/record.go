@@ -138,9 +138,17 @@ func GetRecordsByID(Stuid string) []BackRecord {
 }
 
 // GetRecordsByUid 序列号查询记录
-func GetRecordsByUid(Uid string) []Record {
+func GetRecordsByUid(Uid string, Page string, Max int) []Record {
+
+	//转换数据格式
+	pageint, err := strconv.Atoi(Page)
+	if err != nil {
+		fmt.Println("序列号查询记录 数据转换失败", err.Error())
+		pageint = 0
+	}
+
 	var records []Record
-	DB := db.Model(&Record{}).Where(&Record{Uid: Uid}).Order("get_time Desc").Find(&records)
+	DB := db.Model(&Record{}).Where(&Record{Uid: Uid}).Order("get_time Desc").Offset(pageint * Max).Limit(Max).Find(&records)
 	if DB.Error != nil {
 		fmt.Println("序列号查询记录失败：", DB.Error.Error())
 	}

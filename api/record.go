@@ -21,8 +21,9 @@ func GetRecordsByUva(c *gin.Context) {
 
 	//模型绑定
 	id := c.Query("uid")
+	page := c.DefaultQuery("page", "0")
 
 	//查数据
-	records := Model.GetRecordsByUid(id)
-	c.JSON(200, &records)
+	records := Model.GetRecordsByUid(id, page, PAGEMAX)
+	c.JSON(200, gin.H{"code": "200", "desc": "获取成功", "data": &records})
 }

@@ -7,22 +7,6 @@ import (
 	"io"
 )
 
-/*
-func CreateQRCode(id string) string {
-	filename := "./img/qrcode/" + id + ".png"
-	err := qrcode.WriteFile(id, qrcode.Medium, 256, filename)
-	if err != nil {
-		return ""
-	}
-	if !UploadImgToOSS("qrcode/"+id+".png", filename) {
-		fmt.Println("OSS上传失败")
-	}
-
-	return id
-}
-
-*/
-
 func UploadImgToOSS(cloudfilepath string, file io.Reader) bool {
 	// 创建OSSClient实例。
 	// yourEndpoint填写Bucket对应的Endpoint，以华东1（杭州）为例，填写为https://oss-cn-hangzhou.aliyuncs.com。其它Region请按实际情况填写。
@@ -64,7 +48,7 @@ func GetPicUrl(filename string) (string, bool) {
 		return "", false
 	}
 	// 填写存储空间名称，例如examplebucket。
-	bucket, err := client.Bucket("unknownx")
+	bucket, err := client.Bucket(BucketName)
 	if err != nil {
 		fmt.Println("获取临时url失败2:", err.Error())
 		return "", false
@@ -82,7 +66,7 @@ func GetSTSToken() (sts.Credentials, bool) {
 
 	//构建一个阿里云客户端, 用于发起请求。
 	//构建阿里云客户端时，需要设置AccessKey ID和AccessKey Secret。
-	client, err := sts.NewClientWithAccessKey("cn-shenzhen", AccessKeyID, AccessKeySecret)
+	client, err := sts.NewClientWithAccessKey(RegionID, AccessKeyID, AccessKeySecret)
 	if err != nil {
 		fmt.Print("获取STS临时密钥失败1：", err.Error())
 	}
@@ -92,7 +76,7 @@ func GetSTSToken() (sts.Credentials, bool) {
 	request.Scheme = "https"
 
 	//设置参数。关于参数含义和设置方法，请参见《API参考》。
-	request.RoleArn = "acs:ram::1761650696847549:role/tmp"
+	request.RoleArn = RoleArn
 	request.RoleSessionName = "go"
 	request.DurationSeconds = "900"
 
