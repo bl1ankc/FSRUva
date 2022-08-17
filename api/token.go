@@ -1,6 +1,8 @@
 package api
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -75,8 +77,13 @@ func Login(c *gin.Context) {
 		c.JSON(404, gin.H{"code": 404, "desc": "未找到该用户"})
 		return
 	}
+	//加密
+	h := md5.New()
+	h.Write([]byte(user.Pwd))
+	ciphertext := hex.EncodeToString(h.Sum(nil))
+
 	//密码验证
-	if User.Pwd != user.Pwd {
+	if User.Pwd != ciphertext {
 		c.JSON(401, gin.H{"code": 401, "desc": "密码错误"})
 		return
 	}
