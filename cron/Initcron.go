@@ -3,7 +3,7 @@ package cron
 import (
 	"fmt"
 	cron2 "github.com/robfig/cron/v3"
-	"main/Model"
+	"main/utils"
 )
 
 var c *cron2.Cron
@@ -16,7 +16,7 @@ func InitCron() *cron2.Cron {
 	c = cron2.New(cron2.WithSeconds())
 
 	//每2个小时获取wxcode
-	id, err := c.AddFunc("0 0 */2 * * ?", Model.GetWXAccessToken)
+	id, err := c.AddFunc("0 0 */2 * * ?", utils.GetWXAccessToken)
 	if err != nil {
 		fmt.Println("定时任务1出错", err.Error())
 	}

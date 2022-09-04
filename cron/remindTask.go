@@ -2,7 +2,8 @@ package cron
 
 import (
 	"fmt"
-	"main/Model"
+	"main/Service"
+	"main/utils"
 )
 
 type Value struct {
@@ -12,7 +13,7 @@ type Value struct {
 // RemindUserReturnUav 提醒用户归还无人机
 func RemindUserReturnUav() {
 	//查找即将要归还的无人机
-	uavs, _ := Model.SearchStuInOneDay()
+	uavs, _ := Service.SearchStuInOneDay()
 
 	//定义返回消息
 	Message := "您有要归还的设备，请及时归还"
@@ -29,17 +30,17 @@ func RemindUserReturnUav() {
 			EndTime:   Value{Value: uav.Plan_time.Format("2006-01-02 15:04")},
 			Comment:   Value{Value: Message},
 		}
-		user, err := Model.GetUserByIDToLogin(uav.StudentID)
+		user, err := Service.GetUserByIDToLogin(uav.StudentID)
 		if err != nil {
 			fmt.Println("提醒用户归还无人机失败 查找用户：", err.Error())
 		}
-		Model.SendMessage(user.Openid, "RemindUserReturnUav", "/pages/returnby_rfid/returnby_rfid", data)
+		utils.SendMessage(user.Openid, "RemindUserReturnUav", "/pages/returnby_rfid/returnby_rfid", data)
 	}
 }
 
 // RemindScheduleOK 预约成功
 func RemindScheduleOK(Uid string) {
-	uav := Model.GetUavByUid(Uid)
+	uav := Service.GetUavByUid(Uid)
 
 	//定义返回消息
 	//Message := "您已预约成功！"
@@ -60,19 +61,19 @@ func RemindScheduleOK(Uid string) {
 		UavName:   Value{Value: uav.Name},
 	}
 
-	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	user, err := Service.GetUserByIDToLogin(uav.StudentID)
 	if err != nil {
 		fmt.Println("预约成功提醒失败 查找用户：", err.Error())
 	}
 
-	Model.SendMessage(user.Openid, "RemindScheduleOK", "", data)
+	utils.SendMessage(user.Openid, "RemindScheduleOK", "", data)
 }
 
 // RemindCheckOK 审核成功
 func RemindCheckOK(uid string, op string) {
-	uav := Model.GetUavByUid(uid)
+	uav := Service.GetUavByUid(uid)
 
-	_, record := Model.GetRecordById(uav.RecordID)
+	_, record := Service.GetRecordById(uav.RecordID)
 
 	//定义返回消息
 	//Message := "您已预约成功！"
@@ -100,18 +101,18 @@ func RemindCheckOK(uid string, op string) {
 		page = ""
 	}
 
-	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	user, err := Service.GetUserByIDToLogin(uav.StudentID)
 	if err != nil {
 		fmt.Println("预约成功审核成功 查找用户：", err.Error())
 	}
 
-	Model.SendMessage(user.Openid, "RemindCheckOK", page, data)
+	utils.SendMessage(user.Openid, "RemindCheckOK", page, data)
 }
 
 // RemindAdminCheck 审核通知
 func RemindAdminCheck(uid string, op string) {
 
-	uav := Model.GetUavByUid(uid)
+	uav := Service.GetUavByUid(uid)
 	//定义返回消息
 	//Message := "您已预约成功！"
 
@@ -133,10 +134,10 @@ func RemindAdminCheck(uid string, op string) {
 		data.Comment = Value{Value: "归还审核：" + uav.Name}
 	}
 
-	user, err := Model.GetUserByIDToLogin(uav.StudentID)
+	user, err := Service.GetUserByIDToLogin(uav.StudentID)
 	if err != nil {
 		fmt.Println("审核通知审核成功 查找用户：", err.Error())
 	}
 
-	Model.SendMessage(user.Openid, "RemindAdminCheck", "pages/showunderreview/showunderreview", data)
+	utils.SendMessage(user.Openid, "RemindAdminCheck", "pages/showunderreview/showunderreview", data)
 }

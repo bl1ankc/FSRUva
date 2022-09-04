@@ -100,21 +100,7 @@ type BackRecord struct {
 	Uav []BackUav `json:"uavs" gorm:"-"` //设备组
 }
 
-// BackUav 返回设备模型
-type BackUav struct {
-	Name      string    `json:"name"`      //设备名称
-	State     string    `json:"state"`     //设备状态
-	Type      string    `json:"type"`      //设备类型
-	Uid       string    `json:"uid"`       //设备序号
-	Get_time  time.Time `json:"get_time"`  //借出时间
-	Plan_time time.Time `json:"plan_time"` //预计归还时间
-	Back_time time.Time `json:"back_time"` //实际归还时间
-	Borrower  string    `json:"borrower"`  //借用人
 
-	Location string `json:"location"` //设备存放位置
-	Remark   string `json:"remark"`   //设备备注信息
-
-}
 
 // BackUser 返回用户模型
 type BackUser struct {
