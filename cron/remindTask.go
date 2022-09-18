@@ -26,8 +26,8 @@ func RemindUserReturnUav() {
 
 	for _, uav := range uavs {
 		data := T{
-			StartTime: Value{Value: uav.Get_time.Format("2006-01-02 15:04")},
-			EndTime:   Value{Value: uav.Plan_time.Format("2006-01-02 15:04")},
+			StartTime: Value{Value: uav.GetTime.Format("2006-01-02 15:04")},
+			EndTime:   Value{Value: uav.PlanTime.Format("2006-01-02 15:04")},
 			Comment:   Value{Value: Message},
 		}
 		user, err := Service.GetUserByIDToLogin(uav.StudentID)
@@ -40,8 +40,11 @@ func RemindUserReturnUav() {
 
 // RemindScheduleOK 预约成功
 func RemindScheduleOK(Uid string) {
-	uav := Service.GetUavByUid(Uid)
-
+	exist, uav := Service.GetUavByUid(Uid)
+	if exist != true {
+		fmt.Println("查找设备失败")
+		return
+	}
 	//定义返回消息
 	//Message := "您已预约成功！"
 
@@ -55,8 +58,8 @@ func RemindScheduleOK(Uid string) {
 
 	data := T{
 		Name:      Value{Value: uav.Borrower},
-		StartTime: Value{Value: uav.Get_time.Format("2006-01-02 15:04")},
-		EndTime:   Value{Value: uav.Plan_time.Format("2006-01-02 15:04")},
+		StartTime: Value{Value: uav.GetTime.Format("2006-01-02 15:04")},
+		EndTime:   Value{Value: uav.PlanTime.Format("2006-01-02 15:04")},
 		Usage:     Value{Value: uav.Usage},
 		UavName:   Value{Value: uav.Name},
 	}
@@ -71,7 +74,7 @@ func RemindScheduleOK(Uid string) {
 
 // RemindCheckOK 审核成功
 func RemindCheckOK(uid string, op string) {
-	uav := Service.GetUavByUid(uid)
+	_, uav := Service.GetUavByUid(uid)
 
 	_, record := Service.GetRecordById(uav.RecordID)
 
@@ -112,7 +115,7 @@ func RemindCheckOK(uid string, op string) {
 // RemindAdminCheck 审核通知
 func RemindAdminCheck(uid string, op string) {
 
-	uav := Service.GetUavByUid(uid)
+	_, uav := Service.GetUavByUid(uid)
 	//定义返回消息
 	//Message := "您已预约成功！"
 
@@ -125,8 +128,8 @@ func RemindAdminCheck(uid string, op string) {
 
 	data := T{
 		Name:      Value{Value: uav.Borrower},
-		StartTime: Value{Value: uav.Get_time.Format("2006-01-02 15:04")},
-		EndTime:   Value{Value: uav.Plan_time.Format("2006-01-02 15:04")},
+		StartTime: Value{Value: uav.GetTime.Format("2006-01-02 15:04")},
+		EndTime:   Value{Value: uav.PlanTime.Format("2006-01-02 15:04")},
 	}
 	if op == "get" {
 		data.Comment = Value{Value: "借用审核：" + uav.Name}

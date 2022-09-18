@@ -45,7 +45,7 @@ func AdminRoute() {
 		g.POST("/GetDevices", Controller.GetDevices)
 
 		//通过uid获取设备信息（管理员）
-		g.GET("/GetDevice", Controller.AdminGetDeviceByUid)
+		//g.GET("/GetDevice", Controller.AdminGetDeviceByUid)
 
 		//强制修改设备信息
 		g.POST("/ForceUpdateDevices", Controller.ForceUpdateDevices)
@@ -66,7 +66,7 @@ func AdminRoute() {
 		g.DELETE("/UavType", Controller.RemoveUavType)
 
 		//获取图片临时访问地址
-		g.GET("/GetImgUrl", Controller.GetImgUrl)
+		//g.GET("/GetImgUrl", Controller.GetImgUrl)
 	}
 
 }

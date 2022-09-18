@@ -8,15 +8,15 @@ import (
 // Record 历史记录模型
 type Record struct {
 	gorm.Model
-	State     string    `json:"state"`     //状态	使用中using 拒绝借用refuse 已归还returned  损坏damaged  取消cancelled
-	Uid       string    `json:"uid"`       //设备序号
-	StudentID string    `json:"stuid"`     //学号
-	Borrower  string    `json:"name"`      //借用人姓名
-	Phone     string    `json:"phone"`     //借用人电话
-	Get_time  time.Time `json:"get_time"`  //借出时间
-	Plan_time time.Time `json:"plan_time"` //预计归还时间
-	Back_time time.Time `json:"back_Time"` //实际归还时间
-	Usage     string    `json:"usage"`     //用途
+	State     string    `json:"state"`    //状态	使用中using 拒绝借用refuse 已归还returned  损坏damaged  取消cancelled
+	Uid       string    `json:"uid"`      //设备序号
+	StudentID string    `json:"stuid"`    //学号
+	Borrower  string    `json:"name"`     //借用人姓名
+	Phone     string    `json:"phone"`    //借用人电话
+	GetTime   time.Time `json:"GetTime"`  //借出时间
+	PlanTime  time.Time `json:"PlanTime"` //预计归还时间
+	BackTime  time.Time `json:"BackTime"` //实际归还时间
+	Usage     string    `json:"usage"`    //用途
 
 	GetReviewer      string    `json:"getreviewer"`       //借用审核人
 	GetReviewTime    time.Time `json:"getreview_time"`    //借用审核时间
@@ -37,7 +37,7 @@ type BackRecord struct {
 	Borrower  string    `json:"borrower"` //借用人姓名
 	StudentID string    `json:"stuid"`    //学号
 	State     string    `json:"gbstate" ` //全局状态	已全部归还 All returned 损坏Damaged 使用中Using 审核中Reviewing 已预定Scheduled
-	Get_time  time.Time `json:"get_time"` //借出时间
+	GetTime   time.Time `json:"GetTime"`  //借出时间
 	Usage     string    `json:"usage"`    //用途
 
 	GetReviewer      string    `json:"getreviewer"`       //借用审核人
@@ -52,5 +52,5 @@ type BackRecord struct {
 	BackReviewComment string    `json:"backreview_comment"` //归还审核原因
 	BackImg           string    `json:"backImg"`            //归还图片记录
 
-	Uav []BackUav `json:"uavs" gorm:"-"` //设备组
+	Uav []Uav `json:"uavs" gorm:"-"` //设备组
 }

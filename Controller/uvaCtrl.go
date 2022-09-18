@@ -7,7 +7,6 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
-	"main/utils"
 )
 
 // GetNotUsedDrones 获取空闲的设备
@@ -69,7 +68,7 @@ func GetAllDevices(c *gin.Context) {
 
 // GetDevices 获取所有设备(前端指定状态和类型)
 func GetDevices(c *gin.Context) {
-	var uavs Model.SearchUav
+	var uavs Model.Uav
 	//结构体绑定
 	if err := c.BindJSON(&uavs); err != nil {
 		log.Fatal(err.Error())
@@ -84,7 +83,7 @@ func GetDevices(c *gin.Context) {
 func GetDeviceByUid(c *gin.Context) {
 	id := c.Query("uid")
 
-	flag, uav := Service.GetBackUavByUid(id)
+	flag, uav := Service.GetUavByUid(id)
 	if flag {
 		c.JSON(200, &uav)
 	} else {
@@ -97,13 +96,13 @@ func GetDeviceByUid(c *gin.Context) {
 }
 
 // AdminGetDeviceByUid 获取对应uid设备信息(管理员)
-func AdminGetDeviceByUid(c *gin.Context) {
-	id := c.Query("uid")
-
-	uav := Service.GetUavByUid(id)
-	uav.Img, _ = utils.GetPicUrl(uav.Img)
-	c.JSON(200, &uav)
-}
+//func AdminGetDeviceByUid(c *gin.Context) {
+//	id := c.Query("uid")
+//
+//	uav := Service.GetUavByUid(id)
+//	uav.Img, _ = utils.GetPicUrl(uav.Img)
+//	c.JSON(200, &uav)
+//}
 
 // GetDeviceByUids 获取对应uid设备信息
 func GetDeviceByUids(c *gin.Context) {

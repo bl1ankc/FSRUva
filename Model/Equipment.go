@@ -22,49 +22,17 @@ type Uav struct {
 
 	RecordID uint //记录ID
 
-	Get_time  time.Time `json:"get_time"`  //借出时间
-	Plan_time time.Time `json:"plan_time"` //预计归还时间
-	Back_time time.Time `json:"back_time"` //实际归还时间
+	GetTime  time.Time `json:"GetTime"`  //借出时间
+	PlanTime time.Time `json:"PlanTime"` //预计归还时间
+	BackTime time.Time `json:"BackTime"` //实际归还时间
 
 	Img   string `json:"Data"`  //当前图片索引
 	Usage string `json:"usage"` //当前借用用途
 
-	Location string `json:"location"` //设备存放位置
-	Remark   string `json:"remark"`   //设备备注信息
-}
-
-// BackUav 返回设备模型
-type BackUav struct {
-	Name      string    `json:"name"`      //设备名称
-	State     string    `json:"state"`     //设备状态
-	Type      string    `json:"type"`      //设备类型
-	Uid       string    `json:"uid"`       //设备序号
-	Get_time  time.Time `json:"get_time"`  //借出时间
-	Plan_time time.Time `json:"plan_time"` //预计归还时间
-	Back_time time.Time `json:"back_time"` //实际归还时间
-	Borrower  string    `json:"borrower"`  //借用人
-
-	Location string `json:"location"` //设备存放位置
-	Remark   string `json:"remark"`   //设备备注信息
-
-}
-
-// SearchUav 查询设备模型
-type SearchUav struct {
-	Name  string `json:"name" form:"name" binding:"-"`   //设备名称
-	State string `json:"state" form:"state" binding:"-"` //设备状态
-	Type  string `json:"type" form:"type" binding:"-"`   //设备类型
-	Uid   string `json:"uid" form:"uid" binding:"-"`     //设备序号
-}
-
-// BorrowUav 借用设备模型
-type BorrowUav struct {
-	Uid       string    `json:"uid"`       //设备序号
-	StudentID string    `json:"stuid"`     //学号
-	Borrower  string    `json:"borrower"`  //借用人姓名
-	Phone     string    `json:"phone"`     //借用人电话
-	Plan_time time.Time `json:"plan_time"` //预计归还时间
-	Usage     string    `json:"usage"`     //用途
+	Location  string `json:"location"`  //设备存放位置
+	Remark    string `json:"remark"`    //设备备注信息
+	matter    bool   `json:"matter"`    //
+	Expensive bool   `json:"expensive"` //是否贵重
 }
 
 // CheckUav 审核设备模型
@@ -76,12 +44,12 @@ type CheckUav struct {
 
 // UsingUav 使用中的无人机
 type UsingUav struct {
-	Uid       string `json:"uid"`
-	Name      string `json:"name"`
-	State     string `json:"state"`
-	Get_Time  string `json:"get_time"`  //借用时间
-	Plan_Time string `json:"plan_time"` //预计归还时间
-	LastDays  int    `json:"lastDays"`  //剩余时间
+	Uid      string `json:"uid"`
+	Name     string `json:"name"`
+	State    string `json:"state"`
+	GetTime  string `json:"GetTime"`  //借用时间
+	PlanTime string `json:"PlanTime"` //预计归还时间
+	LastDays int    `json:"lastDays"` //剩余时间
 }
 
 type UavType struct {

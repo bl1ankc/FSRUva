@@ -6,7 +6,6 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
-	"main/utils"
 	"time"
 )
 
@@ -32,7 +31,7 @@ func UploadNewUav(c *gin.Context) {
 	}
 }
 
-// UpdateDevice 更新设备
+// UpdateDevice 更新设备 @2022/09/06
 func UpdateDevice(c *gin.Context) {
 	//模型定义
 	var uav Model.Uav
@@ -58,7 +57,7 @@ func UpdateDevice(c *gin.Context) {
 	return
 }
 
-// DeleteDevice
+// DeleteDevice 删除设备 @2022/09/06
 func DeleteDevice(c *gin.Context) {
 	var code int
 
@@ -69,7 +68,7 @@ func DeleteDevice(c *gin.Context) {
 		return
 	}
 
-	Device := Service.GetUavByUid(ID)
+	_, Device := Service.GetUavByUid(ID)
 	if err := Service.RemoveDevice(Device); err != nil {
 		code = Const.FuncFail
 		c.JSON(code, R(code, nil, "删除设备失败，检查函数与传入ID是否存在"))
@@ -86,12 +85,12 @@ func GetReview(c *gin.Context) {
 	var uavs []Model.Uav
 
 	GetUav := Service.GetUavByStates("Get under review", "")
-	BackUav := Service.GetUavByStates("Back under review", "")
+	Uav := Service.GetUavByStates("Back under review", "")
 
 	for _, uav := range GetUav {
 		uavs = append(uavs, uav)
 	}
-	for _, uav := range BackUav {
+	for _, uav := range Uav {
 		uavs = append(uavs, uav)
 	}
 
@@ -112,12 +111,17 @@ func GetPassedUav(c *gin.Context) {
 
 	//更新状态与借用时间
 	BorrowTime := time.Now()
-	Service.UpdateState(uav.Uid, "scheduled")
-	Service.UpdateBorrowTime(uav.Uid, BorrowTime)
-	Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
-	Service.UpdateRecordState(uav.Uid, "scheduled")
+	err := Service.UpdateState(uav.Uid, "scheduled")
+	err = Service.UpdateBorrowTime(uav.Uid, BorrowTime)
+	err = Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
+	err = Service.UpdateRecordState(uav.Uid, "scheduled")
 
+	if err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+		return
+	}
 	c.JSON(200, gin.H{"desc": "审核成功"})
+	return
 	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
@@ -206,7 +210,7 @@ func ForceUpdateDevices(c *gin.Context) {
 		return
 	}
 	Service.UpdateDevices(uav)
-	device := Service.GetUavByUid(uav.Uid)
+	_, device := Service.GetUavByUid(uav.Uid)
 
 	c.JSON(200, &device)
 }
@@ -225,20 +229,20 @@ func UpdateUavRemark(c *gin.Context) {
 }
 
 // GetImgUrl 获取图片临时地址
-func GetImgUrl(c *gin.Context) {
-	imgName := c.Query("imgName")
-
-	url, flag := utils.GetPicUrl(imgName + ".png")
-
-	//绑定结构体
-	type T struct {
-		Url string `json:"url"`
-	}
-	resp := &T{Url: url}
-
-	if flag {
-		c.JSON(200, gin.H{"code": 200, "desc": "获取成功", "data": resp})
-	} else {
-		c.JSON(200, gin.H{"code": 200, "desc": "获取失败"})
-	}
-}
+//func GetImgUrl(c *gin.Context) {
+//	imgName := c.Query("imgName")
+//
+//	url, flag := utils.GetPicUrl(imgName + ".png")
+//
+//	//绑定结构体
+//	type T struct {
+//		Url string `json:"url"`
+//	}
+//	resp := &T{Url: url}
+//
+//	if flag {
+//		c.JSON(200, gin.H{"code": 200, "desc": "获取成功", "data": resp})
+//	} else {
+//		c.JSON(200, gin.H{"code": 200, "desc": "获取失败"})
+//	}
+//}
