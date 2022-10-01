@@ -59,6 +59,9 @@ func AdminRoute() {
 		//取消管理员
 		g.GET("/DelAdmin", Controller.DelAdmin)
 
+		//管理员类型设置
+		g.GET("/ChangeAdminType", Controller.ChangeAdminType)
+
 		//添加设备类型
 		g.POST("/UavType", Controller.AddUavType)
 

@@ -5,6 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
+	"strconv"
 )
 
 /*
@@ -116,4 +118,27 @@ func DelAdmin(c *gin.Context) {
 	} else {
 		c.JSON(200, gin.H{"code": 200, "desc": "取消失败"})
 	}
+}
+
+// ChangeAdminType 设置管理员类型
+func ChangeAdminType(c *gin.Context) {
+	var code int
+
+	id, _ := c.Get("studentid")
+	adminType, err := strconv.Atoi(c.Query("adminType"))
+	if err != nil {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "传入参数错误"))
+		return
+	}
+
+	if err = Service.UpdateAdminType(id.(string), adminType); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "更新管理员类型失败"))
+		return
+	}
+	code = Status.OK
+	c.JSON(code, R(code, nil, "更新管理员成功"))
+	return
+
 }

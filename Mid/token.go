@@ -148,23 +148,9 @@ func AuthRequired() gin.HandlerFunc {
 		}
 
 		user := Service.GetUserByID(claim.UserID)
+		c.Set("user", claim)
 		c.Set("admin", user.IsAdmin)
 		c.Set("studentid", user.StudentID)
-		c.Next()
-	}
-}
-
-// VerifyAdmin 验证管理员
-func VerifyAdmin() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		IsAdmin := c.MustGet("admin").(bool)
-
-		if IsAdmin == false {
-			c.JSON(401, gin.H{"message": "非管理员非法操作"})
-			c.Abort()
-			return
-		}
 		c.Next()
 	}
 }

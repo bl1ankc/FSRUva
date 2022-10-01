@@ -82,20 +82,6 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 
 }
 
-// UpdateAdmin 修改管理员标识
-func UpdateAdmin(Stuid string, Isadmin bool) bool {
-	//用户变量
-	var user Model.User
-
-	//更新用户管理权限
-	DB := db.Model(&Model.User{}).Where(&Model.User{StudentID: Stuid}).First(&user).Update("is_admin", Isadmin)
-	if DB.Error != nil {
-		fmt.Println("修改管理员标识失败：", DB.Error.Error())
-		return false
-	}
-	return true
-}
-
 //// UpdateStudentId 修改学号
 //func UpdateStudentId(Name string, Id string) {
 //

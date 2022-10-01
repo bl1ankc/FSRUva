@@ -109,6 +109,14 @@ func GetPassedUav(c *gin.Context) {
 		return
 	}
 
+	if uav.Type == "Drone" {
+		user := c.MustGet("user").(Model.User)
+		if user.AdminType != 1 {
+			c.JSON(301, R(301, nil, "非老师操作，无法通过无人机审核"))
+			return
+		}
+	}
+
 	//更新状态与借用时间
 	BorrowTime := time.Now()
 	err := Service.UpdateState(uav.Uid, "scheduled")

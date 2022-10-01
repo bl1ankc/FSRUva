@@ -40,6 +40,7 @@ type CheckUav struct {
 	Uid     string `json:"uid"`     //设备序号
 	Checker string `json:"checker"` //审核人姓名
 	Comment string `json:"comment"` //备注原因
+	Type    string `json:"type"`    //设备类型
 }
 
 // UsingUav 使用中的无人机
