@@ -22,9 +22,9 @@ type Uav struct {
 
 	RecordID uint //记录ID
 
-	GetTime  time.Time `json:"GetTime"`  //借出时间
-	PlanTime time.Time `json:"PlanTime"` //预计归还时间
-	BackTime time.Time `json:"BackTime"` //实际归还时间
+	GetTime  time.Time `json:"getTime"`  //借出时间
+	PlanTime time.Time `json:"planTime"` //预计归还时间
+	BackTime time.Time `json:"backTime"` //实际归还时间
 
 	Img   string `json:"Data"`  //当前图片索引
 	Usage string `json:"usage"` //当前借用用途
@@ -55,6 +55,7 @@ type UsingUav struct {
 
 type UavType struct {
 	gorm.Model
-	TypeName string `json:"typeName"` //设备类型名
-	Remark   string `json:"remark"`   //备注
+	DepartmentID uint   `json:"departmentID"`
+	TypeName     string `json:"typeName"` //设备类型名
+	Remark       string `json:"remark"`   //备注
 }

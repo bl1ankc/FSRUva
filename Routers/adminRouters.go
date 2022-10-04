@@ -45,7 +45,7 @@ func AdminRoute() {
 		g.POST("/GetDevices", Controller.GetDevices)
 
 		//通过uid获取设备信息（管理员）
-		//g.GET("/GetDevice", Controller.AdminGetDeviceByUid)
+		g.GET("/GetDevice", Controller.AdminGetDeviceByUid)
 
 		//强制修改设备信息
 		g.POST("/ForceUpdateDevices", Controller.ForceUpdateDevices)
@@ -59,7 +59,7 @@ func AdminRoute() {
 		//取消管理员
 		g.GET("/DelAdmin", Controller.DelAdmin)
 
-		//管理员类型设置
+		//管理员类型设置 @2022/10/01 b1ank
 		g.GET("/ChangeAdminType", Controller.ChangeAdminType)
 
 		//添加设备类型

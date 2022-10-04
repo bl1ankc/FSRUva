@@ -23,6 +23,12 @@ func BorrowUav(c *gin.Context) {
 		return
 	}
 
+	exist, tmp := Service.GetUavByUid(uav.Uid)
+	expensive := tmp.Expensive
+	if exist == false {
+		c.JSON(200, R(200, nil, "该设备不存在"))
+		return
+	}
 	//表单中提交不可使用的无人机
 	flag := false
 
@@ -30,14 +36,15 @@ func BorrowUav(c *gin.Context) {
 	if Service.GetUavStateByUid(uav) != "free" {
 		flag = true
 	} else {
-		if uav.Expensive != true { //非贵重直接跳到预约成功
+		Service.RecordBorrow(uav.Uid, uav.StudentID, uav.Borrower, uav.PlanTime, uav.Usage) //用途
+		if expensive != true {                                                              //非贵重直接跳到预约成功
 			uav.State = "scheduled"
 			uav.GetTime = time.Now().Local()
+			Service.UpdateRecordState(uav.Uid, "scheduled")
 		} else {
 			uav.State = "Get under review"
 		}
-		err = Service.UpdateDevice(uav)                                                           //更新设备信息
-		err = Service.RecordBorrow(uav.Uid, uav.StudentID, uav.Borrower, uav.PlanTime, uav.Usage) //用途
+		err = Service.UpdateDevice(uav) //更新设备信息
 		if err != nil {
 			c.JSON(401, R(401, nil, "更新函数错误"))
 			return
@@ -117,8 +124,11 @@ func GetUav(c *gin.Context) {
 
 	//更新对应设备状态
 	err := Service.UpdateState(id, "using")
+	err = Service.UpdateBorrowTime(id, time.Now().Local())
+	err = Service.GetReviewRecord(id, "", "", "", time.Now().Local())
 	exist := Service.UpdateImgInRecord(id, "get_img")
 	err = Service.UpdateRecordState(id, "using")
+
 	if err != nil || exist != true {
 		c.JSON(503, gin.H{"code": 503, "desc": "函数操作失败"})
 		return

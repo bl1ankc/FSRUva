@@ -124,7 +124,7 @@ func DelAdmin(c *gin.Context) {
 func ChangeAdminType(c *gin.Context) {
 	var code int
 
-	id, _ := c.Get("studentid")
+	id := c.Query("studentid")
 	adminType, err := strconv.Atoi(c.Query("adminType"))
 	if err != nil {
 		code = Status.ErrorData
@@ -132,7 +132,7 @@ func ChangeAdminType(c *gin.Context) {
 		return
 	}
 
-	if err = Service.UpdateAdminType(id.(string), adminType); err != nil {
+	if err = Service.UpdateAdminType(id, adminType); err != nil {
 		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "更新管理员类型失败"))
 		return

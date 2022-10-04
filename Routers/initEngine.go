@@ -17,5 +17,7 @@ func InitRouter() *gin.Engine {
 
 	RecordRoute()
 
+	DepartmentInit()
+
 	return r
 }

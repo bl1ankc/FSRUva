@@ -71,7 +71,7 @@ func UpdateGetTimeinRecords(Uid string) bool {
 func GetRecordsByID(Stuid string) []Model.BackRecord {
 	//查找不同的借用时间
 	var times []time.Time
-	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid}).Distinct("GetTime").Select("GetTime").Order("GetTime Desc").Find(&times)
+	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid}).Distinct("Get_Time").Select("Get_Time").Order("Get_Time Desc").Find(&times)
 	if DB.Error != nil {
 		fmt.Println("学号查询记录失败1：", DB.Error.Error())
 	}
@@ -88,7 +88,7 @@ func GetRecordsByID(Stuid string) []Model.BackRecord {
 
 		//查找设备组
 		var uavs []Model.Uav
-		DB = db.Model(&Model.Record{}).Where(&Model.Record{GetTime: t, StudentID: Stuid}).Select("state, uid, GetTime, BackTime, PlanTime").Find(&uavs)
+		DB = db.Model(&Model.Record{}).Where(&Model.Record{GetTime: t, StudentID: Stuid}).Select("state, uid, Get_Time, BackTime, PlanTime").Find(&uavs)
 		if DB.Error != nil {
 			fmt.Println("学号查询记录失败2：", DB.Error.Error())
 		}
@@ -152,7 +152,7 @@ func GetRecordsByUid(Uid string, Page string, Max int) []Model.Record {
 	}
 
 	var records []Model.Record
-	DB := db.Model(&Model.Record{}).Where(&Model.Record{Uid: Uid}).Order("GetTime Desc").Offset(pageint * Max).Limit(Max).Find(&records)
+	DB := db.Model(&Model.Record{}).Where(&Model.Record{Uid: Uid}).Order("Get_Time Desc").Offset(pageint * Max).Limit(Max).Find(&records)
 	if DB.Error != nil {
 		fmt.Println("序列号查询记录失败：", DB.Error.Error())
 	}
@@ -279,7 +279,7 @@ func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav, 
 		PlanTime time.Time `json:"PlanTime"` //预计归还时间
 	}
 	var tempuav []TempUav
-	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "using"}).Or(&Model.Record{StudentID: Stuid, State: "Get under review"}).Or(&Model.Record{StudentID: Stuid, State: "scheduled"}).Order("GetTime Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
+	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "using"}).Or(&Model.Record{StudentID: Stuid, State: "Get under review"}).Or(&Model.Record{StudentID: Stuid, State: "scheduled"}).Order("Get_Time Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找使用中的无人机失败：", DB.Error.Error())
 		return uavs, false
@@ -321,7 +321,7 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		PlanTime time.Time `json:"PlanTime"` //预计归还时间
 	}
 	var tempuav []TempUav
-	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "returned"}).Or(&Model.Record{StudentID: Stuid, State: "refuse"}).Or(&Model.Record{StudentID: Stuid, State: "cancelled"}).Or(&Model.Record{StudentID: Stuid, State: "Back under review"}).Order("GetTime Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
+	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "returned"}).Or(&Model.Record{StudentID: Stuid, State: "refuse"}).Or(&Model.Record{StudentID: Stuid, State: "cancelled"}).Or(&Model.Record{StudentID: Stuid, State: "Back under review"}).Order("get_time desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找历史借用的无人机失败", DB.Error.Error())
 		return uavs, false

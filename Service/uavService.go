@@ -162,6 +162,15 @@ func GetUavType() (bool, []Model.UavType) {
 	return true, types
 }
 
+// GetType 获取单独设备类型
+func GetType(id uint) (Model.UavType, error) {
+	var uavType Model.UavType
+	if err := db.Model(&Model.UavType{}).Where("id = ?", id).First(&uavType).Error; err != nil {
+		return Model.UavType{}, err
+	}
+	return uavType, nil
+}
+
 // AddUavType 增加设备类型
 func AddUavType(TypeName string, Remark string) bool {
 
@@ -204,9 +213,14 @@ func RemoveDevice(Device Model.Uav) error {
 
 // UpdateDevice 更新
 func UpdateDevice(uav Model.Uav) error {
-	uav.PlanTime = uav.PlanTime.Add(-time.Hour * 8) //时区矫正
-	if err := db.Model(&uav).Updates(uav).Error; err != nil {
+
+	if err := db.Model(&uav).Where("uid = ?", uav.Uid).Updates(uav).Error; err != nil {
 		return err
+	}
+	if uav.Expensive == false {
+		db.Model(&uav).Where("uid = ?", uav.Uid).Updates(map[string]interface{}{
+			"expensive": false,
+		})
 	}
 	return nil
 }

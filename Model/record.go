@@ -13,9 +13,9 @@ type Record struct {
 	StudentID string    `json:"stuid"`    //学号
 	Borrower  string    `json:"name"`     //借用人姓名
 	Phone     string    `json:"phone"`    //借用人电话
-	GetTime   time.Time `json:"GetTime"`  //借出时间
-	PlanTime  time.Time `json:"PlanTime"` //预计归还时间
-	BackTime  time.Time `json:"BackTime"` //实际归还时间
+	GetTime   time.Time `json:"getTime"`  //借出时间
+	PlanTime  time.Time `json:"planTime"` //预计归还时间
+	BackTime  time.Time `json:"backTime"` //实际归还时间
 	Usage     string    `json:"usage"`    //用途
 
 	GetReviewer      string    `json:"getreviewer"`       //借用审核人

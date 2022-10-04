@@ -6,6 +6,7 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/utils"
 	"time"
 )
 
@@ -94,7 +95,7 @@ func GetReview(c *gin.Context) {
 		uavs = append(uavs, uav)
 	}
 
-	c.JSON(200, &uavs)
+	c.JSON(200, uavs)
 }
 
 // GetPassedUav 审核通过借用设备
@@ -118,10 +119,9 @@ func GetPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与借用时间
-	BorrowTime := time.Now()
+
 	err := Service.UpdateState(uav.Uid, "scheduled")
-	err = Service.UpdateBorrowTime(uav.Uid, BorrowTime)
-	err = Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, BorrowTime)
+	err = Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, time.Time{})
 	err = Service.UpdateRecordState(uav.Uid, "scheduled")
 
 	if err != nil {
@@ -237,20 +237,20 @@ func UpdateUavRemark(c *gin.Context) {
 }
 
 // GetImgUrl 获取图片临时地址
-//func GetImgUrl(c *gin.Context) {
-//	imgName := c.Query("imgName")
-//
-//	url, flag := utils.GetPicUrl(imgName + ".png")
-//
-//	//绑定结构体
-//	type T struct {
-//		Url string `json:"url"`
-//	}
-//	resp := &T{Url: url}
-//
-//	if flag {
-//		c.JSON(200, gin.H{"code": 200, "desc": "获取成功", "data": resp})
-//	} else {
-//		c.JSON(200, gin.H{"code": 200, "desc": "获取失败"})
-//	}
-//}
+func GetImgUrl(c *gin.Context) {
+	imgName := c.Query("imgName")
+
+	url, flag := utils.GetPicUrl(imgName + ".png")
+
+	//绑定结构体
+	type T struct {
+		Url string `json:"url"`
+	}
+	resp := &T{Url: url}
+
+	if flag {
+		c.JSON(200, gin.H{"code": 200, "desc": "获取成功", "data": resp})
+	} else {
+		c.JSON(200, gin.H{"code": 200, "desc": "获取失败"})
+	}
+}
