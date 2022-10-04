@@ -3,9 +3,12 @@ package Const
 const (
 	//OSS云端
 
-	Endpoint        = ""
-	AccessKeyID     = ""
-	AccessKeySecret = ""
+	Endpoint        = "https://oss-cn-shenzhen.aliyuncs.com"
+	AccessKeyID     = "LTAI5tL6ShsoKEBhUxj56u5q"
+	AccessKeySecret = "penTxHVCEY2ecbuto9q5i7rO4JUJwJ"
+	RoleArn         = "acs:ram::1761650696847549:role/tmp"
+	BucketName      = "unknownx"
+	RegionID        = "cn-shenzhen"
 )
 
 const (

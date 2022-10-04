@@ -13,7 +13,7 @@ var db *gorm.DB //数据库指针
 func init() {
 	var err error
 
-	dsn := "root:lyq200291@tcp(127.0.0.1:3306)/ginsql?parseTime=true&loc=Local"
+	dsn := "root:Qq3318055.@tcp(127.0.0.1:3306)/xdstest?parseTime=true&loc=Local"
 
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
