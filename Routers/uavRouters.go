@@ -8,6 +8,9 @@ func UavRoute() {
 		//可借用无人机展示
 		g.GET("/GetUav", Controller.GetNotUsedDrones)
 
+		//获取所有设备信息
+		g.GET("/GetAllDevices", Controller.GetAllDevices)
+		
 		//可借用电池展示
 		//g.GET("/GetBattery", Controller.GetNotUsedBattery)
 

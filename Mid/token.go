@@ -14,9 +14,10 @@ import (
 
 type JWTClaims struct {
 	jwt.StandardClaims
-	UserID  string `json:"name"`
-	Pwd     string `json:"pwd"`
-	IsAdmin bool   `json:"isAdmin"`
+	UserID    string `json:"name"`
+	Pwd       string `json:"pwd"`
+	IsAdmin   bool   `json:"isAdmin"`
+	AdminType int    `json:"adminType"`
 }
 
 var (
@@ -148,7 +149,7 @@ func AuthRequired() gin.HandlerFunc {
 		}
 
 		user := Service.GetUserByID(claim.UserID)
-		c.Set("user", claim)
+		c.Set("adminType", user.AdminType)
 		c.Set("admin", user.IsAdmin)
 		c.Set("studentid", user.StudentID)
 		c.Next()

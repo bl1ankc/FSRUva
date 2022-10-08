@@ -1,7 +1,9 @@
 package Service
 
 import (
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"main/Model"
 )
 
@@ -19,7 +21,7 @@ func DeleteDepartment(department Model.Department) error {
 		fmt.Println("清理类型关联失败")
 		return err
 	}
-	if err := db.Model(&department).Delete(department).Error; err != nil {
+	if err := db.Model(&department).Delete(&department).Error; err != nil {
 		fmt.Println("删除失败")
 		return err
 	}
@@ -30,7 +32,9 @@ func DeleteDepartment(department Model.Department) error {
 func GetDepartmentList() ([]Model.Department, error) {
 	var department []Model.Department
 	if err := db.Model(&Model.Department{}).Find(&department).Error; err != nil {
-		return []Model.Department{}, err
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return []Model.Department{}, err
+		}
 	}
 	return department, nil
 }
@@ -57,7 +61,9 @@ func GetDepartmentTypes(department Model.Department) ([]Model.UavType, error) {
 	var types []Model.UavType
 
 	if err := db.Model(&department).Association("Types").Find(&types); err != nil {
-		return []Model.UavType{}, err
+		if !errors.Is(err,gorm.ErrRecordNotFound){
+			return []Model.UavType{}, err
+		}
 	}
 
 	return types, nil

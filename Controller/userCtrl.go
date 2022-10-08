@@ -29,6 +29,13 @@ func BorrowUav(c *gin.Context) {
 		c.JSON(200, R(200, nil, "该设备不存在"))
 		return
 	}
+
+	//tmp.Borrower = uav.Borrower
+	//tmp.StudentID = uav.StudentID
+	//tmp.Phone = uav.Phone
+	//tmp.PlanTime = uav.PlanTime
+	//tmp.Usage = uav.Usage
+	uav.Expensive = tmp.Expensive
 	//表单中提交不可使用的无人机
 	flag := false
 
@@ -44,6 +51,8 @@ func BorrowUav(c *gin.Context) {
 		} else {
 			uav.State = "Get under review"
 		}
+		fmt.Println(uav)
+		fmt.Println(tmp)
 		err = Service.UpdateDevice(uav) //更新设备信息
 		if err != nil {
 			c.JSON(401, R(401, nil, "更新函数错误"))
@@ -60,8 +69,8 @@ func BorrowUav(c *gin.Context) {
 	return
 }
 
-// Uav 归还设备
-func Uav(c *gin.Context) {
+// BackUav 归还设备
+func BackUav(c *gin.Context) {
 	//获取id
 	id, flag := c.GetQuery("uid")
 
@@ -223,15 +232,15 @@ func UploadImg(c *gin.Context) bool {
 	}(src)
 
 	//云端上传
-	//if !utils.UploadImgToOSS("Data/"+filename, src) {
-	//	fmt.Println("OSS上传失败")
-	//	return false
-	//}
+	if !utils.UploadImgToOSS("Data/"+filename, src) {
+		fmt.Println("OSS上传失败")
+		return false
+	}
 
 	//上传成功
 	Service.UpdateImg(c.Query("uid"), filename)
 	fmt.Println("OSS上传成功")
-	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
+	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
 	return true
 }
 

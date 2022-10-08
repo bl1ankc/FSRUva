@@ -23,7 +23,7 @@ func UserRoute() {
 		g.POST("/GetUav", Controller.GetUav)
 
 		//归还设备
-		g.POST("/BackUav", Controller.Uav)
+		g.POST("/BackUav", Controller.BackUav)
 
 		//取消借用
 		g.POST("/CancelBorrow", Controller.CancelBorrow)

@@ -11,9 +11,6 @@ func AdminRoute() {
 		//审核设备展示
 		g.GET("/GetUnderReviewUav", Controller.GetReview)
 
-		//获取所有设备信息
-		g.GET("/GetAllDevices", Controller.GetAllDevices)
-
 		//提交新的设备
 		g.POST("/UploadUav", Controller.UploadNewUav)
 

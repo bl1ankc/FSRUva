@@ -292,7 +292,7 @@ func UpdateUavUsage(Uid string, Usage string) error {
 // UpdateImg 更新图片img
 func UpdateImg(uid string, img string) {
 
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uid}).Update("Data", img)
+	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uid}).Update("img", img)
 
 	if DB.Error != nil {
 		fmt.Println("更新图片img失败", DB.Error.Error())
