@@ -163,7 +163,7 @@ func GetUavType() (bool, []Model.UavType) {
 }
 
 // GetType 获取单独设备类型
-func GetType(id uint) (Model.UavType, error) {
+func GetType(id int) (Model.UavType, error) {
 	var uavType Model.UavType
 	if err := db.Model(&Model.UavType{}).Where("id = ?", id).First(&uavType).Error; err != nil {
 		return Model.UavType{}, err
@@ -195,6 +195,12 @@ func RemoveUavType(TypeName string) bool {
 	}
 
 	return true
+}
+
+// UpdateUavType 更新设备类型
+func UpdateUavType(uavType Model.UavType) error {
+	err := db.Model(&uavType).Updates(uavType).Error
+	return err
 }
 
 /*
@@ -300,6 +306,18 @@ func UpdateImg(uid string, img string) {
 	}
 
 	return
+}
+
+// UpdateTypeImg 更新类型图片
+func UpdateTypeImg(id int, img string) error {
+	uavType, err := GetType(id)
+	if err != nil {
+		return err
+	}
+	if err := db.Model(&uavType).Update("img", img).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 /*

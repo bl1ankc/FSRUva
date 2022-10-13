@@ -163,17 +163,15 @@ func GetFailUav(c *gin.Context) {
 	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.ShouldBindJSON(&uav); err != nil {
-		fmt.Println("审核通过借用设备数据绑定失败：", err.Error())
+	if err := c.BindJSON(&uav); err != nil {
+		fmt.Println("审核不通过借用设备数据绑定失败：", err.Error())
 		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
 	}
 
 	if uav.Type == "Drone" {
-		adminType, exist := c.Get("adminType")
-		atype, _ := strconv.Atoi(adminType.(string))
-
-		if !exist || atype != 1 {
+		adminType := c.MustGet("adminType").(int)
+		if adminType != 1 {
 			c.JSON(301, R(301, nil, "非老师操作，无法通过无人机审核"))
 			return
 		}

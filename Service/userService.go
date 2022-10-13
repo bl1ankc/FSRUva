@@ -155,7 +155,7 @@ func GetAllUsers() []Model.BackUser {
 func GetUserByID(Stuid string) Model.BackUser {
 
 	var user Model.BackUser
-	DB := db.Model(&Model.User{}).Where(&Model.User{StudentID: Stuid}).Find(&user)
+	DB := db.Model(&Model.User{}).Where(&Model.User{StudentID: Stuid}).First(&user)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找用户信息失败：", DB.Error.Error())
 	}

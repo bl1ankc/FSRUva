@@ -122,7 +122,7 @@ func TypeToDepartment(c *gin.Context) {
 		return
 	}
 
-	uavType, err := Service.GetType(uint(typeID))
+	uavType, err := Service.GetType(typeID)
 	if err != nil {
 		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "查询失败，检查传入参数是否正确，若正确联系后端人员"))

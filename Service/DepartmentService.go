@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"log"
 	"main/Model"
 )
 
@@ -51,6 +52,7 @@ func GetDepartment(id uint) (Model.Department, error) {
 // AddTypeToDepartment 向部门添加类型
 func AddTypeToDepartment(uavType Model.UavType, department Model.Department) error {
 	if err := db.Model(&department).Association("Types").Append(&uavType); err != nil {
+		log.Printf(err.Error())
 		return err
 	}
 	return nil
@@ -61,7 +63,7 @@ func GetDepartmentTypes(department Model.Department) ([]Model.UavType, error) {
 	var types []Model.UavType
 
 	if err := db.Model(&department).Association("Types").Find(&types); err != nil {
-		if !errors.Is(err,gorm.ErrRecordNotFound){
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return []Model.UavType{}, err
 		}
 	}

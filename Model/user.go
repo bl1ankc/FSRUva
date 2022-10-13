@@ -26,5 +26,5 @@ type BackUser struct {
 	IsAdmin   bool   `json:"IsAdmin"`
 	NickName  string `json:"nickName"`
 	AvatarUrl string `json:"avatarUrl"`
-	AdminType string `json:"adminType"`
+	AdminType int    `json:"adminType"`
 }

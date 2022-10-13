@@ -7,6 +7,7 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 )
 
@@ -22,32 +23,6 @@ func GetNotUsedDrones(c *gin.Context) {
 	//JSON格式返回
 	c.JSON(200, &uav)
 }
-
-/* 优化
-// GetNotUsedBattery 获取空闲的电池设备
-func GetNotUsedBattery(c *gin.Context) {
-
-	page := c.DefaultQuery("page", "0")
-
-	//获取设备信息
-	Battery := Model.GetUavsByStatesWithPage("free", "Battery", page, PAGEMAX)
-
-	//JSON格式返回
-	c.JSON(200, &Battery)
-}
-
-// GetNotUsedControl 获取空闲的遥控设备
-func GetNotUsedControl(c *gin.Context) {
-
-	page := c.DefaultQuery("page", "0")
-
-	//获取设备信息
-	Control := Model.GetUavsByStatesWithPage("free", "Control", page, PAGEMAX)
-
-	//JSON格式返回
-	c.JSON(200, &Control)
-}
-*/
 
 // GetUsingDevices 获取使用中的所有设备
 func GetUsingDevices(c *gin.Context) {
@@ -141,12 +116,19 @@ func GetUavType(c *gin.Context) {
 func AddUavType(c *gin.Context) {
 	//定义结构体
 	var typename Model.UavType
-
+	var code int
 	//绑定数据
 	err := c.BindJSON(&typename)
 	if err != nil {
 		fmt.Println("添加设备类型 绑定失败", err.Error())
 		c.JSON(401, gin.H{"code": 400, "desc": "绑定失败"})
+		return
+	}
+
+	file, _ := c.FormFile("upload_img")
+	if file != nil && UploadImg(c, "UavType") == false {
+		code = Status.OBSErr
+		c.JSON(code, R(code, nil, "上传图片出错"))
 		return
 	}
 
@@ -158,6 +140,7 @@ func AddUavType(c *gin.Context) {
 		_, newType := Service.GetUavType()
 		c.JSON(200, gin.H{"code": 200, "desc": "增加失败", "data": newType})
 	}
+
 }
 
 // RemoveUavType 删除设备类型
@@ -181,4 +164,34 @@ func RemoveUavType(c *gin.Context) {
 		_, newType := Service.GetUavType()
 		c.JSON(200, gin.H{"code": 200, "desc": "删除失败", "data": newType})
 	}
+}
+
+// UpdateUavType 更新设备类型
+func UpdateUavType(c *gin.Context) {
+	var code int
+	var uavType Model.UavType
+
+	if err := c.ShouldBindJSON(&uavType); err != nil {
+		code = Status.FailToBindJson
+		c.JSON(code, R(code, nil, "绑定数据出错"))
+		return
+	}
+
+	if err := Service.UpdateUavType(uavType); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "更新失败"))
+		return
+	}
+
+	file, _ := c.FormFile("upload_img")
+	if file != nil && UploadImg(c, "UavType") == false {
+		code = Status.OBSErr
+		c.JSON(code, R(code, nil, "上传图片出错"))
+		return
+	}
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "更新成功"))
+	return
+
 }

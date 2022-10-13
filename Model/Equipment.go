@@ -29,10 +29,10 @@ type Uav struct {
 	Img   string `json:"Data"`  //当前图片索引
 	Usage string `json:"usage"` //当前借用用途
 
-	Location  string `json:"location"`  //设备存放位置
-	Remark    string `json:"remark"`    //设备备注信息
-	matter    bool   `json:"matter"`    //
-	Expensive bool   `json:"expensive"` //是否贵重
+	Location  string `json:"location"`                //设备存放位置
+	Remark    string `json:"remark"`                  //设备备注信息
+	matter    bool   `json:"matter"`                  //
+	Expensive bool   `json:"expensive" gorm :"false"` //是否贵重
 }
 
 // CheckUav 审核设备模型
@@ -55,7 +55,8 @@ type UsingUav struct {
 
 type UavType struct {
 	gorm.Model
-	DepartmentID uint   `gorm:"index"`
+	DepartmentID uint
 	TypeName     string `json:"typeName"` //设备类型名
 	Remark       string `json:"remark"`   //备注
+	Img          string `json:"img"`
 }

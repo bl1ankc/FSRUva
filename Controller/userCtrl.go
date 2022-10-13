@@ -8,6 +8,7 @@ import (
 	"main/Service"
 	"main/utils"
 	"mime/multipart"
+	"strconv"
 	"time"
 )
 
@@ -98,7 +99,7 @@ func BackUav(c *gin.Context) {
 	}
 
 	//上传图片
-	if UploadImg(c) == false {
+	if UploadImg(c, "Uav") == false {
 		c.JSON(200, gin.H{"code": 200, "desc": "图片上传失败"})
 		return
 	}
@@ -127,7 +128,7 @@ func GetUav(c *gin.Context) {
 	}
 
 	//上传图片
-	if UploadImg(c) == false {
+	if UploadImg(c, "Uav") == false {
 		return
 	}
 
@@ -193,7 +194,7 @@ func CancelBack(c *gin.Context) {
 }
 
 // UploadImg 上传图片
-func UploadImg(c *gin.Context) bool {
+func UploadImg(c *gin.Context, imgType string) bool {
 	/*
 		上传图片,并保存在./img服务器文件夹中
 		自动生成图片对应的uid,该uid为文件名,并且绑定对应记录
@@ -238,7 +239,15 @@ func UploadImg(c *gin.Context) bool {
 	}
 
 	//上传成功
-	Service.UpdateImg(c.Query("uid"), filename)
+	if imgType == "Uav" {
+		Service.UpdateImg(c.Query("uid"), filename)
+	} else if imgType == "UavType" {
+		typeID, err := strconv.Atoi(c.Query("typeID"))
+		if err != nil {
+			return false
+		}
+		Service.UpdateTypeImg(typeID, filename)
+	}
 	fmt.Println("OSS上传成功")
 	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
 	return true
