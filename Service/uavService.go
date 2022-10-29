@@ -69,10 +69,10 @@ func GetUavByNames(UavName string, UavType string) []Model.Uav {
 }
 
 // InsertUva 创建新的设备
-func InsertUva(UavName string, UavType string, UavUid string) (bool, string) {
+func InsertUva(uav Model.Uav) (bool, string) {
 	//查询设备是否存在
 	var cnt int64
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: UavUid}).Count(&cnt)
+	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid}).Count(&cnt)
 	if DB.Error != nil {
 		fmt.Println("创建新的设备失败1：", DB.Error.Error())
 		return false, "发生未知错误1"
@@ -82,7 +82,7 @@ func InsertUva(UavName string, UavType string, UavUid string) (bool, string) {
 	}
 
 	//创建新记录
-	DB = db.Create(&Model.Uav{Name: UavName, Type: UavType, Uid: UavUid, GetTime: time.Unix(0, 0), PlanTime: time.Unix(0, 0), BackTime: time.Unix(0, 0)})
+	DB = db.Create(&Model.Uav{Name: uav.Name, Type: uav.Type, Uid: uav.Uid, Location: uav.Location})
 
 	if DB.Error != nil {
 		fmt.Println("创建新的设备失败2：", DB.Error.Error())

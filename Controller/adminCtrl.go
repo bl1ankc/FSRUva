@@ -24,7 +24,7 @@ func UploadNewUav(c *gin.Context) {
 	}
 
 	//数据插入
-	flag, response := Service.InsertUva(uav.Name, uav.Type, uav.Uid)
+	flag, response := Service.InsertUva(uav)
 	//Model.CreateQRCode(uav.Uid)
 	if flag {
 		c.JSON(200, gin.H{"code": 200, "desc": "上传成功"})
