@@ -149,60 +149,6 @@ func GetUavsByStatesWithPage(UavState string, UavType string, Page string, Max i
 	return uavs
 }
 
-// GetUavType 获取设备类型列表
-func GetUavType() (bool, []Model.UavType) {
-	var types []Model.UavType
-	DB := db.Model(&Model.UavType{}).Find(&types)
-
-	if DB.Error != nil {
-		fmt.Println("获取设备类型列表：", DB.Error.Error())
-		return false, []Model.UavType{}
-	}
-
-	return true, types
-}
-
-// GetType 获取单独设备类型
-func GetType(id int) (Model.UavType, error) {
-	var uavType Model.UavType
-	if err := db.Model(&Model.UavType{}).Where("id = ?", id).First(&uavType).Error; err != nil {
-		return Model.UavType{}, err
-	}
-	return uavType, nil
-}
-
-// AddUavType 增加设备类型
-func AddUavType(TypeName string, Remark string) bool {
-
-	DB := db.Model(&Model.UavType{}).Create(&Model.UavType{TypeName: TypeName, Remark: Remark})
-
-	if DB.Error != nil {
-		fmt.Println("增加设备类型失败：", DB.Error.Error())
-		return false
-	}
-
-	return true
-}
-
-// RemoveUavType 删除设备类型
-func RemoveUavType(TypeName string) bool {
-
-	DB := db.Where("type_name=?", TypeName).Delete(&Model.UavType{})
-
-	if DB.Error != nil {
-		fmt.Println("删除设备类型失败：", DB.Error.Error())
-		return false
-	}
-
-	return true
-}
-
-// UpdateUavType 更新设备类型
-func UpdateUavType(uavType Model.UavType) error {
-	err := db.Model(&uavType).Updates(uavType).Error
-	return err
-}
-
 /*
 	删除
 */
@@ -295,28 +241,16 @@ func UpdateUavUsage(Uid string, Usage string) error {
 	return nil
 }
 
-// UpdateImg 更新图片img
-func UpdateImg(uid string, img string) {
+// UpdateUavImg 更新图片img
+func UpdateUavImg(uid string, img string) error {
 
 	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uid}).Update("img", img)
 
 	if DB.Error != nil {
 		fmt.Println("更新图片img失败", DB.Error.Error())
-		return
+		return DB.Error
 	}
 
-	return
-}
-
-// UpdateTypeImg 更新类型图片
-func UpdateTypeImg(id int, img string) error {
-	uavType, err := GetType(id)
-	if err != nil {
-		return err
-	}
-	if err := db.Model(&uavType).Update("img", img).Error; err != nil {
-		return err
-	}
 	return nil
 }
 

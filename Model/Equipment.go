@@ -55,7 +55,7 @@ type UsingUav struct {
 
 type UavType struct {
 	gorm.Model
-	DepartmentID uint
+	DepartmentID uint   `gorm:"default:NULL"`
 	TypeName     string `json:"typeName"` //设备类型名
 	Remark       string `json:"remark"`   //备注
 	Img          string `json:"img"`

@@ -99,7 +99,7 @@ func BackUav(c *gin.Context) {
 	}
 
 	//上传图片
-	if UploadImg(c, "Uav") == false {
+	if UploadImg(c, "Uav", "") == false {
 		c.JSON(200, gin.H{"code": 200, "desc": "图片上传失败"})
 		return
 	}
@@ -128,7 +128,7 @@ func GetUav(c *gin.Context) {
 	}
 
 	//上传图片
-	if UploadImg(c, "Uav") == false {
+	if UploadImg(c, "Uav", "") == false {
 		return
 	}
 
@@ -194,7 +194,7 @@ func CancelBack(c *gin.Context) {
 }
 
 // UploadImg 上传图片
-func UploadImg(c *gin.Context, imgType string) bool {
+func UploadImg(c *gin.Context, imgType string, id interface{}) bool {
 	/*
 		上传图片,并保存在./img服务器文件夹中
 		自动生成图片对应的uid,该uid为文件名,并且绑定对应记录
@@ -240,16 +240,35 @@ func UploadImg(c *gin.Context, imgType string) bool {
 
 	//上传成功
 	if imgType == "Uav" {
-		Service.UpdateImg(c.Query("uid"), filename)
-	} else if imgType == "UavType" {
-		typeID, err := strconv.Atoi(c.Query("typeID"))
-		if err != nil {
+		uid := c.Query("uid") //前端携带
+		if uid == "" {        //前端未携带，检查是否有参数
+			if value, ok := id.(string); ok {
+				uid = value
+			} else {
+				return false
+			}
+		}
+		if err = Service.UpdateUavImg(c.Query("uid"), filename); err != nil {
 			return false
 		}
-		Service.UpdateTypeImg(typeID, filename)
+
+	} else if imgType == "UavType" {
+		v, err := strconv.Atoi(c.Query("typeID"))
+		typeID := uint(v)
+		if err != nil {
+			fmt.Println("无参")
+			if value, ok := id.(uint); ok {
+				typeID = value
+			} else {
+				return false
+			}
+		}
+		if err = Service.UpdateTypeImg(typeID, filename); err != nil {
+			return false
+		}
 	}
 	fmt.Println("OSS上传成功")
-	c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
+	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
 	return true
 }
 

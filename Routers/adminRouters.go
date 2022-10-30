@@ -60,13 +60,16 @@ func AdminRoute() {
 		g.GET("/ChangeAdminType", Controller.ChangeAdminType)
 
 		//添加设备类型
-		g.POST("/UavType", Controller.AddUavType)
+		g.POST("/AddUavType", Controller.AddUavType)
+
+		//更新设备类型图片
+		g.POST("/UploadUavTypeImg", Controller.UploadUavTypeImg)
 
 		//删除设备类型
-		g.DELETE("/UavType", Controller.RemoveUavType)
+		g.DELETE("/RemoveUavType", Controller.RemoveUavType)
 
 		//更新设备类型
-		g.POST("UpdateUavType", Controller.UpdateUavType)
+		g.POST("/UpdateUavType", Controller.UpdateUavType)
 
 		//获取图片临时访问地址
 		g.GET("/GetImgUrl", Controller.GetImgUrl)

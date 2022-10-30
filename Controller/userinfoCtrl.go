@@ -101,7 +101,7 @@ func SetAdmin(c *gin.Context) {
 		user := Service.GetUserByID(id)
 		c.JSON(200, gin.H{"code": 200, "desc": "设置成功", "data": user})
 	} else {
-		c.JSON(200, gin.H{"code": 200, "desc": "设置失败"})
+		c.JSON(500, gin.H{"code": 500, "desc": "设置失败"})
 	}
 
 }

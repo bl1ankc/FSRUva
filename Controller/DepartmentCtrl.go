@@ -109,11 +109,12 @@ func DepartmentTypes(c *gin.Context) {
 // TypeToDepartment 添加类型
 func TypeToDepartment(c *gin.Context) {
 	var code int
-	var departmentID, typeID int
+	var departmentID, typeValue int
 	var err error
 
 	departmentID, err = strconv.Atoi(c.Query("departmentID"))
-	typeID, err = strconv.Atoi(c.Query("typeID"))
+	typeValue, err = strconv.Atoi(c.Query("typeID"))
+	typeID := uint(typeValue)
 
 	department, err := Service.GetDepartment(uint(departmentID))
 	if err != nil {

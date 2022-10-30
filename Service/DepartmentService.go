@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"main/Model"
+	"main/utils"
 )
 
 // CreateDepartment 添加部门信息
@@ -65,6 +66,12 @@ func GetDepartmentTypes(department Model.Department) ([]Model.UavType, error) {
 	if err := db.Model(&department).Association("Types").Find(&types); err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return []Model.UavType{}, err
+		}
+	}
+
+	for i, t := range types {
+		if types[i].Img != "" {
+			types[i].Img, _ = utils.GetPicUrl(t.Img)
 		}
 	}
 
