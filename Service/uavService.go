@@ -82,7 +82,7 @@ func InsertUva(uav Model.Uav) (bool, string) {
 	}
 
 	//创建新记录
-	DB = db.Create(&uav)
+	DB = db.Select("name", "type", "uid", "location", "expensive").Create(&uav)
 
 	if DB.Error != nil {
 		fmt.Println("创建新的设备失败2：", DB.Error.Error())

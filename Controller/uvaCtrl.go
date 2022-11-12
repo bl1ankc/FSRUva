@@ -100,8 +100,12 @@ func GetDeviceByUids(c *gin.Context) {
 
 }
 
-// GetUavType 获取设备类型列表
-func GetUavType(c *gin.Context) {
+/*
+	类型操作
+*/
+
+// GetUavTypeList 获取设备类型列表
+func GetUavTypeList(c *gin.Context) {
 
 	flag, types := Service.GetUavType()
 
@@ -111,6 +115,23 @@ func GetUavType(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 200, "desc": "查询失败"})
 	}
 
+}
+
+// GetUavType 名称获取单个设备类型
+func GetUavType(c *gin.Context) {
+	var code int
+
+	typeName := c.Query("typeName")
+	uavType, err := Service.GetTypeByName(typeName)
+	if err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "获取设备类型失败，服务器报错"))
+		return
+	}
+	uavType.Img, _ = utils.GetPicUrl(uavType.Img)
+	code = Status.OK
+	c.JSON(code, R(code, uavType, "获取成功"))
+	return
 }
 
 // AddUavType 添加设备类型

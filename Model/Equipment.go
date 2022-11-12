@@ -33,6 +33,7 @@ type Uav struct {
 	Remark    string `json:"remark"`                  //设备备注信息
 	matter    bool   `json:"matter"`                  //
 	Expensive bool   `json:"expensive" gorm :"false"` //是否贵重
+	TmpImg    string `json:"tmpImg"`                  //临时图片
 }
 
 // CheckUav 审核设备模型
@@ -60,3 +61,11 @@ type UavType struct {
 	Remark       string `json:"remark"`   //备注
 	Img          string `json:"img"`
 }
+
+//func (uav Uav) AfterFind(tx *gorm.DB) (err error) {
+//
+//	tmpType, _ := Service.GetTypeByName(uav.Type)
+//	uav.TmpImg, _ = utils.GetPicUrl(tmpType.TypeName)
+//
+//	return nil
+//}

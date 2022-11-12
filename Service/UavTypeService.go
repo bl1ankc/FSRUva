@@ -27,6 +27,15 @@ func GetType(id uint) (Model.UavType, error) {
 	return uavType, nil
 }
 
+// GetTypeByName 获取单独设备类型
+func GetTypeByName(typeName string) (Model.UavType, error) {
+	var uavType Model.UavType
+	if err := db.Model(&Model.UavType{}).Where("typeName = ?", typeName).First(&uavType).Error; err != nil {
+		return Model.UavType{}, err
+	}
+	return uavType, nil
+}
+
 // AddUavType 增加设备类型
 func AddUavType(typeName string, remark string) (error, uint) {
 
