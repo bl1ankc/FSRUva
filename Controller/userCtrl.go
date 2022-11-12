@@ -6,6 +6,7 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 	"mime/multipart"
 	"strconv"
@@ -295,6 +296,7 @@ func GetOwnUsing(c *gin.Context) {
 
 // GetOwnHistory 查看历史借用中的设备
 func GetOwnHistory(c *gin.Context) {
+	var code int
 	stuid, flag := c.GetQuery("stuid")
 
 	page := c.DefaultQuery("page", "0")
@@ -305,10 +307,14 @@ func GetOwnHistory(c *gin.Context) {
 	}
 
 	uavs, flag := Service.GetHistoryUavsByStuID(stuid, page, Const.PAGEMAX)
-	if flag {
-		c.JSON(200, &uavs)
-	} else {
-		c.JSON(502, gin.H{"code": 502, "message": "查询失败"})
+	if !flag {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "查询失败"))
+		return
 	}
+
+	code = Status.OK
+	c.JSON(code, R(code, uavs, "查询成功"))
+	return
 
 }

@@ -1,7 +1,9 @@
 package Model
 
 import (
+	"fmt"
 	"gorm.io/gorm"
+	"main/utils"
 	"time"
 )
 
@@ -10,6 +12,7 @@ type Record struct {
 	gorm.Model
 	State     string    `json:"state"`    //状态	使用中using 拒绝借用refuse 已归还returned  损坏damaged  取消cancelled
 	Uid       string    `json:"uid"`      //设备序号
+	Type      string    `json:"type"`     //设备类型
 	StudentID string    `json:"stuid"`    //学号
 	Borrower  string    `json:"name"`     //借用人姓名
 	Phone     string    `json:"phone"`    //借用人电话
@@ -30,6 +33,7 @@ type Record struct {
 	BackReviewComment string    `json:"backreview_comment"` //归还审核原因
 	BackImg           string    `json:"backimg"`            //归还图片记录
 
+	TmpImg string `json:"tmpImg"` //临时图片（类型图片）
 }
 
 // BackRecord 查询历史记录返回模型
@@ -53,4 +57,25 @@ type BackRecord struct {
 	BackImg           string    `json:"backImg"`            //归还图片记录
 
 	Uav []Uav `json:"uavs" gorm:"-"` //设备组
+}
+
+func (r *Record) AfterFind(tx *gorm.DB) (err error) {
+	var uavType UavType
+	var uav Uav
+	if r.Type == "" {
+		if err = tx.Model(&Uav{}).Where(Uav{Uid: r.Uid}).First(&uav).Error; err != nil {
+			return err
+		}
+		r.Type = uav.Type
+		r.TmpImg = uav.TmpImg
+		fmt.Println("查询失败" + r.TmpImg + " another" + r.Type)
+		return nil
+	}
+	if err = tx.Model(&UavType{}).Where(UavType{TypeName: r.Type}).First(&uavType).Error; err != nil {
+		return err
+	}
+	tmpImg, _ := utils.GetPicUrl(uavType.Img)
+	r.TmpImg = tmpImg
+	fmt.Println("sssssssssssssssss" + r.Type + r.TmpImg)
+	return nil
 }

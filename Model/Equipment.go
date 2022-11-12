@@ -2,6 +2,7 @@ package Model
 
 import (
 	"gorm.io/gorm"
+	"main/utils"
 	"time"
 )
 
@@ -52,6 +53,7 @@ type UsingUav struct {
 	GetTime  string `json:"GetTime"`  //借用时间
 	PlanTime string `json:"PlanTime"` //预计归还时间
 	LastDays int    `json:"lastDays"` //剩余时间
+	TmpImg   string `json:"tmpImg"`
 }
 
 type UavType struct {
@@ -62,10 +64,11 @@ type UavType struct {
 	Img          string `json:"img"`
 }
 
-//func (uav Uav) AfterFind(tx *gorm.DB) (err error) {
-//
-//	tmpType, _ := Service.GetTypeByName(uav.Type)
-//	uav.TmpImg, _ = utils.GetPicUrl(tmpType.TypeName)
-//
-//	return nil
-//}
+func (u *Uav) AfterFind(tx *gorm.DB) (err error) {
+	var uavType UavType
+	tx.Model(&UavType{}).Where(UavType{TypeName: u.Type}).First(&uavType)
+
+	tmpImg, _ := utils.GetPicUrl(uavType.Img)
+	u.TmpImg = tmpImg
+	return nil
+}

@@ -272,13 +272,8 @@ func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav, 
 
 	var uavs []Model.UsingUav
 	var uav Model.UsingUav
-	type TempUav struct {
-		Uid      string    `json:"uid"`
-		State    string    `json:"state"`
-		GetTime  time.Time `json:"GetTime"`  //借用时间
-		PlanTime time.Time `json:"PlanTime"` //预计归还时间
-	}
-	var tempuav []TempUav
+
+	var tempuav []Model.Record
 	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "using"}).Or(&Model.Record{StudentID: Stuid, State: "Get under review"}).Or(&Model.Record{StudentID: Stuid, State: "scheduled"}).Order("Get_Time Desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找使用中的无人机失败：", DB.Error.Error())
@@ -297,6 +292,7 @@ func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav, 
 		year, month, day = tempuav.PlanTime.Date()
 		uav.PlanTime = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
 		uav.LastDays = int(tempuav.PlanTime.Sub(time.Now()).Hours()) / 24
+		uav.TmpImg = tempuav.TmpImg
 		uavs = append(uavs, uav)
 	}
 	return uavs, true
@@ -319,8 +315,9 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		State    string    `json:"state"`
 		GetTime  time.Time `json:"GetTime"`  //借用时间
 		PlanTime time.Time `json:"PlanTime"` //预计归还时间
+		TmpImg   string    `json:"tmpImg"`   //类型名称
 	}
-	var tempuav []TempUav
+	var tempuav []Model.Record
 	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "returned"}).Or(&Model.Record{StudentID: Stuid, State: "refuse"}).Or(&Model.Record{StudentID: Stuid, State: "cancelled"}).Or(&Model.Record{StudentID: Stuid, State: "Back under review"}).Order("get_time desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
 		fmt.Println("通过学号查找历史借用的无人机失败", DB.Error.Error())
@@ -339,6 +336,7 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		year, month, day = tempuav.PlanTime.Date()
 		uav.PlanTime = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
 		uav.LastDays = 0
+		uav.TmpImg = tempuav.TmpImg
 		uavs = append(uavs, uav)
 	}
 	return uavs, true

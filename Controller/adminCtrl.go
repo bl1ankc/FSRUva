@@ -7,7 +7,6 @@ import (
 	"main/Model"
 	"main/Service"
 	"main/utils"
-	"strconv"
 	"time"
 )
 
@@ -112,10 +111,8 @@ func GetPassedUav(c *gin.Context) {
 	}
 
 	if uav.Type == "Drone" {
-		adminType, exist := c.Get("adminType")
-		atype, _ := strconv.Atoi(adminType.(string))
-
-		if !exist || atype != 1 {
+		adminType := c.MustGet("adminType").(int)
+		if adminType != 1 {
 			c.JSON(301, R(301, nil, "非老师操作，无法通过无人机审核"))
 			return
 		}
