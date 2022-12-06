@@ -32,6 +32,12 @@ func AdminRoute() {
 		//审核不通过归还设备
 		g.POST("/BackFailUav", Controller.BackFailUav)
 
+		//强制取走
+		g.PUT("/ForcedGet", Controller.ForcedGet)
+
+		//强制归还
+		g.PUT("/ForcedBack", Controller.ForcedBack)
+		
 		//获取所有用户
 		g.GET("/GetAllUsers", Controller.GetAllUsers)
 

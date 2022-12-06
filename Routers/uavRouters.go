@@ -21,7 +21,7 @@ func UavRoute() {
 		g.GET("/GetDevice", Controller.GetDeviceByUid)
 
 		//获取设备组信息
-		g.POST("/GetDeviceByUids", Controller.GetDeviceByUids)
+		g.GET("/GetDeviceByUids", Controller.GetDeviceByUids)
 
 		//获取设备类型列表
 		g.GET("/GetUavTypeList", Controller.GetUavTypeList)

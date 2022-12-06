@@ -6,6 +6,7 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 	"time"
 )
@@ -146,7 +147,6 @@ func BackPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与归还时间
-	Service.UpdateBackRecord(uav.Uid)
 	Service.UpdateState(uav.Uid, "free")
 	Service.UpdateBackTime(uav.Uid)
 	Service.UpdateRecordState(uav.Uid, "returned")
@@ -160,7 +160,7 @@ func GetFailUav(c *gin.Context) {
 	var uav Model.CheckUav
 
 	//绑定结构体
-	if err := c.BindJSON(&uav); err != nil {
+	if err := c.ShouldBindJSON(&uav); err != nil {
 		fmt.Println("审核不通过借用设备数据绑定失败：", err.Error())
 		c.JSON(400, gin.H{"msg": "参数格式错误"})
 		return
@@ -174,7 +174,7 @@ func GetFailUav(c *gin.Context) {
 		}
 	}
 
-	//更新状态与借用时间
+	//更新状态与借用时
 	Service.UpdateState(uav.Uid, "free")
 	Service.UpdateRecordState(uav.Uid, "refuse")
 	Service.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now())
@@ -198,6 +198,80 @@ func BackFailUav(c *gin.Context) {
 	Service.UpdateRecordState(uav.Uid, "using")
 	Service.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
 	c.JSON(200, gin.H{"desc": "审核成功"})
+}
+
+// ForcedGet 强制取走
+func ForcedGet(c *gin.Context) {
+	var code int
+
+	id := c.Query("uid")
+
+	if err := Service.UpdateState(id, "using"); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "函数操作错误"))
+		return
+	}
+	if err := Service.UpdateBorrowTime(id, time.Now().Local()); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "函数操作错误"))
+		return
+	}
+	if err := Service.GetReviewRecord(id, "", "", "", time.Now().Local()); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "函数操作错误"))
+		return
+	}
+	if err := Service.UpdateRecordState(id, "using"); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "函数操作错误"))
+		return
+	}
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "强制修改成功"))
+	return
+}
+
+// ForcedBack 强制归还
+func ForcedBack(c *gin.Context) {
+	var code int
+
+	id := c.Query("uid")
+
+	exist, uav := Service.GetUavByUid(id)
+	if exist == false {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "无人机不存在"))
+		return
+	}
+
+	if uav.State != "using" && uav.State != "scheduled" {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "设备不在使用中"))
+		return
+	}
+
+	if err := Service.UpdateState(id, "free"); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "更新状态失败，检查函数及数据库"))
+		return
+	}
+	if err := Service.UpdateRecordState(id, "returned"); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "更新记录状态失败，检查函数及数据库"))
+		return
+	}
+	if exist := Service.UpdateBackRecord(id); exist != true {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "更新归还记录时间，检查函数及数据库"))
+		return
+	}
+	Service.UpdateBackTime(uav.Uid)
+	Service.BackReviewRecord(uav.Uid, "", "passed", "")
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "强制归还成功"))
+	return
 }
 
 // GetAllUsers 获取所有用户

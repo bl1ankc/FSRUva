@@ -32,11 +32,6 @@ func BorrowUav(c *gin.Context) {
 		return
 	}
 
-	//tmp.Borrower = uav.Borrower
-	//tmp.StudentID = uav.StudentID
-	//tmp.Phone = uav.Phone
-	//tmp.PlanTime = uav.PlanTime
-	//tmp.Usage = uav.Usage
 	uav.Expensive = tmp.Expensive
 	//表单中提交不可使用的无人机
 	flag := false
@@ -45,8 +40,8 @@ func BorrowUav(c *gin.Context) {
 	if Service.GetUavStateByUid(uav) != "free" {
 		flag = true
 	} else {
-		Service.RecordBorrow(uav.Uid, uav.StudentID, uav.Borrower, uav.PlanTime, uav.Usage) //用途
-		if expensive != true {                                                              //非贵重直接跳到预约成功
+		Service.RecordBorrow(uav) //用途
+		if expensive != true {    //非贵重直接跳到预约成功
 			uav.State = "scheduled"
 			uav.GetTime = time.Now().Local()
 			Service.UpdateRecordState(uav.Uid, "scheduled")
@@ -55,8 +50,8 @@ func BorrowUav(c *gin.Context) {
 		}
 		fmt.Println(uav)
 		fmt.Println(tmp)
-		err = Service.UpdateDevice(uav) //更新设备信息
-		if err != nil {
+		//更新设备信息
+		if err = Service.UpdateDevice(uav); err != nil {
 			c.JSON(401, R(401, nil, "更新函数错误"))
 			return
 		}

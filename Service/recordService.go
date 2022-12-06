@@ -9,20 +9,36 @@ import (
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(Uid string, Stuid string, Borrower string, PlanTime time.Time, Usage string) error {
+func RecordBorrow(uav Model.Uav) error {
 	var id uint
 
 	//uav := GetUavByUid(Uid)
 
-	DB := db.Create(&Model.Record{Uid: Uid, StudentID: Stuid, Borrower: Borrower, PlanTime: PlanTime, Usage: Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
-
+	DB := db.Create(&Model.Record{Name: uav.Uid, Uid: uav.Uid, StudentID: uav.StudentID, Borrower: uav.Borrower, PlanTime: uav.PlanTime, Usage: uav.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
+	DB = db.Model(&uav).Updates(&Model.Uav{RecordID: id})
 	if DB.Error != nil {
 		fmt.Println("增加一条记录失败：", DB.Error.Error())
 		return DB.Error
 	}
 
-	UpdateRecordIdinUav(Uid, id)
-	UpdateRecordState(Uid, "Get under review")
+	UpdateRecordState(uav.Uid, "Get under review")
+	return nil
+}
+
+// GetRecordByUid 序列号单一查找
+func GetRecordByUid(uid string) (Model.Record, error) {
+	var data Model.Record
+	if err := db.Model(&Model.Record{}).Where("uid = ?", uid).First(&data).Error; err != nil {
+		return Model.Record{}, err
+	}
+	return data, nil
+}
+
+// UpdateRecord 更新记录
+func UpdateRecord(record Model.Record) error {
+	if DB := db.Model(&record).Updates(&record); DB.Error != nil {
+		return DB.Error
+	}
 	return nil
 }
 
@@ -188,7 +204,7 @@ func GetReviewRecord(Uid string, Checker string, Result string, Comment string, 
 	if !flag {
 		return errors.New("NotFind")
 	}
-
+	fmt.Println("//////////+" + Comment)
 	DB := db.Model(&Model.Record{}).Where("id", id).Updates(&Model.Record{GetReviewer: Checker, GetTime: GetTime, GetReviewResult: Result, GetReviewComment: Comment, GetReviewTime: time.Now()})
 	if DB.Error != nil {
 		fmt.Println("添加借用审核记录失败：", DB.Error.Error())
@@ -198,7 +214,7 @@ func GetReviewRecord(Uid string, Checker string, Result string, Comment string, 
 	return nil
 }
 
-// BackReviewRecord 添加归还审核记录
+// BackReviewRecord 添加审核记录中归还信息
 func BackReviewRecord(Uid string, Checker string, Result string, Comment string) bool {
 	//获取时间
 	//Time := time.Now()
@@ -292,6 +308,8 @@ func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav, 
 		year, month, day = tempuav.PlanTime.Date()
 		uav.PlanTime = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
 		uav.LastDays = int(tempuav.PlanTime.Sub(time.Now()).Hours()) / 24
+		uav.GetComment = tempuav.GetReviewComment
+		uav.BackComment = tempuav.BackReviewComment
 		uav.TmpImg = tempuav.TmpImg
 		uavs = append(uavs, uav)
 	}
@@ -310,13 +328,7 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 
 	var uavs []Model.UsingUav
 	var uav Model.UsingUav
-	type TempUav struct {
-		Uid      string    `json:"uid"`
-		State    string    `json:"state"`
-		GetTime  time.Time `json:"GetTime"`  //借用时间
-		PlanTime time.Time `json:"PlanTime"` //预计归还时间
-		TmpImg   string    `json:"tmpImg"`   //类型名称
-	}
+
 	var tempuav []Model.Record
 	DB := db.Model(&Model.Record{}).Where(&Model.Record{StudentID: Stuid, State: "returned"}).Or(&Model.Record{StudentID: Stuid, State: "refuse"}).Or(&Model.Record{StudentID: Stuid, State: "cancelled"}).Or(&Model.Record{StudentID: Stuid, State: "Back under review"}).Order("get_time desc").Offset(pageint * Max).Limit(Max).Find(&tempuav)
 	if DB.Error != nil {
@@ -330,12 +342,14 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		if flag == false {
 			return uavs, false
 		}
-		uav.State = tempuav.State
 		year, month, day := tempuav.GetTime.Date()
 		uav.GetTime = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
 		year, month, day = tempuav.PlanTime.Date()
 		uav.PlanTime = strconv.Itoa(year) + "." + strconv.Itoa(int(month)) + "." + strconv.Itoa(day)
 		uav.LastDays = 0
+		uav.State = tempuav.State
+		uav.GetComment = tempuav.GetReviewComment
+		uav.BackComment = tempuav.BackReviewComment
 		uav.TmpImg = tempuav.TmpImg
 		uavs = append(uavs, uav)
 	}

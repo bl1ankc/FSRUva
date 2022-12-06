@@ -47,13 +47,15 @@ type CheckUav struct {
 
 // UsingUav 使用中的无人机
 type UsingUav struct {
-	Uid      string `json:"uid"`
-	Name     string `json:"name"`
-	State    string `json:"state"`
-	GetTime  string `json:"GetTime"`  //借用时间
-	PlanTime string `json:"PlanTime"` //预计归还时间
-	LastDays int    `json:"lastDays"` //剩余时间
-	TmpImg   string `json:"tmpImg"`
+	Uid         string `json:"uid"`
+	Name        string `json:"name"`
+	State       string `json:"state"`
+	GetTime     string `json:"GetTime"`  //借用时间
+	PlanTime    string `json:"PlanTime"` //预计归还时间
+	LastDays    int    `json:"lastDays"` //剩余时间
+	TmpImg      string `json:"tmpImg"`
+	BackComment string `json:"backComment"`
+	GetComment  string `json:"getComment"`
 }
 
 type UavType struct {
