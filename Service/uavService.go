@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"main/Model"
-	"strconv"
+	"main/Service/Scopes"
+	"net/http"
 	"time"
 )
 
@@ -56,25 +57,12 @@ func GetUavByStates(UavState string, UavType string) []Model.Uav {
 	return uav
 }
 
-//// GetUavByNames 获取对应型号及状态的设备信息
-//func GetUavByNames(UavName string, UavType string) []Model.Uav {
-//	var uav []Model.Uav
-//	DB := db.Model(&Model.Uav{}).Where(Model.Uav{Name: UavName, Type: UavType}).Find(&uav)
-//
-//	if DB.Error != nil {
-//		fmt.Println("获取对应型号及状态的设备信息失败：", DB.Error.Error())
-//	}
-//
-//	return uav
-//}
-
 // InsertUva 创建新的设备
 func InsertUva(uav Model.Uav) (bool, string) {
-	//查询设备是否存在
 	var cnt int64
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid}).Count(&cnt)
-	if DB.Error != nil {
-		fmt.Println("创建新的设备失败1：", DB.Error.Error())
+	//查询设备是否存在
+	if err := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid}).Count(&cnt).Error; err != nil {
+		fmt.Println("创建新的设备失败1：", err.Error())
 		return false, "发生未知错误1"
 	}
 	if cnt >= 1 {
@@ -82,14 +70,18 @@ func InsertUva(uav Model.Uav) (bool, string) {
 	}
 
 	//创建新记录
-	DB = db.Select("name", "type", "uid", "location", "expensive").Create(&uav)
-
-	if DB.Error != nil {
-		fmt.Println("创建新的设备失败2：", DB.Error.Error())
+	if err := db.Select("name", "type", "uid", "location", "expensive").Create(&uav).Error; err != nil {
+		fmt.Println("创建新的设备失败2：", err.Error())
 		return false, "发生未知错误2"
 	}
 
 	return true, "创建成功"
+}
+
+// RemoveDevice 删除对应设备
+func RemoveDevice(Device Model.Uav) error {
+	err := db.Model(&Device).Delete(&Device).Error
+	return err
 }
 
 // GetUavByAll 多条件查找设备信息
@@ -104,17 +96,6 @@ func GetUavByAll(uav Model.Uav) []Model.Uav {
 	return uavs
 }
 
-// GetUavStateByUid 通过Uid获取设备状态
-func GetUavStateByUid(u Model.Uav) string {
-	var uav Model.Uav
-	DB := db.Model(&Model.Uav{}).Where("uid = ?", u.Uid).First(&uav)
-
-	if DB.Error != nil {
-		fmt.Println("通过Uid获取设备状态失败：", DB.Error.Error())
-	}
-	return uav.State
-}
-
 // SearchStuInOneDay 获取即将归还的设备
 func SearchStuInOneDay() ([]Model.Uav, bool) {
 	var uavs []Model.Uav
@@ -126,20 +107,12 @@ func SearchStuInOneDay() ([]Model.Uav, bool) {
 	return uavs, true
 }
 
-// GetUavsByStatesWithPage 分页获取对应序列号组的设备组信息
-func GetUavsByStatesWithPage(UavState string, UavType string, Page string, Max int) []Model.Uav {
-
-	//转换数据格式
-	pageint, err := strconv.Atoi(Page)
-	if err != nil {
-		fmt.Println("分页获取对应序列号组的设备组信息 数据转换失败", err.Error())
-		pageint = 0
-	}
-
+// GetUavsByStatesWithPage 分页获取对应序列号组的设备组信息 @2023/3/3 分页更新
+func GetUavsByStatesWithPage(UavState string, UavType string, r *http.Request) []Model.Uav {
 	//查找数据
 	var uavs []Model.Uav
 
-	DB := db.Model(&Model.Uav{}).Where(Model.Uav{State: UavState, Type: UavType}).Offset(pageint * Max).Limit(Max).Find(&uavs)
+	DB := db.Model(&Model.Uav{}).Where(Model.Uav{State: UavState, Type: UavType}).Scopes(Scopes.Paginate(r)).Find(&uavs)
 
 	if DB.Error != nil {
 		fmt.Println("分页获取对应序列号组的设备组信息：", DB.Error.Error())
@@ -147,16 +120,6 @@ func GetUavsByStatesWithPage(UavState string, UavType string, Page string, Max i
 	}
 
 	return uavs
-}
-
-/*
-	删除
-*/
-
-// RemoveDevice 删除对应设备
-func RemoveDevice(Device Model.Uav) error {
-	err := db.Model(&Device).Delete(&Device).Error
-	return err
 }
 
 /*

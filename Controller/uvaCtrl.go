@@ -4,20 +4,18 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
-	"main/Const"
 	"main/Model"
 	"main/Service"
 	"main/utils"
 )
 
-// GetNotUsedDrones 获取空闲的设备
+// GetNotUsedDrones 获取空闲的设备 @2023/3/3(paginate update)
 func GetNotUsedDrones(c *gin.Context) {
 
-	page := c.DefaultQuery("page", "0")
 	typename := c.Query("type")
 
 	//获取设备信息
-	uav := Service.GetUavsByStatesWithPage("free", typename, page, Const.PAGEMAX)
+	uav := Service.GetUavsByStatesWithPage("free", typename, c.Request)
 
 	//JSON格式返回
 	c.JSON(200, &uav)
@@ -33,10 +31,10 @@ func GetUsingDevices(c *gin.Context) {
 
 // GetAllDevices 获取所有设备
 func GetAllDevices(c *gin.Context) {
-	page := c.DefaultQuery("page", "0")
+
 	typename := c.DefaultQuery("type", "")
 
-	device := Service.GetUavsByStatesWithPage("", typename, page, Const.PAGEMAX)
+	device := Service.GetUavsByStatesWithPage("", typename, c.Request)
 
 	c.JSON(200, &device)
 }

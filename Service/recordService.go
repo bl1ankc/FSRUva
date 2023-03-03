@@ -14,14 +14,13 @@ func RecordBorrow(uav Model.Uav) error {
 
 	//uav := GetUavByUid(Uid)
 
-	DB := db.Create(&Model.Record{Name: uav.Uid, Uid: uav.Uid, StudentID: uav.StudentID, Borrower: uav.Borrower, PlanTime: uav.PlanTime, Usage: uav.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
+	DB := db.Create(&Model.Record{Name: uav.Uid, State: "Get under review", Uid: uav.Uid, StudentID: uav.StudentID, Borrower: uav.Borrower, PlanTime: uav.PlanTime, Usage: uav.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
 	DB = db.Model(&uav).Updates(&Model.Uav{RecordID: id})
 	if DB.Error != nil {
 		fmt.Println("增加一条记录失败：", DB.Error.Error())
 		return DB.Error
 	}
 
-	UpdateRecordState(uav.Uid, "Get under review")
 	return nil
 }
 

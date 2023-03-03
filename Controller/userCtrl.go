@@ -24,7 +24,7 @@ func BorrowUav(c *gin.Context) {
 		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
-
+	//uav示例获取
 	exist, tmp := Service.GetUavByUid(uav.Uid)
 	expensive := tmp.Expensive
 	if exist == false {
@@ -37,14 +37,21 @@ func BorrowUav(c *gin.Context) {
 	flag := false
 
 	//再次验证是否能被借用
-	if Service.GetUavStateByUid(uav) != "free" {
+	if uav.State != "free" {
 		flag = true
 	} else {
-		Service.RecordBorrow(uav) //用途
-		if expensive != true {    //非贵重直接跳到预约成功
+		if err := Service.RecordBorrow(uav); err != nil {
+			c.JSON(401, R(401, nil, "创建记录函数错误RecordBorrowError"))
+			return
+		} //借用记录生成
+
+		if expensive != true { //非贵重直接跳到预约成功
+			if err := Service.UpdateRecordState(uav.Uid, "scheduled"); err != nil {
+				c.JSON(401, R(401, nil, "更新记录信息函数错误UpdateRecordStateError"))
+				return
+			}
 			uav.State = "scheduled"
 			uav.GetTime = time.Now().Local()
-			Service.UpdateRecordState(uav.Uid, "scheduled")
 		} else {
 			uav.State = "Get under review"
 		}

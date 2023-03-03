@@ -6,6 +6,7 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 	"time"
 )
@@ -96,9 +97,10 @@ func GetReview(c *gin.Context) {
 	}
 
 	c.JSON(200, uavs)
+	return
 }
 
-// GetPassedUav 审核通过借用设备
+// GetPassedUav 审核通过借用设备 @2023/3/3
 func GetPassedUav(c *gin.Context) {
 	//模型定义
 	var uav Model.CheckUav
