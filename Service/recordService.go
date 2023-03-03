@@ -42,6 +42,19 @@ func UpdateRecord(record Model.Record) error {
 	return nil
 }
 
+// GetRecordById 通过记录ID获取记录实例
+func GetRecordById(recordid uint) (bool, Model.Record) {
+	var record Model.Record
+
+	DB := db.Model(&Model.Record{}).Where("id", recordid).First(&record)
+	if DB.Error != nil {
+		fmt.Println("通过记录ID查找记录信息失败", DB.Error.Error())
+		return false, record
+	}
+
+	return true, record
+}
+
 // UpdateRecordState 更新记录状态
 func UpdateRecordState(Uid string, State string) error {
 
@@ -53,7 +66,7 @@ func UpdateRecordState(Uid string, State string) error {
 		return errors.New("NotFind")
 	}
 
-	DB := db.Model(&Model.Record{}).Where("id", id).Updates(&Model.Record{State: State})
+	DB := db.Model(&Model.Record{}).Where("id = ?", id).Updates(&Model.Record{State: State})
 	if DB.Error != nil {
 		fmt.Println("更新记录状态失败：", DB.Error.Error())
 		return DB.Error
@@ -214,7 +227,7 @@ func GetReviewRecord(Uid string, Checker string, Result string, Comment string, 
 	return nil
 }
 
-// BackReviewRecord 添加审核记录中归还信息
+// BackReviewRecord 添加归还审核记录
 func BackReviewRecord(Uid string, Checker string, Result string, Comment string) bool {
 	//获取时间
 	//Time := time.Now()
@@ -354,17 +367,4 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		uavs = append(uavs, uav)
 	}
 	return uavs, true
-}
-
-// GetRecordById 通过记录ID查找记录信息
-func GetRecordById(recordid uint) (bool, Model.Record) {
-	var record Model.Record
-
-	DB := db.Model(&Model.Record{}).Where("id", recordid).First(&record)
-	if DB.Error != nil {
-		fmt.Println("通过记录ID查找记录信息失败", DB.Error.Error())
-		return false, record
-	}
-
-	return true, record
 }

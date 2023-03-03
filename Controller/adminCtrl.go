@@ -6,7 +6,6 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
-	"main/Service/Status"
 	"main/utils"
 	"time"
 )
@@ -120,15 +119,19 @@ func GetPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与借用时间
-
-	err := Service.UpdateState(uav.Uid, "scheduled")
-	err = Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, time.Time{})
-	err = Service.UpdateRecordState(uav.Uid, "scheduled")
-
-	if err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+	if err := Service.UpdateState(uav.Uid, "scheduled"); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--updateState"))
 		return
 	}
+	if err := Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, time.Time{}); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--getReviewRecord"))
+		return
+	}
+	if err := Service.UpdateRecordState(uav.Uid, "scheduled"); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--updateRecordState"))
+		return
+	}
+
 	c.JSON(200, gin.H{"desc": "审核成功"})
 	return
 	//Model.UpdateUserCountByUid(uav.Uid, 1)
@@ -147,6 +150,7 @@ func BackPassedUav(c *gin.Context) {
 	}
 
 	//更新状态与归还时间
+	Service.UpdateBackRecord(uav.Uid)
 	Service.UpdateState(uav.Uid, "free")
 	Service.UpdateBackTime(uav.Uid)
 	Service.UpdateRecordState(uav.Uid, "returned")
@@ -174,11 +178,21 @@ func GetFailUav(c *gin.Context) {
 		}
 	}
 
-	//更新状态与借用时
-	Service.UpdateState(uav.Uid, "free")
-	Service.UpdateRecordState(uav.Uid, "refuse")
-	Service.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now())
+	//更新状态与借用时间
+	if err := Service.UpdateState(uav.Uid, "free"); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+		return
+	}
+	if err := Service.UpdateRecordState(uav.Uid, "refuse"); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+		return
+	}
+	if err := Service.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now()); err != nil {
+		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+		return
+	}
 	c.JSON(200, gin.H{"desc": "审核成功"})
+	return
 }
 
 // BackFailUav 审核不通过归还设备

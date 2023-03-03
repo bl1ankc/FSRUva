@@ -56,17 +56,17 @@ func GetUavByStates(UavState string, UavType string) []Model.Uav {
 	return uav
 }
 
-// GetUavByNames 获取对应型号及状态的设备信息
-func GetUavByNames(UavName string, UavType string) []Model.Uav {
-	var uav []Model.Uav
-	DB := db.Model(&Model.Uav{}).Where(Model.Uav{Name: UavName, Type: UavType}).Find(&uav)
-
-	if DB.Error != nil {
-		fmt.Println("获取对应型号及状态的设备信息失败：", DB.Error.Error())
-	}
-
-	return uav
-}
+//// GetUavByNames 获取对应型号及状态的设备信息
+//func GetUavByNames(UavName string, UavType string) []Model.Uav {
+//	var uav []Model.Uav
+//	DB := db.Model(&Model.Uav{}).Where(Model.Uav{Name: UavName, Type: UavType}).Find(&uav)
+//
+//	if DB.Error != nil {
+//		fmt.Println("获取对应型号及状态的设备信息失败：", DB.Error.Error())
+//	}
+//
+//	return uav
+//}
 
 // InsertUva 创建新的设备
 func InsertUva(uav Model.Uav) (bool, string) {

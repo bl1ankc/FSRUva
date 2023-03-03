@@ -83,6 +83,12 @@ func BackUav(c *gin.Context) {
 		c.JSON(400, gin.H{"code": 400, "desc": "未找到对应设备"})
 		return
 	}
+	////获取记录实例
+	//exist, record := Service.GetRecordById(uav.RecordID)
+	//if exist == false {
+	//	c.JSON(400, gin.H{"code": 400, "desc": "未找到对应记录"})
+	//	return
+	//}
 
 	if uav.StudentID != c.MustGet("studentid") {
 		c.JSON(403, gin.H{"code": 403, "desc": "不可归还别人借用的设备"})
@@ -103,6 +109,10 @@ func BackUav(c *gin.Context) {
 	//更新状态为归还审核
 	err := Service.UpdateState(id, "Back under review")
 	exist = Service.UpdateImgInRecord(id, "back_img")
+	if err != nil || exist == false {
+		c.JSON(503, gin.H{"code": 503, "desc": "函数操作错误"})
+		return
+	}
 	err = Service.UpdateRecordState(id, "Back under review")
 	exist = Service.UpdateBackRecord(id)
 	if err != nil || exist == false {
