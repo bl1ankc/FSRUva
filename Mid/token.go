@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"main/Controller"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 	"time"
 )
@@ -108,6 +110,7 @@ func Login(c *gin.Context) {
 	_, Openid, Unionid := utils.GetOpenid(user.Code)
 	Service.UpdateUserInfo(user.UserID, user.NickName, user.AvatarUrl, Openid, Unionid)
 	c.JSON(200, gin.H{"token": signedToken, "desc": "登录成功", "IsAdmin": User.IsAdmin, "phone": User.Phone, "name": User.Name})
+	return
 }
 
 // verifyAction
@@ -154,4 +157,27 @@ func AuthRequired() gin.HandlerFunc {
 		c.Set("studentid", user.StudentID)
 		c.Next()
 	}
+}
+
+// GetUserByToken 通过token获取用户信息
+func GetUserByToken(c *gin.Context) {
+	var code int
+	strToken := c.Request.Header.Get("token")
+
+	if strToken == "" {
+		code = Status.InvalidToken
+		c.JSON(code, Controller.R(code, nil, "无效token"))
+		return
+	}
+	claim, err := verifyAction(strToken)
+	if err != nil {
+		code = Status.InvalidToken
+		c.JSON(code, Controller.R(code, nil, "token验证失败,检查token是否正确"))
+		return
+	}
+
+	user := Service.GetUserByID(claim.UserID)
+	code = Status.OK
+	c.JSON(code, Controller.R(code, user, "获取数据成功"))
+	return
 }

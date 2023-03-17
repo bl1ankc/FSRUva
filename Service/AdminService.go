@@ -21,7 +21,9 @@ func UpdateAdmin(Stuid string, Isadmin bool) bool {
 
 func UpdateAdminType(stuID string, Type int) error {
 
-	result := db.Model(&Model.User{}).Where(&Model.User{StudentID: stuID}).Updates(Model.User{AdminType: Type})
+	result := db.Model(&Model.User{}).Where(&Model.User{StudentID: stuID}).Updates(map[string]interface{}{
+		"AdminType": Type,
+	})
 	if result.Error != nil {
 		fmt.Println("修改管理员类型失败:", result.Error.Error())
 	}

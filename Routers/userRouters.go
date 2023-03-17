@@ -11,11 +11,16 @@ func UserRoute() {
 	r.POST("/login", Mid.Login)
 	//上传用户信息
 	r.POST("/UploadUser", Controller.UploadUser)
+	//获取用户信息
+	r.GET("/GetUserByToken", Mid.GetUserByToken)
 	//获取用户手机号
 	//r.POST("/GetPhoneNumber", Controller.GetPhoneNumber)
 
 	g := r.Group("/User", Mid.AuthRequired())
 	{
+		//注销
+		g.DELETE("/Logout", Controller.LogoutUser)
+
 		//预约设备
 		g.POST("/BorrowUav", Controller.BorrowUav)
 

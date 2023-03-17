@@ -35,6 +35,62 @@ func UploadUser(c *gin.Context) {
 }
 
 /*
+	删除
+*/
+
+// RemoveUser 删除用户(管理员)
+func RemoveUser(c *gin.Context) {
+	var code int
+
+	stuID := c.Query("stuID")
+	user, err := Service.GetUserByIDToLogin(stuID)
+	if err != nil {
+		code = Status.UserNotExists
+		c.JSON(code, R(code, nil, "用户查询失败"))
+		return
+	}
+
+	if err := Service.DeleteUser(user); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "删除失败"))
+		return
+	}
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "删除用户成功"))
+	return
+}
+
+// LogoutUser 注销用户
+func LogoutUser(c *gin.Context) {
+	var code int
+
+	stuID, exist := c.Get("studentid")
+	if exist == false {
+		code = Status.JWTErr
+		c.JSON(code, R(code, nil, "操作用户信息读取失败"))
+		return
+	}
+
+	user, err := Service.GetUserByIDToLogin(stuID.(string))
+	if err != nil {
+		code = Status.UserNotExists
+		c.JSON(code, R(code, nil, "用户不存在"))
+		return
+	}
+
+	if err := Service.DeleteUser(user); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "注销失败"))
+		return
+	}
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "注销用户成功"))
+	return
+}
+
+/*
 	更改信息 获取信息
 */
 

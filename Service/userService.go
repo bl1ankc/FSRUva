@@ -7,6 +7,15 @@ import (
 	"main/Model"
 )
 
+// GetUser 获取用户实例
+func GetUser(id uint) (Model.User, error) {
+	var user Model.User
+	if err := db.Model(&Model.User{}).Where("id = ?", id).First(&user).Error; err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
 // InsertUser 创建新用户
 func InsertUser(Name string, Phone string, StudentID string, Pwd string) (bool, string) {
 
@@ -31,6 +40,11 @@ func InsertUser(Name string, Phone string, StudentID string, Pwd string) (bool, 
 		return false, "注册失败，请联系管理员"
 	}
 	return true, "注册成功"
+}
+
+// DeleteUser 删除用户数据
+func DeleteUser(user Model.User) error {
+	return db.Model(&Model.User{}).Where("id = ?", user.ID).Delete(&user).Error
 }
 
 // UpdatePhone 修改电话号码
@@ -81,42 +95,6 @@ func UpdatePwd(Stuid string, OldPwd string, NewPwd string) (string, bool) {
 	}
 
 }
-
-//// UpdateStudentId 修改学号
-//func UpdateStudentId(Name string, Id string) {
-//
-//	DB := db.Model(&User{}).Where(&User{Name: Name}).Updates(&User{StudentID: Id})
-//
-//	if DB.Error != nil {
-//		log.Fatal(DB.Error.Error())
-//	}
-//
-//	return
-//}
-
-//// UpdateUserCount 增加借用次数
-//func UpdateUserCount(UserName string, add int) {
-//
-//	var tmp User
-//	DB := db.Model(&User{}).Where(&User{Name: UserName}).Select("count").First(&tmp).Update("count", tmp.Count+add)
-//
-//	if DB.Error != nil {
-//		log.Fatal(DB.Error.Error())
-//	}
-//
-//	return
-//}
-
-//// UpdateUserCountByUid 通过无人机序列号查询姓名增加借用次数
-//func UpdateUserCountByUid(Uid string, add int) {
-//
-//	Uav := GetUavByUid(Uid)
-//	Borrower := Uav.Borrower
-//
-//	UpdateUserCount(Borrower, add)
-//
-//	return
-//}
 
 // GetUserByName 通过名字查找用户信息
 func GetUserByName(Name string) (Model.BackUser, error) {

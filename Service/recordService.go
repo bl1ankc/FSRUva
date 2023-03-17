@@ -3,24 +3,34 @@ package Service
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"main/Model"
 	"strconv"
 	"time"
 )
 
 // RecordBorrow 增加一条记录
-func RecordBorrow(uav Model.Uav) error {
+func RecordBorrow(uav *Model.Uav, data *Model.Uav) error {
 	var id uint
 
-	//uav := GetUavByUid(Uid)
+	//事务处理
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&Model.Record{Name: uav.Name, Phone: data.Phone,State: "Get under review", Uid: uav.Uid, StudentID: data.StudentID, Borrower: data.Borrower, PlanTime: data.PlanTime, Usage: data.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id).Error; err != nil {
+			fmt.Println("增加一条记录失败：", err)
+			return err
+		}
 
-	DB := db.Create(&Model.Record{Name: uav.Uid, State: "Get under review", Uid: uav.Uid, StudentID: uav.StudentID, Borrower: uav.Borrower, PlanTime: uav.PlanTime, Usage: uav.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id)
-	DB = db.Model(&uav).Updates(&Model.Uav{RecordID: id})
-	if DB.Error != nil {
-		fmt.Println("增加一条记录失败：", DB.Error.Error())
-		return DB.Error
+		if err := tx.Model(&Model.Uav{}).Where("uid = ?", uav.Uid).Updates(&Model.Uav{RecordID: id}).Error; err != nil {
+			fmt.Println("更新记录查找id失败：", err)
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
 	}
 
+	data.RecordID = id
 	return nil
 }
 
@@ -216,7 +226,7 @@ func GetReviewRecord(Uid string, Checker string, Result string, Comment string, 
 	if !flag {
 		return errors.New("NotFind")
 	}
-	fmt.Println("//////////+" + Comment)
+	fmt.Println("添加借用审核记录中+" + Comment)
 	DB := db.Model(&Model.Record{}).Where("id", id).Updates(&Model.Record{GetReviewer: Checker, GetTime: GetTime, GetReviewResult: Result, GetReviewComment: Comment, GetReviewTime: time.Now()})
 	if DB.Error != nil {
 		fmt.Println("添加借用审核记录失败：", DB.Error.Error())

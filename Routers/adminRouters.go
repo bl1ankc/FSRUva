@@ -18,7 +18,7 @@ func AdminRoute() {
 		g.POST("/UpdateDevice", Controller.UpdateDevice)
 
 		//删除设备	@2022/09/04 b1ank
-		g.POST("/DeleteDevice", Controller.DeleteDevice)
+		g.DELETE("/DeleteDevice", Controller.DeleteDevice)
 
 		//审核通过借用设备
 		g.POST("/GetPassedUav", Controller.GetPassedUav)
@@ -37,7 +37,7 @@ func AdminRoute() {
 
 		//强制归还
 		g.PUT("/ForcedBack", Controller.ForcedBack)
-		
+
 		//获取所有用户
 		g.GET("/GetAllUsers", Controller.GetAllUsers)
 
@@ -45,25 +45,19 @@ func AdminRoute() {
 		g.GET("/GetAllRecords", Controller.GetAllRecords)
 
 		//导出设备
-		g.POST("/GetDevices", Controller.GetDevices)
+		//g.POST("/GetDevices", Controller.GetDevices)
 
 		//通过uid获取设备信息（管理员）
 		g.GET("/GetDevice", Controller.AdminGetDeviceByUid)
 
-		//强制修改设备信息
-		g.POST("/ForceUpdateDevices", Controller.ForceUpdateDevices)
-
-		//修改设备备注信息
-		g.POST("/UpdateUavRemark", Controller.UpdateUavRemark)
-
 		//管理员设置
-		g.GET("/SetAdmin", Controller.SetAdmin)
+		g.PUT("/SetAdmin", Controller.SetAdmin)
 
 		//取消管理员
-		g.GET("/DelAdmin", Controller.DelAdmin)
+		g.PUT("/DelAdmin", Controller.DelAdmin)
 
 		//管理员类型设置 @2022/10/01 b1ank
-		g.GET("/ChangeAdminType", Controller.ChangeAdminType)
+		g.PUT("/ChangeAdminType", Controller.ChangeAdminType)
 
 		//添加设备类型
 		g.POST("/AddUavType", Controller.AddUavType)
@@ -79,6 +73,16 @@ func AdminRoute() {
 
 		//获取图片临时访问地址
 		g.GET("/GetImgUrl", Controller.GetImgUrl)
+
+		//删除用户
+		g.DELETE("/RemoveUser", Controller.RemoveUser)
+
+		//强制修改设备信息-停用-改用更新设备接口
+		//g.POST("/ForceUpdateDevices", Controller.ForceUpdateDevices)
+
+		//修改设备备注信息-停用-使用更新设备操作更新
+		//g.POST("/UpdateUavRemark", Controller.UpdateUavRemark)
+
 	}
 
 }

@@ -3,22 +3,36 @@ package Controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"main/Model"
 	"main/Service"
+	"main/Service/Status"
 	"main/utils"
 )
 
-// GetNotUsedDrones 获取空闲的设备 @2023/3/3(paginate update)
+// GetNotUsedDrones 获取空闲的设备 @2023/3/14
 func GetNotUsedDrones(c *gin.Context) {
+	var code int
+	var response struct {
+		Devices []Model.Uav
+		Total   int64
+	}
 
 	typename := c.Query("type")
 
 	//获取设备信息
-	uav := Service.GetUavsByStatesWithPage("free", typename, c.Request)
+	if uav, total, err := Service.GetUavsByStatesWithPage("free", typename, c.Request); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "获取数据失败"))
+		return
+	} else {
+		response.Devices = uav
+		response.Total = total
+	}
 
 	//JSON格式返回
-	c.JSON(200, &uav)
+	code = Status.OK
+	c.JSON(code, R(code, response, "获取数据成功"))
+	return
 }
 
 // GetUsingDevices 获取使用中的所有设备
@@ -29,27 +43,27 @@ func GetUsingDevices(c *gin.Context) {
 	c.JSON(200, &device)
 }
 
-// GetAllDevices 获取所有设备
+// GetAllDevices 获取所有设备 @2023/3/14
 func GetAllDevices(c *gin.Context) {
+	var code int
+	var response struct {
+		Devices []Model.Uav
+		Total   int64
+	}
 
 	typename := c.DefaultQuery("type", "")
 
-	device := Service.GetUavsByStatesWithPage("", typename, c.Request)
-
-	c.JSON(200, &device)
-}
-
-// GetDevices 获取所有设备(前端指定状态和类型)
-func GetDevices(c *gin.Context) {
-	var uavs Model.Uav
-	//结构体绑定
-	if err := c.BindJSON(&uavs); err != nil {
-		log.Fatal(err.Error())
+	if device, total, err := Service.GetUavsByStatesWithPage("", typename, c.Request); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "获取数据失败"))
 		return
+	} else {
+		response.Devices = device
+		response.Total = total
 	}
-	device := Service.GetUavByAll(uavs)
-
-	c.JSON(200, &device)
+	code = Status.OK
+	c.JSON(code, R(code, response, "获取数据成功"))
+	return
 }
 
 // GetDeviceByUid 获取对应uid设备信息(用户)

@@ -2,8 +2,18 @@ package Service
 
 import (
 	"fmt"
+	"log"
 	"main/Model"
 )
+
+// AddUavType 增加设备类型
+func AddUavType(uavType Model.UavType, department Model.Department) (error, uint) {
+	if err := db.Model(&department).Association("Types").Append(&uavType); err != nil {
+		log.Printf(err.Error())
+		return err, uavType.ID
+	}
+	return nil, uavType.ID
+}
 
 // GetUavType 获取设备类型列表
 func GetUavType() (bool, []Model.UavType) {
@@ -34,20 +44,6 @@ func GetTypeByName(typeName string) (Model.UavType, error) {
 		return Model.UavType{}, err
 	}
 	return uavType, nil
-}
-
-// AddUavType 增加设备类型
-func AddUavType(typeName string, remark string) (error, uint) {
-
-	uavType := Model.UavType{TypeName: typeName, Remark: remark}
-	DB := db.Model(&Model.UavType{}).Create(&uavType)
-
-	if DB.Error != nil {
-		fmt.Println("增加设备类型失败：", DB.Error.Error())
-		return DB.Error, 0
-	}
-
-	return nil, uavType.ID
 }
 
 // RemoveUavType 删除设备类型

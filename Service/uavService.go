@@ -10,9 +10,46 @@ import (
 	"time"
 )
 
-/*
-	获取及创建
-*/
+// InsertUva 创建
+func InsertUva(uav Model.Uav) (bool, string) {
+	var cnt int64
+	//查询设备是否存在
+	if err := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid}).Count(&cnt).Error; err != nil {
+		fmt.Println("创建新的设备失败1：", err.Error())
+		return false, "发生未知错误1"
+	}
+	if cnt >= 1 {
+		return false, "设备已存在"
+	}
+
+	//创建新记录
+	if err := db.Select("name", "type", "uid", "location", "expensive").Create(&uav).Error; err != nil {
+		fmt.Println("创建新的设备失败2：", err.Error())
+		return false, "发生未知错误2"
+	}
+
+	return true, "创建成功"
+}
+
+// RemoveDevice 删除
+func RemoveDevice(Device Model.Uav) error {
+	err := db.Model(&Device).Delete(&Device).Error
+	return err
+}
+
+// UpdateDevice 更新
+func UpdateDevice(uav Model.Uav) error {
+
+	if err := db.Model(&uav).Where("uid = ?", uav.Uid).Updates(uav).Error; err != nil {
+		return err
+	}
+	if uav.Expensive == false {
+		db.Model(&uav).Where("uid = ?", uav.Uid).Updates(map[string]interface{}{
+			"expensive": false,
+		})
+	}
+	return nil
+}
 
 // GetUavByUid 获取对应序列号的设备信息
 func GetUavByUid(Uid string) (bool, Model.Uav) {
@@ -57,33 +94,6 @@ func GetUavByStates(UavState string, UavType string) []Model.Uav {
 	return uav
 }
 
-// InsertUva 创建新的设备
-func InsertUva(uav Model.Uav) (bool, string) {
-	var cnt int64
-	//查询设备是否存在
-	if err := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid}).Count(&cnt).Error; err != nil {
-		fmt.Println("创建新的设备失败1：", err.Error())
-		return false, "发生未知错误1"
-	}
-	if cnt >= 1 {
-		return false, "设备已存在"
-	}
-
-	//创建新记录
-	if err := db.Select("name", "type", "uid", "location", "expensive").Create(&uav).Error; err != nil {
-		fmt.Println("创建新的设备失败2：", err.Error())
-		return false, "发生未知错误2"
-	}
-
-	return true, "创建成功"
-}
-
-// RemoveDevice 删除对应设备
-func RemoveDevice(Device Model.Uav) error {
-	err := db.Model(&Device).Delete(&Device).Error
-	return err
-}
-
 // GetUavByAll 多条件查找设备信息
 func GetUavByAll(uav Model.Uav) []Model.Uav {
 
@@ -107,37 +117,18 @@ func SearchStuInOneDay() ([]Model.Uav, bool) {
 	return uavs, true
 }
 
-// GetUavsByStatesWithPage 分页获取对应序列号组的设备组信息 @2023/3/3 分页更新
-func GetUavsByStatesWithPage(UavState string, UavType string, r *http.Request) []Model.Uav {
+// GetUavsByStatesWithPage 分页获取对应序列号组的设备组信息 @2023/3/14
+func GetUavsByStatesWithPage(UavState string, UavType string, r *http.Request) ([]Model.Uav, int64, error) {
 	//查找数据
 	var uavs []Model.Uav
-
-	DB := db.Model(&Model.Uav{}).Where(Model.Uav{State: UavState, Type: UavType}).Scopes(Scopes.Paginate(r)).Find(&uavs)
-
-	if DB.Error != nil {
-		fmt.Println("分页获取对应序列号组的设备组信息：", DB.Error.Error())
-		return []Model.Uav{}
+	var total int64
+	if err := db.Model(&Model.Uav{}).Where(Model.Uav{State: UavState, Type: UavType}).Scopes(Scopes.Paginate(r)).Find(&uavs).Error; err != nil {
+		return []Model.Uav{}, 0, err
 	}
-
-	return uavs
-}
-
-/*
-	更新信息
-*/
-
-// UpdateDevice 更新
-func UpdateDevice(uav Model.Uav) error {
-
-	if err := db.Model(&uav).Where("uid = ?", uav.Uid).Updates(uav).Error; err != nil {
-		return err
+	if err := db.Model(&Model.Uav{}).Where(Model.Uav{State: UavState, Type: UavType}).Count(&total).Error; err != nil {
+		return []Model.Uav{}, 0, err
 	}
-	if uav.Expensive == false {
-		db.Model(&uav).Where("uid = ?", uav.Uid).Updates(map[string]interface{}{
-			"expensive": false,
-		})
-	}
-	return nil
+	return uavs, total, nil
 }
 
 // UpdateState 更新状态
@@ -192,18 +183,6 @@ func UpdateUavRemark(Uid string, Remark string) {
 
 }
 
-// UpdateUavUsage 更新设备用途
-func UpdateUavUsage(Uid string, Usage string) error {
-	DB := db.Model(&Model.Uav{}).Where(Model.Uav{Uid: Uid}).Updates(&Model.Uav{Usage: Usage})
-
-	if DB.Error != nil {
-		fmt.Println("更新设备用途失败：", DB.Error.Error())
-		return DB.Error
-	}
-
-	return nil
-}
-
 // UpdateUavImg 更新图片img
 func UpdateUavImg(uid string, img string) error {
 
@@ -217,31 +196,6 @@ func UpdateUavImg(uid string, img string) error {
 	return nil
 }
 
-/*
-	修改信息
-*/
-
-// UpdateDevices 强制修改设备数据
-func UpdateDevices(uav Model.Uav) {
-	UpdateDataInUav(uav.Uid, "type", uav.Type)
-	UpdateDataInUav(uav.Uid, "name", uav.Name)
-	UpdateDataInUav(uav.Uid, "location", uav.Location)
-	UpdateDataInUav(uav.Uid, "remark", uav.Remark)
-	//UpdateDataInUav(uav.Uid, "borrower", uav.Borrower)
-	//UpdateDataInUav(uav.Uid, "phone", uav.Phone)
-	//UpdateDataInUav(uav.Uid, "state", uav.State)
-}
-
-// UpdateDataInUav 修改设备单个字符串数据
-func UpdateDataInUav(Uid string, HeadName string, Data string) {
-	if Data != "" {
-		DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: Uid}).Update(HeadName, Data)
-		if DB.Error != nil {
-			fmt.Println("修改设备单个字符串数据失败：", DB.Error.Error())
-		}
-	}
-}
-
 // GetUavNameByUid 通过序列号查找设备名
 func GetUavNameByUid(Uid string) (string, bool) {
 	var name string
@@ -251,20 +205,6 @@ func GetUavNameByUid(Uid string) (string, bool) {
 		return "", false
 	}
 	return name, true
-}
-
-/*
-	记录相关
-*/
-
-// UpdateRecordIdinUav 在设备中更新记录ID
-func UpdateRecordIdinUav(Uid string, id uint) bool {
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: Uid}).Updates(&Model.Uav{RecordID: id})
-	if DB.Error != nil {
-		fmt.Println("在设备中更新记录ID失败：", DB.Error.Error())
-		return false
-	}
-	return true
 }
 
 // GetRecordIdinUav 在设备中获取记录ID

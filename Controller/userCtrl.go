@@ -7,6 +7,7 @@ import (
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
+	"main/Service/Transaction"
 	"main/utils"
 	"mime/multipart"
 	"strconv"
@@ -16,52 +17,55 @@ import (
 // BorrowUav 借用设备
 func BorrowUav(c *gin.Context) {
 	//模型定义
-	var uav Model.Uav
-	var err error
+	var data Model.Uav
+	var code int
 	//结构体绑定
-	if err = c.ShouldBindJSON(&uav); err != nil {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		fmt.Println("绑定失败：", err.Error())
 		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
 		return
 	}
 	//uav示例获取
-	exist, tmp := Service.GetUavByUid(uav.Uid)
-	expensive := tmp.Expensive
+	exist, uav := Service.GetUavByUid(data.Uid)
 	if exist == false {
 		c.JSON(200, R(200, nil, "该设备不存在"))
 		return
 	}
 
-	uav.Expensive = tmp.Expensive
 	//表单中提交不可使用的无人机
 	flag := false
-
 	//再次验证是否能被借用
 	if uav.State != "free" {
 		flag = true
 	} else {
-		if err := Service.RecordBorrow(uav); err != nil {
-			c.JSON(401, R(401, nil, "创建记录函数错误RecordBorrowError"))
-			return
-		} //借用记录生成
-
-		if expensive != true { //非贵重直接跳到预约成功
-			if err := Service.UpdateRecordState(uav.Uid, "scheduled"); err != nil {
-				c.JSON(401, R(401, nil, "更新记录信息函数错误UpdateRecordStateError"))
-				return
-			}
-			uav.State = "scheduled"
-			uav.GetTime = time.Now().Local()
-		} else {
-			uav.State = "Get under review"
-		}
-		fmt.Println(uav)
-		fmt.Println(tmp)
-		//更新设备信息
-		if err = Service.UpdateDevice(uav); err != nil {
-			c.JSON(401, R(401, nil, "更新函数错误"))
+		//借用事务
+		if err := Transaction.Borrow(&data); err != nil {
+			code = Status.FuncFail
+			c.JSON(code, R(code, nil, "生成记录失败"))
 			return
 		}
+		////借用记录生成
+		//if err := Service.RecordBorrow(&uav,&data); err != nil {
+		//	c.JSON(401, R(401, nil, "创建记录函数错误RecordBorrowError"))
+		//	return
+		//}
+		////非贵重直接跳到预约成功
+		//if expensive != true {
+		//	if err := Service.UpdateRecordState(data.Uid, "scheduled"); err != nil {
+		//		c.JSON(401, R(401, nil, "更新记录信息函数错误UpdateRecordStateError"))
+		//		return
+		//	}
+		//	data.State = "scheduled"
+		//	data.GetTime = time.Now().Local()
+		//} else {
+		//	data.State = "Get under review"
+		//}
+		//
+		////更新设备信息
+		//if err := Service.UpdateDevice(data); err != nil {
+		//	c.JSON(401, R(401, nil, "更新函数错误"))
+		//	return
+		//}
 	}
 
 	//返回错误信息

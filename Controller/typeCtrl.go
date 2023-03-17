@@ -1,8 +1,10 @@
 package Controller
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
@@ -43,17 +45,28 @@ func GetUavType(c *gin.Context) {
 // AddUavType 添加设备类型
 func AddUavType(c *gin.Context) {
 	//定义结构体
-	var typename Model.UavType
+	var uavType Model.UavType
 	var code int
 
 	//绑定数据
-	remark := c.PostForm("remark")
-	typeName := c.PostForm("typename")
-	typename.TypeName = typeName
-	typename.Remark = remark
+	uavType.Remark = c.PostForm("remark")
+	uavType.TypeName = c.PostForm("typename")
+	DepartmentID, _ := strconv.Atoi(c.PostForm("departmentID"))
+
+	//获取部门实例
+	department, err := Service.GetDepartment(uint(DepartmentID))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "查询不到对应部门信息"))
+		return
+	} else if err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "数据库操作错误"))
+		return
+	}
 
 	//添加数据
-	if err, typeID := Service.AddUavType(typename.TypeName, typename.Remark); err != nil {
+	if err, typeID := Service.AddUavType(uavType, department); err != nil {
 		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "添加设备类型失败"))
 		return
