@@ -72,7 +72,7 @@ func AdminRoute() {
 		g.POST("/UpdateUavType", Controller.UpdateUavType)
 
 		//获取图片临时访问地址
-		g.GET("/GetImgUrl", Controller.GetImgUrl)
+		//g.GET("/GetImgUrl", Controller.GetImgUrl)
 
 		//删除用户
 		g.DELETE("/RemoveUser", Controller.RemoveUser)

@@ -1,9 +1,7 @@
 package Model
 
 import (
-	"fmt"
 	"gorm.io/gorm"
-	"main/utils"
 	"time"
 )
 
@@ -62,23 +60,23 @@ type BackRecord struct {
 	Uav []Uav `json:"uavs" gorm:"-"` //设备组
 }
 
-func (r *Record) AfterFind(tx *gorm.DB) (err error) {
-	var uavType UavType
-	var uav Uav
-	if r.Type == "" {
-		if err = tx.Model(&Uav{}).Where(Uav{Uid: r.Uid}).First(&uav).Error; err != nil {
-			return err
-		}
-		r.Type = uav.Type
-		r.TmpImg = uav.TmpImg
-		fmt.Println("查询失败" + r.TmpImg + " another" + r.Type)
-		return nil
-	}
-	if err = tx.Model(&UavType{}).Where(UavType{TypeName: r.Type}).First(&uavType).Error; err != nil {
-		return err
-	}
-	tmpImg, _ := utils.GetPicUrl(uavType.Img)
-	r.TmpImg = tmpImg
-	fmt.Println("sssssssssssssssss" + r.Type + r.TmpImg)
-	return nil
-}
+//func (r *Record) AfterFind(tx *gorm.DB) (err error) {
+//	var uavType UavType
+//	var uav Uav
+//	if r.Type == "" {
+//		if err = tx.Model(&Uav{}).Where(Uav{Uid: r.Uid}).First(&uav).Error; err != nil {
+//			return err
+//		}
+//		r.Type = uav.Type
+//		r.TmpImg = uav.TmpImg
+//		fmt.Println("查询失败" + r.TmpImg + " another" + r.Type)
+//		return nil
+//	}
+//	if err = tx.Model(&UavType{}).Where(UavType{TypeName: r.Type}).First(&uavType).Error; err != nil {
+//		return err
+//	}
+//	tmpImg, _ := utils.GetPicUrl(uavType.Img)
+//	r.TmpImg = tmpImg
+//	fmt.Println("sssssssssssssssss" + r.Type + r.TmpImg)
+//	return nil
+//}

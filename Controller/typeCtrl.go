@@ -8,7 +8,6 @@ import (
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
-	"main/utils"
 	"strconv"
 )
 
@@ -36,7 +35,7 @@ func GetUavType(c *gin.Context) {
 		c.JSON(code, R(code, nil, "获取设备类型失败，服务器报错"))
 		return
 	}
-	uavType.Img, _ = utils.GetPicUrl(uavType.Img)
+
 	code = Status.OK
 	c.JSON(code, R(code, uavType, "获取成功"))
 	return

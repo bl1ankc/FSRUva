@@ -2,7 +2,6 @@ package Model
 
 import (
 	"gorm.io/gorm"
-	"main/utils"
 	"time"
 )
 
@@ -67,11 +66,11 @@ type UavType struct {
 	Img          string `json:"img"`
 }
 
-func (u *Uav) AfterFind(tx *gorm.DB) (err error) {
-	var uavType UavType
-	tx.Model(&UavType{}).Where(UavType{TypeName: u.Type}).First(&uavType)
-
-	tmpImg, _ := utils.GetPicUrl(uavType.Img)
-	u.TmpImg = tmpImg
-	return nil
-}
+//func (u *Uav) AfterFind(tx *gorm.DB) (err error) {
+//	var uavType UavType
+//	tx.Model(&UavType{}).Where(UavType{TypeName: u.Type}).First(&uavType)
+//
+//	tmpImg, _ := utils.GetPicUrl(uavType.Img)
+//	u.TmpImg = tmpImg
+//	return nil
+//}

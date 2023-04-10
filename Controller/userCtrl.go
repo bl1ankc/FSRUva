@@ -8,9 +8,6 @@ import (
 	"main/Service"
 	"main/Service/Borrow"
 	"main/Service/Status"
-	"main/utils"
-	"mime/multipart"
-	"strconv"
 	"time"
 )
 
@@ -194,85 +191,6 @@ func CancelBack(c *gin.Context) {
 
 	c.JSON(200, gin.H{"code": 200, "desc": "取消成功"})
 	return
-}
-
-// UploadImg 上传图片
-func UploadImg(c *gin.Context, imgType string, id interface{}) bool {
-	/*
-		上传图片,并保存在./img服务器文件夹中
-		自动生成图片对应的uid,该uid为文件名,并且绑定对应记录
-	*/
-
-	//上传图片
-	file, _ := c.FormFile("upload_img")
-	filename := utils.GetUid() + ".png"
-
-	//上传失败
-	if file != nil {
-		/* 保存到本地
-		if err := c.SaveUploadedFile(file, "./Data/"+filename); err != nil {
-			//c.JSON(500, gin.H{"code": 500, "desc": "保存图片失败"})
-			return false
-		}
-		*/
-	} else {
-		//c.JSON(400, gin.H{"code": 400, "desc": "未上传图片"})
-		return false
-	}
-
-	//转换失败
-	src, err := file.Open()
-	if err != nil {
-		fmt.Println("OSS文件转换失败")
-		return false
-	}
-
-	//关闭失败
-	defer func(src multipart.File) {
-		err := src.Close()
-		if err != nil {
-			fmt.Println("OSS文件关闭失败")
-		}
-	}(src)
-
-	//云端上传
-	if !utils.UploadImgToOSS("Data/"+filename, src) {
-		fmt.Println("OSS上传失败")
-		return false
-	}
-
-	//上传成功
-	if imgType == "Uav" {
-		uid := c.Query("uid") //前端携带
-		if uid == "" {        //前端未携带，检查是否有参数
-			if value, ok := id.(string); ok {
-				uid = value
-			} else {
-				return false
-			}
-		}
-		if err = Service.UpdateUavImg(c.Query("uid"), filename); err != nil {
-			return false
-		}
-
-	} else if imgType == "UavType" {
-		v, err := strconv.Atoi(c.Query("typeID"))
-		typeID := uint(v)
-		if err != nil {
-			fmt.Println("无参")
-			if value, ok := id.(uint); ok {
-				typeID = value
-			} else {
-				return false
-			}
-		}
-		if err = Service.UpdateTypeImg(typeID, filename); err != nil {
-			return false
-		}
-	}
-	fmt.Println("OSS上传成功")
-	//c.JSON(200, gin.H{"code": 200, "desc": "上传图片成功", "src": "/Data/" + filename})
-	return true
 }
 
 // GetOwnUsing 查看个人正在借用中的设备

@@ -6,7 +6,6 @@ import (
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
-	"main/utils"
 )
 
 // GetNotUsedDrones 获取空闲的设备 @2023/3/14
@@ -88,7 +87,6 @@ func AdminGetDeviceByUid(c *gin.Context) {
 	id := c.Query("uid")
 
 	_, uav := Service.GetUavByUid(id)
-	uav.Img, _ = utils.GetPicUrl(uav.Img)
 	c.JSON(200, &uav)
 }
 
