@@ -52,8 +52,9 @@ func GetAllDevices(c *gin.Context) {
 	}
 
 	typename := c.DefaultQuery("type", "")
+	uavState := c.DefaultQuery("state", "")
 
-	if device, total, err := Service.GetUavsByStatesWithPage("", typename, c.Request); err != nil {
+	if device, total, err := Service.GetUavsByStatesWithPage(uavState, typename, c.Request); err != nil {
 		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "获取数据失败"))
 		return

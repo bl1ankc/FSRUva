@@ -9,44 +9,36 @@ import (
 	"time"
 )
 
-// RecordBorrow 增加一条记录
-func RecordBorrow(uav *Model.Uav, data *Model.Uav) error {
-	var id uint
+// CreateRecord 创建记录
+func CreateRecord(record Model.Record) error {
 
-	//事务处理
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Create(&Model.Record{Name: uav.Name, Phone: data.Phone,State: "Get under review", Uid: uav.Uid, StudentID: data.StudentID, Borrower: data.Borrower, PlanTime: data.PlanTime, Usage: data.Usage, GetTime: time.Now(), BackTime: time.Unix(0, 0), GetReviewTime: time.Unix(0, 0), BackReviewTime: time.Unix(0, 0)}).Select("id").Find(&id).Error; err != nil {
-			fmt.Println("增加一条记录失败：", err)
+		if err := tx.Model(&Model.Uav{}).Association("Records").Append(&record); err != nil {
 			return err
 		}
-
-		if err := tx.Model(&Model.Uav{}).Where("uid = ?", uav.Uid).Updates(&Model.Uav{RecordID: id}).Error; err != nil {
-			fmt.Println("更新记录查找id失败：", err)
+		if err := tx.Model(&Model.User{}).Association("Records").Append(&record); err != nil {
 			return err
 		}
-
 		return nil
 	}); err != nil {
 		return err
 	}
 
-	data.RecordID = id
 	return nil
 }
 
-// GetRecordByUid 序列号单一查找
-func GetRecordByUid(uid string) (Model.Record, error) {
-	var data Model.Record
-	if err := db.Model(&Model.Record{}).Where("uid = ?", uid).First(&data).Error; err != nil {
-		return Model.Record{}, err
+// ReplaceRecord 替换记录表
+func ReplaceRecord(record []Model.Record) error {
+	if err := db.Model(&Model.Uav{}).Association("Records").Replace(&record); err != nil {
+		return err
 	}
-	return data, nil
+	return nil
 }
 
-// UpdateRecord 更新记录
-func UpdateRecord(record Model.Record) error {
-	if DB := db.Model(&record).Updates(&record); DB.Error != nil {
-		return DB.Error
+// DeleteRecord 删除记录
+func DeleteRecord(record Model.Record) error {
+	if err := db.Model(&Model.Uav{}).Association("Records").Delete(&record); err != nil {
+		return err
 	}
 	return nil
 }
@@ -82,27 +74,6 @@ func UpdateRecordState(Uid string, State string) error {
 	}
 
 	return nil
-}
-
-// UpdateGetTimeinRecords 记录中更新借用时间
-func UpdateGetTimeinRecords(Uid string) bool {
-
-	//uav := GetUavByUid(Uid)
-	//更新状态
-	//DB := db.Model(&Record{}).Where(&Record{Uid: Uid, StudentID: uav.StudentID, GetTime: uav.GetTime}).Select("GetTime").Updates(&Record{GetTime: time})
-
-	id, flag := GetRecordIdinUav(Uid)
-	if !flag {
-		return false
-	}
-
-	DB := db.Model(&Model.Record{}).Where("id", id).Updates(&Model.Record{GetTime: time.Now()})
-	if DB.Error != nil {
-		fmt.Println("记录中更新借用时间：", DB.Error.Error())
-		return false
-	}
-
-	return true
 }
 
 // GetRecordsByID 学号查询记录

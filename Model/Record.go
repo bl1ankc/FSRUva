@@ -11,6 +11,7 @@ import (
 type Record struct {
 	gorm.Model
 	UavID     uint
+	UserID    uint
 	Name      string    `json:"name"`     //设备名称
 	State     string    `json:"state"`    //状态	使用中using 拒绝借用refuse 已归还returned  损坏damaged  取消cancelled
 	Uid       string    `json:"uid"`      //设备序号

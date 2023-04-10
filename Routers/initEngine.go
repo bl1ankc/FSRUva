@@ -4,10 +4,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var r *gin.Engine
+var r *gin.RouterGroup
 
 func InitRouter() *gin.Engine {
-	r = gin.Default()
+	def := gin.Default()
+
+	r = def.Group("/api")
 
 	UavRoute()
 
@@ -19,5 +21,7 @@ func InitRouter() *gin.Engine {
 
 	DepartmentInit()
 
-	return r
+	ExcelInit()
+
+	return def
 }

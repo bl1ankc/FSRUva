@@ -140,13 +140,13 @@ func AuthRequired() gin.HandlerFunc {
 		strToken := c.Request.Header.Get("token")
 
 		if strToken == "" {
-			c.JSON(400, gin.H{"desc": "无token"})
+			c.JSON(400, Controller.R(400, nil, "无token"))
 			c.Abort()
 			return
 		}
 		claim, err := verifyAction(strToken)
 		if err != nil {
-			c.JSON(401, err.Error())
+			c.JSON(401, Controller.R(401, nil, err.Error()))
 			c.Abort()
 			return
 		}

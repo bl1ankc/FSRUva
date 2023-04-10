@@ -1,9 +1,12 @@
 package Routers
 
-import "main/Controller"
+import (
+	"main/Controller"
+	"main/Mid"
+)
 
 func UavRoute() {
-	g := r.Group("/Uav")
+	g := r.Group("/Uav", Mid.AuthRequired())
 	{
 		//可借用无人机展示
 		g.GET("/GetUav", Controller.GetNotUsedDrones)

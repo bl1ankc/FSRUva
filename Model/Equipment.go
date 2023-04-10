@@ -21,7 +21,8 @@ type Uav struct {
 	Borrower  string `json:"borrower"` //借用人姓名
 	Phone     string `json:"phone"`    //借用人电话
 
-	RecordID uint //记录ID
+	RecordID uint     //记录ID
+	Records  []Record `json:"records"` //记录表单
 
 	GetTime  time.Time `json:"getTime"`  //借出时间
 	PlanTime time.Time `json:"planTime"` //预计归还时间

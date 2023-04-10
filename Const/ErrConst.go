@@ -5,3 +5,7 @@ const (
 	FailToBindJson = 400 + iota
 	FuncFail
 )
+
+const (
+	ErrorDataType = "ErrorDataType"
+)

@@ -6,8 +6,8 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
+	"main/Service/Borrow"
 	"main/Service/Status"
-	"main/Service/Transaction"
 	"main/utils"
 	"mime/multipart"
 	"strconv"
@@ -31,6 +31,14 @@ func BorrowUav(c *gin.Context) {
 		c.JSON(200, R(200, nil, "该设备不存在"))
 		return
 	}
+	//user实例获取
+	userID, _ := c.Get("UserID")
+	user, err := Service.GetUser(userID.(uint))
+	if err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "用户获取失败"))
+		return
+	}
 
 	//表单中提交不可使用的无人机
 	flag := false
@@ -39,33 +47,11 @@ func BorrowUav(c *gin.Context) {
 		flag = true
 	} else {
 		//借用事务
-		if err := Transaction.Borrow(&data); err != nil {
+		if err := Borrow.Borrow(&data, &user); err != nil {
 			code = Status.FuncFail
 			c.JSON(code, R(code, nil, "生成记录失败"))
 			return
 		}
-		////借用记录生成
-		//if err := Service.RecordBorrow(&uav,&data); err != nil {
-		//	c.JSON(401, R(401, nil, "创建记录函数错误RecordBorrowError"))
-		//	return
-		//}
-		////非贵重直接跳到预约成功
-		//if expensive != true {
-		//	if err := Service.UpdateRecordState(data.Uid, "scheduled"); err != nil {
-		//		c.JSON(401, R(401, nil, "更新记录信息函数错误UpdateRecordStateError"))
-		//		return
-		//	}
-		//	data.State = "scheduled"
-		//	data.GetTime = time.Now().Local()
-		//} else {
-		//	data.State = "Get under review"
-		//}
-		//
-		////更新设备信息
-		//if err := Service.UpdateDevice(data); err != nil {
-		//	c.JSON(401, R(401, nil, "更新函数错误"))
-		//	return
-		//}
 	}
 
 	//返回错误信息

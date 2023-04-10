@@ -95,11 +95,11 @@ func GetUavByStates(UavState string, UavType string) []Model.Uav {
 }
 
 // GetUavByAll 多条件查找设备信息
-func GetUavByAll(uav Model.Uav) []Model.Uav {
+func GetUavByAll(uav Model.Uav, filed []string) []Model.Uav {
 
 	var uavs []Model.Uav
 
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uav.Uid, State: uav.State, Name: uav.Name, Type: uav.Type}).Find(&uavs)
+	DB := db.Model(&Model.Uav{}).Select(filed).Where(&Model.Uav{State: uav.State, Type: uav.Type}).Find(&uavs)
 	if DB.Error != nil {
 		fmt.Println("多条件查找设备信息失败：", DB.Error.Error())
 	}

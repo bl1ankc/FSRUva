@@ -40,3 +40,42 @@ package Controller
 //
 //	c.JSON(200, &device)
 //}
+
+//// SampleOut xlsx格式下
+//func SampleOut(c *gin.Context) {
+//	var code int
+//
+//	//获取数据信息
+//	data, err := Service.GetDeviceData()
+//	if err != nil {
+//		code = Status.FuncFail
+//		c.JSON(code, R(code, nil, "获取设备数据失败"))
+//		return
+//	}
+//
+//	//补充部门信息
+//	for index, device := range data {
+//		uavType, err := Service.GetTypeByName(device.Type)
+//		if err != nil {
+//			continue
+//			//code = Status.ErrorData
+//			//c.JSON(code, R(code, nil, "设备类型获取失败"))
+//			//return
+//		}
+//
+//		department, err := Service.GetDepartment(uavType.DepartmentID)
+//		if err != nil {
+//			continue
+//			//code = Status.FuncFail
+//			//c.JSON(code, R(code, nil, "获取部门实例失败"))
+//			//return
+//		}
+//		data[index].Department = department.DepartmentName
+//	}
+//	//类型泛化
+//	re := utils.ToInterfaceSlice(data)
+//	headers := []string{"ID", "设备名称", "设备状态", "设备部门", "设备类型", "设备序列号", "设备存放位置", "设备备注", "是否贵重"}
+//
+//	content := utils.ToExcel(headers, re, "设备")
+//	utils.ResponseXls(c, content, "DeviceInfo")
+////}
