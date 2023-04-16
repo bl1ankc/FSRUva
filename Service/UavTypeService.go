@@ -2,6 +2,7 @@ package Service
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 	"log"
 	"main/Model"
 )
@@ -61,8 +62,27 @@ func RemoveUavType(TypeName string) bool {
 
 // UpdateUavType 更新设备类型
 func UpdateUavType(uavType Model.UavType) error {
-	err := db.Model(&uavType).Updates(uavType).Error
-	return err
+	return db.Transaction(func(tx *gorm.DB) error {
+		//获取实例
+		var instance Model.UavType
+		if err := db.Model(&Model.UavType{}).Where("id = ?", uavType.ID).First(&instance).Error; err != nil {
+			return err
+		}
+		//替换关联
+		if uavType.DepartmentID != instance.DepartmentID {
+			//删除就部门关联
+			if err := db.Model(&Model.Department{}).Where("id = ?", instance.DepartmentID).Association("Types").Delete(&instance); err != nil {
+				return err
+			}
+			//添加新部门关联
+			if err := db.Model(&Model.Department{}).Where("id = ?", uavType.DepartmentID).Association("Types").Append(&instance); err != nil {
+				return err
+			}
+			return nil
+		}
+		//相同直接更新
+		return db.Model(&Model.UavType{}).Where("id = ?", uavType.ID).Updates(&uavType).Error
+	})
 }
 
 // UpdateTypeImg 更新类型图片
@@ -71,8 +91,20 @@ func UpdateTypeImg(id uint, img string) error {
 	if err != nil {
 		return err
 	}
-	if err := db.Model(&uavType).Update("img", img).Error; err != nil {
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		//更新图片
+		if err := db.Model(&uavType).Update("img", img).Error; err != nil {
+			return err
+		}
+
+		//更新设备图片
+		if err := db.Model(&Model.Uav{}).Where("type = ?", uavType.TypeName).Select("img").Updates(&Model.Uav{Img: uavType.Img}).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -58,6 +58,15 @@ func AddTypeToDepartment(uavType Model.UavType, department Model.Department) err
 	return nil
 }
 
+// DeleteTypeFromDepartment 删除关联
+func DeleteTypeFromDepartment(uavType Model.UavType, department Model.Department) error {
+	if err := db.Model(&department).Association("Types").Delete(&uavType); err != nil {
+		log.Printf(err.Error())
+		return err
+	}
+	return nil
+}
+
 // GetDepartmentTypes 获取部门下所有类型
 func GetDepartmentTypes(department Model.Department) ([]Model.UavType, error) {
 	var types []Model.UavType

@@ -19,7 +19,7 @@ func UploadFileToObs(fileName string, data io.Reader) (string, error) {
 	if err == nil {
 		fmt.Printf("RequestId:%s\n", output.RequestId)
 		fmt.Printf("ETag:%s\n", output.ETag)
-		return Const.BucketName + Const.Endpoint + "/" + fileName, nil
+		return Const.Endpoint[:8] + Const.BucketName + "." + Const.Endpoint[8:] + "/" + fileName, nil
 	} else if obsError, ok := err.(obs.ObsError); ok {
 		fmt.Printf("Code:%s\n", obsError.Code)
 		fmt.Printf("Message:%s\n", obsError.Message)

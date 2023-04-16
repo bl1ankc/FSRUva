@@ -10,6 +10,7 @@ const (
 	FailToBindJson = 400 + iota // 绑定json表单失败！
 	FailToSave                  //存储失败
 	JWTErr                      //jwt验证失败
+	notfound                    //404
 	FailToGetQuery              //获取Query参数失败
 	FuncFail                    //函数异常
 	ErrorData                   //异常数据

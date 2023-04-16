@@ -7,7 +7,7 @@ import (
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
-	"time"
+	"main/Service/Trans"
 )
 
 // UploadNewUav 上传新设备
@@ -99,7 +99,7 @@ func GetReview(c *gin.Context) {
 	return
 }
 
-// GetPassedUav 审核通过借用设备 @2023/3/3-待更新
+// GetPassedUav 审核通过借用设备 @2023/4/15更新
 func GetPassedUav(c *gin.Context) {
 	//模型定义
 	var uav Model.CheckUav
@@ -107,7 +107,7 @@ func GetPassedUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.ShouldBindJSON(&uav); err != nil {
 		fmt.Println("审核通过借用设备数据绑定失败：", err.Error())
-		c.JSON(400, gin.H{"msg": "参数格式错误"})
+		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "数据绑定失败"))
 		return
 	}
 
@@ -119,26 +119,17 @@ func GetPassedUav(c *gin.Context) {
 		}
 	}
 
-	//更新状态与借用时间
-	if err := Service.UpdateState(uav.Uid, "scheduled"); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--updateState"))
-		return
-	}
-	if err := Service.GetReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment, time.Time{}); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--getReviewRecord"))
-		return
-	}
-	if err := Service.UpdateRecordState(uav.Uid, "scheduled"); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败--updateRecordState"))
+	//更新
+	if err := Trans.Review(&uav, "GetPass"); err != nil {
+		c.JSON(Status.FuncFail, R(Status.FuncFail, nil, "更新函数失败"))
 		return
 	}
 
-	c.JSON(200, gin.H{"desc": "审核成功"})
+	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
 	return
-	//Model.UpdateUserCountByUid(uav.Uid, 1)
 }
 
-// BackPassedUav 审核通过归还设备 @2023/3/3-待更新
+// BackPassedUav 审核通过归还设备 @2023/4/15更新
 func BackPassedUav(c *gin.Context) {
 	//模型定义
 	var uav Model.CheckUav
@@ -146,28 +137,29 @@ func BackPassedUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
 		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
-		c.JSON(400, gin.H{"msg": "参数格式错误"})
+		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
-	//更新状态与归还时间
-	Service.UpdateBackRecord(uav.Uid)
-	Service.UpdateState(uav.Uid, "free")
-	Service.UpdateBackTime(uav.Uid)
-	Service.UpdateRecordState(uav.Uid, "returned")
-	Service.BackReviewRecord(uav.Uid, uav.Checker, "passed", uav.Comment)
-	c.JSON(200, gin.H{"desc": "审核成功"})
+	//更新
+	if err := Trans.Review(&uav, "BackPass"); err != nil {
+		c.JSON(Status.FuncFail, R(Status.FuncFail, nil, "更新函数失败"))
+		return
+	}
+
+	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	return
 }
 
-// GetFailUav 审核不通过借用设备 @2023/3/3-待更新
+// GetFailUav 审核不通过借用设备 @2023/4/15更新
 func GetFailUav(c *gin.Context) {
 	//模型定义
 	var uav Model.CheckUav
 
 	//绑定结构体
 	if err := c.ShouldBindJSON(&uav); err != nil {
-		fmt.Println("审核不通过借用设备数据绑定失败：", err.Error())
-		c.JSON(400, gin.H{"msg": "参数格式错误"})
+		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
+		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
@@ -179,66 +171,56 @@ func GetFailUav(c *gin.Context) {
 		}
 	}
 
-	//更新状态与借用时间
-	if err := Service.UpdateState(uav.Uid, "free"); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
+	//更新
+	if err := Trans.Review(&uav, "GetRefuse"); err != nil {
+		c.JSON(Status.FuncFail, R(Status.FuncFail, nil, "更新函数失败"))
 		return
 	}
-	if err := Service.UpdateRecordState(uav.Uid, "refuse"); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
-		return
-	}
-	if err := Service.GetReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment, time.Now()); err != nil {
-		c.JSON(Const.FuncFail, R(Const.FuncFail, nil, "获取设备失败"))
-		return
-	}
-	c.JSON(200, gin.H{"desc": "审核成功"})
+
+	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
 	return
 }
 
-// BackFailUav 审核不通过归还设备 @2023/3/3-待更新
+// BackFailUav 审核不通过归还设备 @2023/4/15更新
 func BackFailUav(c *gin.Context) {
 	//模型定义
 	var uav Model.CheckUav
 
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
-		fmt.Println("审核不通过归还设备数据绑定失败：", err.Error())
-		c.JSON(400, gin.H{"msg": "参数格式错误"})
+		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
+		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
-	//更新状态与归还时间
-	Service.UpdateState(uav.Uid, "using")
-	Service.UpdateRecordState(uav.Uid, "using")
-	Service.BackReviewRecord(uav.Uid, uav.Checker, "fail", uav.Comment)
-	c.JSON(200, gin.H{"desc": "审核成功"})
+	//更新
+	if err := Trans.Review(&uav, "BackRefuse"); err != nil {
+		c.JSON(Status.FuncFail, R(Status.FuncFail, nil, "更新函数失败"))
+		return
+	}
+
+	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	return
 }
 
-// ForcedGet 强制取走 @2023/3/3-待更新
+// ForcedGet 强制取走 @2023/4/16更新
 func ForcedGet(c *gin.Context) {
 	var code int
 
 	id := c.Query("uid")
 
-	if err := Service.UpdateState(id, "using"); err != nil {
-		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "函数操作错误"))
+	//实例获取
+	exist, uav := Service.GetUavByUid(id)
+	if !exist {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "设备查询失败,检查是否有该设备记录"))
 		return
 	}
-	if err := Service.UpdateBorrowTime(id, time.Now().Local()); err != nil {
+
+	//强制归还事务
+	if err := Trans.ForcedGet(&uav); err != nil {
 		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "函数操作错误"))
-		return
-	}
-	if err := Service.GetReviewRecord(id, "", "", "", time.Now().Local()); err != nil {
-		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "函数操作错误"))
-		return
-	}
-	if err := Service.UpdateRecordState(id, "using"); err != nil {
-		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "函数操作错误"))
+		c.JSON(code, R(code, nil, "数据库操作错误"))
 		return
 	}
 
@@ -247,12 +229,13 @@ func ForcedGet(c *gin.Context) {
 	return
 }
 
-// ForcedBack 强制归还 @2023/3/3-待更新
+// ForcedBack 强制归还 @2023/4/16 更新
 func ForcedBack(c *gin.Context) {
 	var code int
 
 	id := c.Query("uid")
 
+	//实例获取
 	exist, uav := Service.GetUavByUid(id)
 	if exist == false {
 		code = Status.ErrorData
@@ -260,29 +243,19 @@ func ForcedBack(c *gin.Context) {
 		return
 	}
 
+	//设备状态检测
 	if uav.State != "using" && uav.State != "scheduled" {
 		code = Status.ErrorData
 		c.JSON(code, R(code, nil, "设备不在使用中"))
 		return
 	}
 
-	if err := Service.UpdateState(id, "free"); err != nil {
+	//强制归还
+	if err := Trans.ForcedBack(&uav); err != nil {
 		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "更新状态失败，检查函数及数据库"))
+		c.JSON(code, R(code, nil, "数据库操作错误"))
 		return
 	}
-	if err := Service.UpdateRecordState(id, "returned"); err != nil {
-		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "更新记录状态失败，检查函数及数据库"))
-		return
-	}
-	if exist := Service.UpdateBackRecord(id); exist != true {
-		code = Status.FuncFail
-		c.JSON(code, R(code, nil, "更新归还记录时间，检查函数及数据库"))
-		return
-	}
-	Service.UpdateBackTime(uav.Uid)
-	Service.BackReviewRecord(uav.Uid, "", "passed", "")
 
 	code = Status.OK
 	c.JSON(code, R(code, nil, "强制归还成功"))

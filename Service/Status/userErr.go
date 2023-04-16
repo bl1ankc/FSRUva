@@ -14,4 +14,5 @@ const (
 	InvalidAdmin                    // 操作权限不足
 	RecordNotFound                  //记录查询失败
 	UserAuthentication              //用户身份验证错误(非本人)
+	ErrorControl                    //错误操作
 )

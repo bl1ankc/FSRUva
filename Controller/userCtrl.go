@@ -6,9 +6,8 @@ import (
 	"main/Const"
 	"main/Model"
 	"main/Service"
-	"main/Service/Borrow"
+	"main/Service/Trans"
 	"main/Service/Status"
-	"time"
 )
 
 // BorrowUav 借用设备
@@ -19,7 +18,8 @@ func BorrowUav(c *gin.Context) {
 	//结构体绑定
 	if err := c.ShouldBindJSON(&data); err != nil {
 		fmt.Println("绑定失败：", err.Error())
-		c.JSON(400, gin.H{"code": 400, "desc": "传输数据失败"})
+		code = Status.FailToBindJson
+		c.JSON(code, R(code, nil, "传输数据失败"))
 		return
 	}
 	//uav示例获取
@@ -27,9 +27,12 @@ func BorrowUav(c *gin.Context) {
 	if exist == false {
 		c.JSON(200, R(200, nil, "该设备不存在"))
 		return
+	} else {
+		data.ID = uav.ID
 	}
+
 	//user实例获取
-	userID, _ := c.Get("UserID")
+	userID, _ := c.Get("userID")
 	user, err := Service.GetUser(userID.(uint))
 	if err != nil {
 		code = Status.FuncFail
@@ -44,7 +47,7 @@ func BorrowUav(c *gin.Context) {
 		flag = true
 	} else {
 		//借用事务
-		if err := Borrow.Borrow(&data, &user); err != nil {
+		if err := Trans.Borrow(data, user); err != nil {
 			code = Status.FuncFail
 			c.JSON(code, R(code, nil, "生成记录失败"))
 			return
@@ -52,72 +55,82 @@ func BorrowUav(c *gin.Context) {
 	}
 
 	//返回错误信息
+	code = Status.OK
 	if flag {
-		c.JSON(200, gin.H{"code": 200, "desc": "设备已被借用"})
+		c.JSON(code, R(code, nil, "设备已被借用"))
 	} else {
-		c.JSON(200, gin.H{"code": 200, "desc": "预约成功"})
+		c.JSON(code, R(code, nil, "预约成功"))
 	}
 	return
 }
 
 // BackUav 归还设备
 func BackUav(c *gin.Context) {
+	//define
+	var code int
+
 	//获取id
 	id, flag := c.GetQuery("uid")
-
-	//获取失败
 	if !flag {
-		c.JSON(400, gin.H{"code": 400, "desc": "传入id失败"})
+		code = Status.FailToGetQuery
+		c.JSON(code, R(code, nil, "传入id失败"))
 		return
 	}
 
 	//获取设备信息
 	exist, uav := Service.GetUavByUid(id)
 	if exist == false {
-		c.JSON(400, gin.H{"code": 400, "desc": "未找到对应设备"})
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "未找到对应设备"))
 		return
 	}
-	////获取记录实例
-	//exist, record := Service.GetRecordById(uav.RecordID)
-	//if exist == false {
-	//	c.JSON(400, gin.H{"code": 400, "desc": "未找到对应记录"})
-	//	return
-	//}
 
-	if uav.StudentID != c.MustGet("studentid") {
-		c.JSON(403, gin.H{"code": 403, "desc": "不可归还别人借用的设备"})
+	//user实例
+	userID := c.MustGet("userID")
+	user, err := Service.GetUser(userID.(uint))
+	if err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "用户获取失败"))
 		return
 	}
+
+	//身份验证
+	if uav.StudentID != user.StudentID {
+		code = Status.UserAuthentication
+		c.JSON(code, R(code, nil, "不可归还别人借用的设备"))
+		return
+	}
+
 	//再次验证是否可以归还
 	if uav.State != "using" {
-		c.JSON(403, gin.H{"code": 403, "desc": "设备不处于使用中状态，不可归还"})
+		code = Status.ErrorControl
+		c.JSON(code, R(code, nil, "设备已归还或者处于其他状态"))
 		return
 	}
 
 	//上传图片
 	if UploadImg(c, "Uav", "") == false {
-		c.JSON(200, gin.H{"code": 200, "desc": "图片上传失败"})
+		code = Status.UploadFail
+		c.JSON(code, R(code, nil, "上传图片失败"))
 		return
 	}
 
-	//更新状态为归还审核
-	err := Service.UpdateState(id, "Back under review")
-	exist = Service.UpdateImgInRecord(id, "back_img")
-	if err != nil || exist == false {
-		c.JSON(503, gin.H{"code": 503, "desc": "函数操作错误"})
+	//归还
+	if err := Trans.Back(&uav); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "归还失败,函数处理异常"))
 		return
 	}
-	err = Service.UpdateRecordState(id, "Back under review")
-	exist = Service.UpdateBackRecord(id)
-	if err != nil || exist == false {
-		c.JSON(503, gin.H{"code": 503, "desc": "函数操作错误"})
-		return
-	}
-	c.JSON(200, gin.H{"desc": "归还成功"})
+
+	code = Status.OK
+	c.JSON(code, R(code, nil, "归还成功"))
+	return
 }
 
 // GetUav 取走设备
 func GetUav(c *gin.Context) {
+	var code int
+
 	//获取id
 	id, flag := c.GetQuery("uid")
 
@@ -127,24 +140,30 @@ func GetUav(c *gin.Context) {
 		return
 	}
 
+	//获取实例
+	exist, uav := Service.GetUavByUid(id)
+	if !exist {
+		code = Status.ErrorData
+		c.JSON(code, R(code, nil, "查找对应设备失败,检查uid是否正确"))
+		return
+	}
+
 	//上传图片
 	if UploadImg(c, "Uav", "") == false {
+		code = Status.ErrorControl
+		c.JSON(code, R(code, nil, "错误操作,未上传取走图片"))
 		return
 	}
 
-	//更新对应设备状态
-	err := Service.UpdateState(id, "using")
-	err = Service.UpdateBorrowTime(id, time.Now().Local())
-	err = Service.GetReviewRecord(id, "", "", "", time.Now().Local())
-	exist := Service.UpdateImgInRecord(id, "get_img")
-	err = Service.UpdateRecordState(id, "using")
-
-	if err != nil || exist != true {
-		c.JSON(503, gin.H{"code": 503, "desc": "函数操作失败"})
+	//更新信息
+	if err := Trans.Get(&uav); err != nil {
+		code = Status.FuncFail
+		c.JSON(code, R(code, nil, "BorrowGet事务处理错误"))
 		return
 	}
 
-	c.JSON(200, gin.H{"code": 200, "desc": "取走成功"})
+	code = Status.OK
+	c.JSON(code, R(code, nil, "取走成功"))
 	return
 }
 

@@ -155,6 +155,7 @@ func AuthRequired() gin.HandlerFunc {
 		c.Set("adminType", user.AdminType)
 		c.Set("admin", user.IsAdmin)
 		c.Set("studentid", user.StudentID)
+		c.Set("userID", user.ID)
 		c.Next()
 	}
 }

@@ -14,7 +14,7 @@ type Uav struct {
 	Name  string `json:"name"`                      //设备名称
 	State string `gorm:"default:free" json:"state"` //设备状态
 	Type  string `json:"type"`                      //设备类型  遥控器Control 电池Battery 无人机Drone
-	Uid   string `json:"uid"`                       //设备序号
+	Uid   string `gorm:"unique" json:"uid"`         //设备序号
 
 	StudentID string `json:"stuid"`    //借用人学号
 	Borrower  string `json:"borrower"` //借用人姓名
@@ -27,14 +27,15 @@ type Uav struct {
 	PlanTime time.Time `json:"planTime"` //预计归还时间
 	BackTime time.Time `json:"backTime"` //实际归还时间
 
-	Img   string `json:"Data"`  //当前图片索引
-	Usage string `json:"usage"` //当前借用用途
+	CurImg string `json:"curImg"` //当前图片索引
+	Img    string `json:"img"`    //类型图片
+	Usage  string `json:"usage"`  //当前借用用途
 
 	Location  string `json:"location"`                //设备存放位置
 	Remark    string `json:"remark"`                  //设备备注信息
 	matter    bool   `json:"matter"`                  //
 	Expensive bool   `json:"expensive" gorm :"false"` //是否贵重
-	TmpImg    string `json:"tmpImg"`                  //临时图片
+	//TmpImg    string `json:"tmpImg"`                  //临时图片
 }
 
 // CheckUav 审核设备模型
@@ -53,7 +54,7 @@ type UsingUav struct {
 	GetTime     string `json:"GetTime"`  //借用时间
 	PlanTime    string `json:"PlanTime"` //预计归还时间
 	LastDays    int    `json:"lastDays"` //剩余时间
-	TmpImg      string `json:"tmpImg"`
+	Img         string `json:"img"`
 	BackComment string `json:"backComment"`
 	GetComment  string `json:"getComment"`
 }

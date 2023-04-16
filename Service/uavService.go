@@ -40,7 +40,7 @@ func RemoveDevice(Device Model.Uav) error {
 // UpdateDevice 更新
 func UpdateDevice(uav Model.Uav) error {
 
-	if err := db.Model(&uav).Where("uid = ?", uav.Uid).Updates(uav).Error; err != nil {
+	if err := db.Model(&Model.Uav{}).Where("uid = ?", uav.Uid).Updates(uav).Error; err != nil {
 		return err
 	}
 	if uav.Expensive == false {
@@ -186,7 +186,7 @@ func UpdateUavRemark(Uid string, Remark string) {
 // UpdateUavImg 更新图片img
 func UpdateUavImg(uid string, img string) error {
 
-	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uid}).Update("img", img)
+	DB := db.Model(&Model.Uav{}).Where(&Model.Uav{Uid: uid}).Update("cur_img", img)
 
 	if DB.Error != nil {
 		fmt.Println("更新图片img失败", DB.Error.Error())

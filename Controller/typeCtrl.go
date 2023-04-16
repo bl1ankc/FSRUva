@@ -112,14 +112,24 @@ func UpdateUavType(c *gin.Context) {
 	var code int
 	var uavType Model.UavType
 
-	typeName := c.PostForm("typeName")
-	remark := c.PostForm("remark")
-	v, _ := strconv.Atoi(c.PostForm("id"))
-	id := uint(v)
+	type Info struct {
+		typeName     string `json:"typeName"`
+		remark       string `json:"remark"`
+		typeID       uint   `json:"typeID"`
+		departmentID uint   `json:"departmentID"`
+	}
+	var data Info
 
-	uavType.ID = id
-	uavType.TypeName = typeName
-	uavType.Remark = remark
+	if err := c.ShouldBindJSON(&data); err != nil {
+		code = Status.FailToBindJson
+		c.JSON(code, R(code, nil, "绑定数据失败"))
+		return
+	}
+
+	uavType.ID = data.typeID
+	uavType.TypeName = data.typeName
+	uavType.Remark = data.remark
+	uavType.DepartmentID = data.departmentID
 
 	if err := Service.UpdateUavType(uavType); err != nil {
 		code = Status.FuncFail
@@ -128,7 +138,7 @@ func UpdateUavType(c *gin.Context) {
 	}
 
 	file, _ := c.FormFile("upload_img")
-	if file != nil && UploadImg(c, "UavType", id) == false {
+	if file != nil && UploadImg(c, "UavType", data.typeID) == false {
 		code = Status.OBSErr
 		c.JSON(code, R(code, nil, "上传图片出错"))
 		return

@@ -261,7 +261,7 @@ func UpdateImgInRecord(Uid string, col string) bool {
 		fmt.Println("未找到对应设备")
 		return exist
 	}
-	DB := db.Model(&Model.Record{}).Where("id", uav.RecordID).Update(col, uav.Img)
+	DB := db.Model(&Model.Record{}).Where("id", uav.RecordID).Update(col, uav.CurImg)
 	if DB.Error != nil {
 		fmt.Println("更新照片失败：", DB.Error.Error())
 		return false
@@ -303,7 +303,7 @@ func GetUsingUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav, 
 		uav.LastDays = int(tempuav.PlanTime.Sub(time.Now()).Hours()) / 24
 		uav.GetComment = tempuav.GetReviewComment
 		uav.BackComment = tempuav.BackReviewComment
-		uav.TmpImg = tempuav.TmpImg
+		uav.Img = tempuav.Img
 		uavs = append(uavs, uav)
 	}
 	return uavs, true
@@ -343,7 +343,7 @@ func GetHistoryUavsByStuID(Stuid string, Page string, Max int) ([]Model.UsingUav
 		uav.State = tempuav.State
 		uav.GetComment = tempuav.GetReviewComment
 		uav.BackComment = tempuav.BackReviewComment
-		uav.TmpImg = tempuav.TmpImg
+		uav.Img = tempuav.Img
 		uavs = append(uavs, uav)
 	}
 	return uavs, true
