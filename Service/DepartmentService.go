@@ -51,10 +51,18 @@ func GetDepartment(id uint) (Model.Department, error) {
 
 // AddTypeToDepartment 向部门添加类型
 func AddTypeToDepartment(uavType Model.UavType, department Model.Department) error {
-	if err := db.Model(&department).Association("Types").Append(&uavType); err != nil {
-		log.Printf(err.Error())
-		return err
-	}
+	uavType.DepartmentName = department.DepartmentName
+	return db.Transaction(func(tx *gorm.DB) error {
+		if err := db.Model(&department).Association("Types").Append(&uavType); err != nil {
+			log.Printf(err.Error())
+			return err
+		}
+		if err := db.Model(&uavType).Updates(uavType).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
 	return nil
 }
 

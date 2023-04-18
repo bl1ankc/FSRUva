@@ -57,7 +57,7 @@ func Borrow(uav Model.Uav, user Model.User) error {
 func Back(uav *Model.Uav) error {
 	return db.Transaction(func(tx *gorm.DB) error {
 		//更新状态
-		if err := tx.Model(&uav).Select("state").Updates(Model.Uav{State: "Back under review"}).Error; err != nil {
+		if err := tx.Model(&uav).Select("state").Updates(Model.Uav{State: "Back under review", BackTime: time.Now().Local()}).Error; err != nil {
 			fmt.Println("更新借用状态失败")
 			return err
 		}
@@ -68,15 +68,9 @@ func Back(uav *Model.Uav) error {
 			return err
 		}
 
-		//更新记录状态
-		if err := tx.Model(&Model.Record{}).Where("id = ?", uav.RecordID).Updates(&Model.Record{State: "Back under review"}).Error; err != nil {
+		//更新记录
+		if err := tx.Model(&Model.Record{}).Where("id = ?", uav.RecordID).Updates(&Model.Record{State: "Back under review", BackTime: time.Now().Local()}).Error; err != nil {
 			fmt.Println("更新记录借用状态失败")
-			return err
-		}
-
-		//更新归还时间
-		if err := tx.Model(&Model.Record{}).Where("id = ?", uav.RecordID).Updates(&Model.Record{BackTime: time.Now()}).Error; err != nil {
-			fmt.Println("更新记录归还时间失败")
 			return err
 		}
 

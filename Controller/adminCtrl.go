@@ -3,7 +3,6 @@ package Controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"main/Const"
 	"main/Model"
 	"main/Service"
 	"main/Service/Status"
@@ -40,7 +39,7 @@ func UpdateDevice(c *gin.Context) {
 
 	//结构体绑定
 	if err := c.BindJSON(&uav); err != nil {
-		code = Const.FailToBindJson
+		code = Status.FailToBindJson
 		fmt.Println("上传新设备数据绑定失败：", err.Error())
 		c.JSON(code, R(code, nil, "传输数据错误"))
 		return
@@ -48,12 +47,12 @@ func UpdateDevice(c *gin.Context) {
 
 	err := Service.UpdateDevice(uav)
 	if err != nil {
-		code = Const.FuncFail
+		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "更新设备失败"))
 		return
 	}
 
-	code = Const.Ok
+	code = Status.OK
 	c.JSON(code, R(code, nil, "更新设备成功"))
 	return
 }
@@ -64,19 +63,19 @@ func DeleteDevice(c *gin.Context) {
 
 	ID := c.Query("uid")
 	if ID == "" {
-		code = Const.FuncFail
+		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "传入uid错误"))
 		return
 	}
 
 	_, Device := Service.GetUavByUid(ID)
 	if err := Service.RemoveDevice(Device); err != nil {
-		code = Const.FuncFail
+		code = Status.FuncFail
 		c.JSON(code, R(code, nil, "删除设备失败，检查函数与传入ID是否存在"))
 		return
 	}
 
-	code = Const.Ok
+	code = Status.OK
 	c.JSON(code, R(code, nil, "删除成功"))
 	return
 }
@@ -107,7 +106,7 @@ func GetPassedUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.ShouldBindJSON(&uav); err != nil {
 		fmt.Println("审核通过借用设备数据绑定失败：", err.Error())
-		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "数据绑定失败"))
+		c.JSON(Status.FailToBindJson, R(Status.FailToBindJson, nil, "数据绑定失败"))
 		return
 	}
 
@@ -125,7 +124,7 @@ func GetPassedUav(c *gin.Context) {
 		return
 	}
 
-	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	c.JSON(Status.OK, R(Status.OK, nil, "审核成功"))
 	return
 }
 
@@ -137,7 +136,7 @@ func BackPassedUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
 		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
-		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
+		c.JSON(Status.FailToBindJson, R(Status.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
@@ -147,7 +146,7 @@ func BackPassedUav(c *gin.Context) {
 		return
 	}
 
-	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	c.JSON(Status.OK, R(Status.OK, nil, "审核成功"))
 	return
 }
 
@@ -159,7 +158,7 @@ func GetFailUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.ShouldBindJSON(&uav); err != nil {
 		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
-		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
+		c.JSON(Status.FailToBindJson, R(Status.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
@@ -177,7 +176,7 @@ func GetFailUav(c *gin.Context) {
 		return
 	}
 
-	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	c.JSON(Status.OK, R(Status.OK, nil, "审核成功"))
 	return
 }
 
@@ -189,7 +188,7 @@ func BackFailUav(c *gin.Context) {
 	//绑定结构体
 	if err := c.BindJSON(&uav); err != nil {
 		fmt.Println("审核通过归还设备数据绑定失败：", err.Error())
-		c.JSON(Const.FailToBindJson, R(Const.FailToBindJson, nil, "绑定数据失败"))
+		c.JSON(Status.FailToBindJson, R(Status.FailToBindJson, nil, "绑定数据失败"))
 		return
 	}
 
@@ -199,7 +198,7 @@ func BackFailUav(c *gin.Context) {
 		return
 	}
 
-	c.JSON(Const.Ok, R(Const.Ok, nil, "审核成功"))
+	c.JSON(Status.OK, R(Status.OK, nil, "审核成功"))
 	return
 }
 

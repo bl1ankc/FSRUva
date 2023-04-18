@@ -40,16 +40,16 @@ func Review(uav *Model.CheckUav, Judge string) error {
 		if err := db.Model(&Model.Uav{}).Where("uid = ?", uav.Uid).First(&instance).Error; err != nil {
 			return err
 		}
-		//归还时间是否更新
-		backTime := func() time.Time {
-			if state[1] == "returned" {
-				return now
-			} else {
-				return instance.BackTime
-			}
-		}
+		////归还时间是否更新
+		//backTime := func() time.Time {
+		//	if state[1] == "returned" {
+		//		return now
+		//	} else {
+		//		return instance.BackTime
+		//	}
+		//}
 		//设备更新
-		if err := db.Model(&instance).Updates(&Model.Uav{State: state[0], BackTime: backTime()}).Error; err != nil {
+		if err := db.Model(&instance).Updates(&Model.Uav{State: state[0]}).Error; err != nil {
 			return err
 		}
 		//记录更新

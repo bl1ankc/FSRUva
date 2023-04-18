@@ -22,7 +22,9 @@ func init() {
 	}
 
 	//自动迁移
-	db.AutoMigrate(&Model.Uav{}, &Model.Record{}, &Model.User{}, &Model.UavType{}, &Model.Department{})
+	if err := db.AutoMigrate(&Model.Uav{}, &Model.Record{}, &Model.User{}, &Model.UavType{}, &Model.Department{}); err != nil {
+		log.Printf(err.Error())
+	}
 
 }
 

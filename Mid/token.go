@@ -137,16 +137,19 @@ func verifyAction(strToken string) (*JWTClaims, error) {
 // AuthRequired 验证token
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var code int
 		strToken := c.Request.Header.Get("token")
 
 		if strToken == "" {
-			c.JSON(400, Controller.R(400, nil, "无token"))
+			code = Status.InvalidToken
+			c.JSON(code, Controller.R(code, nil, "无token"))
 			c.Abort()
 			return
 		}
 		claim, err := verifyAction(strToken)
 		if err != nil {
-			c.JSON(401, Controller.R(401, nil, err.Error()))
+			code = Status.InvalidToken
+			c.JSON(code, Controller.R(code, nil, err.Error()))
 			c.Abort()
 			return
 		}

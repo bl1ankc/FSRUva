@@ -23,5 +23,7 @@ func InitRouter() *gin.Engine {
 
 	ExcelInit()
 
+	RFIDRoute()
+
 	return def
 }
