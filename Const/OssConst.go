@@ -3,12 +3,12 @@ package Const
 const (
 	//OSS云端
 
-	Endpoint   = "https://obs.cn-south-1.myhuaweicloud.com"
-	AK         = "UIWD3I0XCETSEQMIH2RR"
-	SK         = "yJPqICTge7BPzvRbOoLzKAvzkaztb5E82U6f2Pnw"
-	RoleArn    = "acs:ram::1761650696847549:role/tmp"
-	BucketName = "fsrlab-rfid"
-	RegionID   = "cn-shenzhen"
+	Endpoint   = ""
+	AK         = ""
+	SK         = ""
+	RoleArn    = ""
+	BucketName = ""
+	RegionID   = ""
 
 	//OSS日志
 	//
